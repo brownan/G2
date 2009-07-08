@@ -156,11 +156,11 @@ document.getElementById("link"+id).innerHTML = "Explain";
   <tr>
     <td>Vote</td>
     <td class="details">
-      <a href="{% url playlist.views.vote '1' %}">1</a>
-      <a href="{% url playlist.views.vote '2' %}">1</a>
-      <a href="{% url playlist.views.vote '3' %}">1</a>
-      <a href="{% url playlist.views.vote '4' %}">1</a>
-      <a href="{% url playlist.views.vote '5' %}">1</a>
+      <a href="{% url playlist.views.rate song.id "1" %}">1</a>
+      <a href="{% url playlist.views.rate song.id "2" %}">2</a>
+      <a href="{% url playlist.views.rate song.id "3" %}">3</a>
+      <a href="{% url playlist.views.rate song.id "4" %}">4</a>
+      <a href="{% url playlist.views.rate song.id "5" %}">5</a>
     </td>
   </tr>  
   <tr>

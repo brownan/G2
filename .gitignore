@@ -1,0 +1,5 @@
+db.sqlite
+*.e4*
+*~
+*.pyc
+playlist/logic/ices.log

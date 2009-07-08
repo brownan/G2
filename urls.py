@@ -31,6 +31,7 @@ url(r'^admin/(.*)', admin.site.root, {}, "admin_site"),
 (r'^next/(?P<authid>.+)$', 'pydj.playlist.views.next'), 
 (r'^register/?$', 'pydj.playlist.views.register'), 
 (r'^song/(\d+)(/edit)?$', 'pydj.playlist.views.song'),
+(r'^song/(\d+)/rate/(\d)$', 'pydj.playlist.views.rate'),
 
 #(r'', 'django.contrib.auth.views.redirect_to_login', {'next': 'playlist'}),
 

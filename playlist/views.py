@@ -85,9 +85,9 @@ def user(request, userid):
 
 
 @login_required()
-def vote(request, songid, vote):
-  s = Song.objects.get(id=songid)
-  s.vote(vote, request.user)
+def rate(request, songid, vote):
+  song = Song.objects.get(id=songid)
+  song.rate(vote, request.user)
   return render_to_response('playlist/song.html', {'song': song})  
 
 @permission_required('playlist.upload_song')

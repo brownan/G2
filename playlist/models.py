@@ -160,13 +160,16 @@ class Song(models.Model):
       return "%s (%s) - %s" % (self.artist, self.album, self.title)
     
   def rate(self, score, user):
+    score = int(score)
     if not (0 <= score and score <= 5):
       raise ScoreOutOfRangeError
     
-    r = Rating.objects.get_or_create(score=score, user=user, song=self)[0]
+    r = Rating.objects.get_or_create(user=user, song=self)[0]
+    r.score = score
     r.save()
-    self.avgscore = Rating.objects.get(song=self).aggregate(average=models.Avg('score'))
-    self.voteno += 1
+    self.avgscore = 0#Rating.objects.get(song=self).aggregate(average=models.Avg('score'))
+    #FIXME: install trunk and uncomment that to enable avg scoring & counting
+    self.voteno = 0#Rating.objects.get(song=self).count()
     self.save()
     
   
