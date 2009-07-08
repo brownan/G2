@@ -1,0 +1,18 @@
+{% extends "playlist/master.html" %}
+
+{% block title %}GBS-FM{% endblock %}
+
+{% block main %} 
+	<div class="playlist">
+    {% if message %}
+    {{ message }}
+    {% endif %}
+    <p>Upload music file here. Make sure the tags make sense!</p>
+    <form enctype="multipart/form-data" action="/upload" method="POST">
+    <table>
+      {{ form.as_p }}
+      <input type="submit" value="Submit" />
+    </table>
+    </form>
+	</div>
+{% endblock %}

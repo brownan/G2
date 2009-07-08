@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>{% block title %}g2{% endblock %}</title>
+<style type="text/css">
+  div.playlist {margin-left: auto; margin-right:auto; width: 640px; float: center;}
+  div.sidebar {margin-left: 10px; float: left;}
+  div.banner {clear: both; float: center; margin-left: auto; margin-right:auto; width: 640px;}
+  div.song {margin-left: auto; margin-right:auto; width: 630px; float: center; border-style: dotted; border-width: 1px; padding: 5px;}
+  p.artists {border-width: 1px; border-style: dotted; padding: 5px;}
+  ol.menu {list-style-type: lower-greek;}
+  /*table.songs {text-align: center;}*/
+  th.song {
+  font-family: "Lucida Grande","Lucida Sans",Helvetica,Geneva,Verdana,Arial;
+  color: white;
+  background-color: black;
+  font-size: 10px;
+  border-bottom: 2px solid black;
+  }
+
+  /*tr {text-align: inherit;}
+  td {text-align: center;}*/
+  .album {font-weight: bold; text-align: center;}
+  .playing {background-color: #4466bb}
+</style>
+{% block head %}
+{% endblock %}
+</head>
+
+<body>
+<div class="banner">
+    <img src = "images/banner.png" alt="gbs-fm banner" title="gbs-fm" />
+</div>
+
+  <div class="sidebar">
+    <ol class='menu'>
+      <li><a href="{% url playlist.views.playlist %}">Playlist</a></li>
+      <li><a href="{% url playlist.views.search %}">Search</a></li>
+      <li><a href="{% url playlist.views.upload %}">Upload</a></li>
+      <li><a href="{% url django.contrib.auth.views.logout %}">Logout</a></li>
+      <li><a href="{% url admin_site None %}">Admin</a></li>
+    </ol>
+  </div>
+      
+{% block main %}
+{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,171 @@
+{% extends "playlist/master.html" %}
+
+{% block title %}{{song.title}} - GBS-FM{% endblock %}
+
+{% load filters %}
+
+{% block head %}
+<script type="text/javascript">
+<!--
+function getElementsByClassName(oElm, strTagName, strClassName){
+  /*
+  Written by Jonathan Snook, http://www.snook.ca/jonathan
+  Add-ons by Robert Nyman, http://www.robertnyman.com
+*/
+  var arrElements = (strTagName == "*" && oElm.all)? oElm.all : oElm.getElementsByTagName(strTagName);
+  var arrReturnElements = new Array();
+  strClassName = strClassName.replace(/\-/g, "\\-");
+  var oRegExp = new RegExp("(^|\\s)" + strClassName + "(\\s|$)");
+  var oElement;
+  for(var i=0; i<arrElements.length; i++){
+    oElement = arrElements[i];
+    if(oRegExp.test(oElement.className)){
+      arrReturnElements.push(oElement);
+    }
+  }
+  return (arrReturnElements)
+}
+
+
+
+function hide() {
+  for (var e in getElementsByClassName(document, "td", "details")){
+  e.style.display = none;
+  }
+}
+
+function checkLoad(){
+     if (window.onLoad){
+        alert('yes');
+        hide();
+          
+     } else {
+          setTimeout('checkLoad();', 1000);
+     }
+}
+
+checkLoad();
+
+
+function display(action, id)
+{
+if (action == 'show')
+{
+document.getElementById("explanation"+id).style.display = "block";
+document.getElementById("link"+id).href= "javascript:display('hide', "+id+")";
+document.getElementById("link"+id).innerHTML = "Close";
+}
+
+if (action == 'hide')
+{
+document.getElementById("explanation"+id).style.display = "none";
+document.getElementById("link"+id).href= "javascript:display('show', "+id+")";
+document.getElementById("link"+id).innerHTML = "Explain";
+}
+}
+-->
+</script>
+{% endblock %}
+
+{% block main %}
+<div class="song">
+<!--<img class="center" src = "images/down.png" style="float: left;">
+<img class="center" src = "images/down.png" style="float: right;">-->
+<div style="float: right; font-size: 24px; font-weight: bold; color: grey;">{{song.id}}</div>
+<table>
+{% if edit %}
+<form action='{% url playlist.views.song song.id %}' method="post">
+    {% for field in form %}
+      {% ifequal field.label "Artist" %}
+      <tr>
+        <td>{{ field.label_tag }}:</td>
+        <td>
+          {{ field.errors }}
+          <input id="id_artist" type="text" name="artist" value="{{song.artist.name}}" maxlength="300" />
+        </td>
+      </tr>
+      {% else %}
+      {% ifequal field.label "Album" %}
+      <tr>
+        <td>{{ field.label_tag }}:</td>
+        <td>
+          {{ field.errors }}
+          <input id="id_album" type="text" name="album" value="{{song.album.name}}" maxlength="300" />
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td>{{ field.label_tag }}:</td>
+        <td>
+          {{ field.errors }}
+          {{ field }}
+        </td>
+      </tr>
+      {% endifequal %}
+      {% endifequal %}
+    {% endfor %}
+<input type="submit" value="Update" />
+</form>
+{% else %}
+  <tr> <th class="song" colspan="2">Dong <a href='{% url playlist.views.song song.id,"/edit" %}'>(edit)</a></th> </tr>
+  <tr>
+    <td>Artist:</td>
+    <td class="details"><a href='{% url playlist.views.artist song.artist.id %}'>{{ song.artist }}</a></td>
+  </tr>
+  <tr>
+    <td>Album:</td>
+    <td class="details"><a href='{% url playlist.views.artist song.artist.id %}#{{song.album.id}}'>{{ song.album }}</a></td>
+  </tr>
+  <tr>
+    <td>Title:</td>
+    <td class="details"><a href='{% url playlist.views.song song.id,None %}'>{{ song.title }}</a></td>
+  </tr>
+  <tr>
+    <td>Composer:</td>
+    <td class="details">{{song.composer}}</td>
+  </tr>
+  <tr>
+    <td>Remixer:</td>
+    <td class="details">{{song.remixer}}</td>
+  </tr>
+  <tr>
+    <td>Genre(s):</td>
+    <td class="details">{{song.genre}}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td>Length:</td>
+    <td class="details">{{song.length|stom}}</td>
+  </tr>
+  <tr>
+    <td>Bitrate:</td>
+    <td class="details">{{song.bitrate}}kbps</td>
+  </tr>
+  <tr>
+    <td>Date uploaded:</td>
+    <td class="details">{{song.add_date|date:"D jS M Y \a\t g:i:s A"}}</td>
+  </tr>
+  <tr>
+    <td>Uploader</td>
+    <td class="details"><a href="{% url playlist.views.song song.id%}">{{song.uploader}}</a></td>
+  </tr>
+  <tr>
+    <td>Score</td>
+    <td class="details">{{song.avgscore}} with {{song.voteno}} votes.</td>
+  </tr>
+  <tr>
+    <td>Vote</td>
+    <td class="details">
+      <a href="{% url playlist.views.vote '1' %}">1</a>
+      <a href="{% url playlist.views.vote '2' %}">1</a>
+      <a href="{% url playlist.views.vote '3' %}">1</a>
+      <a href="{% url playlist.views.vote '4' %}">1</a>
+      <a href="{% url playlist.views.vote '5' %}">1</a>
+    </td>
+  </tr>  
+  <tr>
+    <td colspan="2" > <!--<input type="submit" value="Update" class="details"/> --></td>
+  </tr>
+</table>
+</div>
+{% endblock %} 

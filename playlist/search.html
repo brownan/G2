@@ -1,0 +1,52 @@
+{% extends "playlist/master.html" %}
+
+{% block title %}{% if query %}{{query}} - {% endif %} Search - GBS-FM{% endblock %}
+{% load filters %}
+
+{% block main %}
+  <div class="playlist">
+    <form action='{% url playlist.views.search %}' method="POST">
+    <p>
+      {{ form.query }}
+      <input type="submit" value="Search" />
+    </p>
+    </form>
+  
+  {% if artists or songs %}
+  {% if artists %}
+  <p class="artists">Artists:
+    {% for artist in artists %}
+    <a href="{% url playlist.views.artist artist.id %}">{{artist.name}}, </a>
+    {% endfor %}
+  </p>
+  {% endif %}
+  {% if songs %}
+  <table width="620" class="songs">
+    <img src = "images/down.png" align = "left">
+    <tr>
+      <th>Artist</th>
+      <th>Title</th>
+      <th>Time</th>
+      <th>Uploaded by</th>
+      <th>Add</th>
+    </tr>
+    {% for song in songs %}
+    <tr>
+    
+      <td><a href='{% url playlist.views.artist song.artist.id %}'>{{ song.artist }}</a></td>
+      <td><a href='{% url playlist.views.song song.id %}'>{{ song.title }}</a></td>
+      <td>{{ song.length|stom }}</td>
+      <td>{{ song.uploader.username }}</td>
+      <td><a href="{% url playlist.views.add song.id %}">Add!</a></td>
+    </tr>
+    {% endfor %}
+    <img class="center" src = "images/down.png" align="right">
+  </table>
+  {% endif %}
+  {% else %}
+  {% if query %}
+  <p>No exact dong/artist matches for "{{query}}", sorry.</p>
+  {% endif %}
+  {% endif %}
+  </div>
+{% endblock %} 
