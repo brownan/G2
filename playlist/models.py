@@ -140,7 +140,7 @@ class Song(models.Model):
   
   avgscore = models.FloatField(default=0)
   voteno = models.IntegerField(default=0)
- # ratings = models.ManyToManyField(Rating, null=True, blank=True)
+  # ratings and comments are related_names
   
   def playlistAdd(self,  user):
     try:
@@ -172,12 +172,29 @@ class Song(models.Model):
     self.voteno = 0#Rating.objects.get(song=self).count()
     self.save()
     
+  def comment(self, user, comment):
+      c = Comment(text=comment, user=user, song=self)
+      c.save()
+      print "Commented: %s" % comment
   
   class Meta:
     permissions = (
     ("view_song",  "Can view song pages"), 
     ("upload_song",  "Can upload songs"), 
     )
+    
+class Comment(models.Model):
+  text = models.CharField(max_length=400)
+  user = models.ForeignKey(User, editable=False)
+  song = models.ForeignKey(Song, editable=False, related_name="comments")
+  time = models.IntegerField(default=0)
+  datetime = models.DateTimeField()
+  
+  def save(self):
+    #ensure datetime is creation date
+    if not self.id:
+        self.datetime = datetime.datetime.today()
+    super(Comment, self).save()
     
 class PlaylistEntry(models.Model):
   

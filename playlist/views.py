@@ -45,8 +45,11 @@ class SongForm(forms.ModelForm):
 
 class SettingsForm(forms.ModelForm):
   class Meta:
-    model = UserProfile
+    #model = UserProfile
     fields = ()
+    
+class CommentForm(forms.Form):
+  comment = forms.CharField(max_length=400)
   
   
 
@@ -67,21 +70,31 @@ def song(request, songid=0, edit=None):
   except Song.DoesNotExist:
     return render_to_response('playlist/song.html', {'error': 'Song not found.'})
   if request.method == "POST":
-    form = SongForm(request.POST, instance=song)
-    if form.is_valid():
-      #song.artist = Artist.get_or_create(name=form.cleaned_data['artist'])
-      
-      #song.album = Song.get_or_create(name=form.cleaned_data['artist'])
-      form.save()
+    editform = SongForm(request.POST, instance=song)
+    if editform.is_valid():
+      editform.save()
   else:
-    form = SongForm(instance=song)
-    form.populate(song)
+    editform = SongForm(instance=song)
+  commentform = CommentForm()
+  comments = Comment.objects.filter(song=song)
   
-  return render_to_response('playlist/song.html', {'song': song, 'form':form, 'edit':edit})
+  return render_to_response('playlist/song.html', {'song': song, 'editform':editform, 'edit':edit, \
+                                                   'commentform':commentform, 'currentuser':request.user, \
+                                                   'comments':comments})
   
 @login_required()
 def user(request, userid):
   pass
+
+@login_required()
+def comment(request, songid): 
+  song = Song.objects.get(id=songid)
+  if request.method == "POST":
+    form = CommentForm(request.POST)
+    if form.is_valid():
+      #TODO: include song time
+      song.comment(request.user, form.cleaned_data['comment'])
+  return HttpResponseRedirect(reverse('song', args=[songid]))
 
 
 @login_required()

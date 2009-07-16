@@ -73,9 +73,10 @@ document.getElementById("link"+id).innerHTML = "Explain";
 <img class="center" src = "images/down.png" style="float: right;">-->
 <div style="float: right; font-size: 24px; font-weight: bold; color: grey;">{{song.id}}</div>
 <table>
+<tr> <th class="song" colspan="2">Dong <a href='{% url playlist.views.song song.id,"/edit" %}'>(edit)</a></th> </tr>
 {% if edit %}
 <form action='{% url playlist.views.song song.id %}' method="post">
-    {% for field in form %}
+    {% for field in editform %}
       {% ifequal field.label "Artist" %}
       <tr>
         <td>{{ field.label_tag }}:</td>
@@ -107,7 +108,7 @@ document.getElementById("link"+id).innerHTML = "Explain";
 <input type="submit" value="Update" />
 </form>
 {% else %}
-  <tr> <th class="song" colspan="2">Dong <a href='{% url playlist.views.song song.id,"/edit" %}'>(edit)</a></th> </tr>
+  
   <tr>
     <td>Artist:</td>
     <td class="details"><a href='{% url playlist.views.artist song.artist.id %}'>{{ song.artist }}</a></td>
@@ -166,6 +167,25 @@ document.getElementById("link"+id).innerHTML = "Explain";
   <tr>
     <td colspan="2" > <!--<input type="submit" value="Update" class="details"/> --></td>
   </tr>
+</table>
+<table>
+<tr> <th class="song" colspan="4">Comments</th> </tr>
+<tr>
+  <td>{{ currentuser.username }}</td>
+  <td>0.00</td>
+  <form action='{% url playlist.views.comment song.id%}' method="post">
+  <td><input id="id_comment" type="text" name="comment" maxlength="400" /></td>
+  <td><input type="submit" value="Comment" /></td>
+  </form>
+</tr>
+{% for comment in comments %}
+<tr>
+  <td>{{ comment.user.username }}</td>
+  <td>{{ comment.time }}</td>
+  <td>{{ comment.text }}</td>
+  <td>{{ comment.datetime|date:"D jS M Y \a\t g:i:s A" }}</td>
+<tr>
+{% endfor %}
 </table>
 </div>
 {% endblock %} 
