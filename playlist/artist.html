@@ -21,7 +21,11 @@
         <td class="album"> <a name="{{song.album.id}}" id="{{song.album.id}}"> </a> {{ song.album.name }}</td>
         </tr> 
         {% endifchanged %}
-        <tr><td><a href="{% url playlist.views.song song.id %}">{{ song.title }}</a></td><td>{{ song.length|stom }}</td><td><a href="{% url playlist.views.add songid=song.id %}">Add!</a></td></tr>
+        <tr>
+          <td><a href="{% url playlist.views.song song.id %}">{{ song.title }}</a></td>
+          <td>{{ song.length|stom }}</td>
+          <td>{% include "playlist/add.html" %}</td>
+        </tr>
       {% endfor %}
 			<img class="center" src = "images/down.png" align="right">
 		</table>

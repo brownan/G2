@@ -147,15 +147,15 @@ document.getElementById("link"+id).innerHTML = "Explain";
     <td class="details">{{song.add_date|date:"D jS M Y \a\t g:i:s A"}}</td>
   </tr>
   <tr>
-    <td>Uploader</td>
+    <td>Uploader:</td>
     <td class="details"><a href="{% url playlist.views.song song.id%}">{{song.uploader}}</a></td>
   </tr>
   <tr>
-    <td>Score</td>
+    <td>Score:</td>
     <td class="details">{{song.avgscore}} with {{song.voteno}} votes.</td>
   </tr>
   <tr>
-    <td>Vote</td>
+    <td>Vote:</td>
     <td class="details">
       <a href="{% url playlist.views.rate song.id "1" %}">1</a>
       <a href="{% url playlist.views.rate song.id "2" %}">2</a>
@@ -165,8 +165,12 @@ document.getElementById("link"+id).innerHTML = "Explain";
     </td>
   </tr>  
   <tr>
-    <td colspan="2" > <!--<input type="submit" value="Update" class="details"/> --></td>
+    <td>Add to playlist:</td>
+    <td>{% include "playlist/add.html" %}</td>
   </tr>
+<!--  <tr>
+    <td colspan="2" > <input type="submit" value="Update" class="details"/> </td>
+  </tr>-->
 </table>
 <table>
 <tr> <th class="song" colspan="4">Comments</th> </tr>

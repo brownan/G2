@@ -56,11 +56,12 @@ class CommentForm(forms.Form):
 @permission_required('playlist.view_playlist')
 def playlist(request, msg=""):
   historylength = request.user.get_profile().s_playlistHistory
+  #historylength = 10
   oldentries = OldPlaylistEntry.objects.all()
   if historylength <= oldentries.count():
     playlist = list(oldentries[oldentries.count()-historylength:]) + list(PlaylistEntry.objects.all().order_by('addtime'))
   else:
-    playlist = list(PlaylistEntry.objects.all().order_by('addtime'))
+    playlist = list(oldentries) + list(PlaylistEntry.objects.all().order_by('addtime'))
   return render_to_response('playlist/index.html',  {'playlist': playlist, 'msg':msg})
 
 @permission_required('playlist.view_song')
@@ -134,8 +135,8 @@ def artist(request, artistid=None):
 def add(request, songid=0): 
   try:
     Song.objects.get(id=songid).playlistAdd(request.user)
-  except AlreadyOnPlaylistError:
-    return playlist(request, msg="Track already on playlist")
+  except AddError, e:
+    return playlist(request, msg="Error: " + e.args[0])        
   return playlist(request, msg="Track successfully added!")
   
 def next(request, authid):
@@ -181,7 +182,7 @@ def search(request):
       
       artists = Artist.objects.filter(name__icontains=query).order_by('name')
       songs = Song.objects.filter(title__icontains=query).order_by('title')
-      return render_to_response('playlist/search.html', {'form':form, 'artists':artists, 'songs':songs, 'query':query})
+      return render_to_response('playlist/search.html', {'form':form, 'artists':list(artists), 'songs':songs, 'query':query})
   else:
     form = SearchForm()
   return render_to_response('playlist/search.html', {'form':form})

@@ -12,8 +12,12 @@ from mutagen.mp3 import MP3
 from django.contrib.auth.models import User
 
 class DuplicateError(Exception): pass
-class AlreadyOnPlaylistError(Exception): pass
-class ScoreOutOfRangeError(Exception): pass
+#class AlreadyOnPlaylistError(Exception): pass
+#class ScoreOutOfRangeError(Exception): pass
+#class AddedTooManyError(Exception): pass
+#class AddedTooSoonError(Exception): pass
+#class SongBannedError(Exception): pass
+class AddError(Exception): pass
 
 class Artist(models.Model):
   name = models.CharField(max_length=300)
@@ -52,7 +56,7 @@ class UserProfile(models.Model):
   def __unicode__(self): return self.name
   
   def addSong(self,  file):
-    
+    #FIXME: change to uploadSong, ambiguous naming at the moment
     try: 
       info = self._getSongInfo(file)
       info['sha_hash'] = utils.hashSong(file)
@@ -70,6 +74,12 @@ class UserProfile(models.Model):
         
     finally:
       file.close()
+      
+  def addDisallowed(self):
+    #check user hasn't got too many songs (currently 3) on the playlist
+    if len(PlaylistEntry.objects.filter(adder=self.user)) >= 3:
+      return ("you already have too many songs on the playlist", "user is greedy")
+    return None
     
   def _getSongInfo(self,  file):
     """Returns dict with tags and stuff"""
@@ -133,23 +143,46 @@ class Song(models.Model):
   length = models.IntegerField(editable=False) #in seconds
   bitrate = models.IntegerField(editable=False) #in kbps
   sha_hash = models.CharField(max_length=40, unique=True, editable=False)
-  add_date = models.DateTimeField(auto_now_add=True, editable=False)
+  add_date = models.DateTimeField(editable=False)
   format = models.CharField(max_length=3, editable=False)
   uploader = models.ForeignKey(User, editable=False)
   category = models.CharField(max_length=20, default="regular")
-  
+  banned = models.BooleanField(default=False)
   avgscore = models.FloatField(default=0)
   voteno = models.IntegerField(default=0)
-  # ratings and comments are related_names
+  # ratings, comments, entries & oldentries are related_names
   
+  def addDisallowed(self):
+    """Returns (reason, shortreason) tuple. 
+    Reason for user, shortreason for add button.
+    Otherwise returns None."""
+    
+    if self.banned:
+      return ("song banned", "banned")
+    if len(PlaylistEntry.objects.filter(song=self)) > 0:
+      return ("song already on playlist", "on playlist")
+    #check song hasn't been played recently: dt is definition of 'recently'
+    dt = datetime.datetime.now()-datetime.timedelta(days=3)
+    if len(OldPlaylistEntry.objects.filter(song=self, playtime__gt=dt)) > 0:
+      return ("song played too recently", "recently played")
+    return None
+    
   def playlistAdd(self,  user):
-    try:
-      PlaylistEntry.objects.get(song=self)
-    except PlaylistEntry.DoesNotExist: 
-      pass
-    else:
-      raise AlreadyOnPlaylistError
-    p = PlaylistEntry(song=self,  adder=user)
+    """Adds song to the playlist. 
+    Raises AddError if there's a problem, with the reason as its only arg."""
+    reasons = self.addDisallowed()
+    if reasons:
+      reason, shortreason = reasons
+      raise AddError, reason, shortreason
+    reasons = user.get_profile().addDisallowed()
+    if reasons:
+      reason, shortreason = reasons
+      raise AddError, reason, shortreason
+    
+    p = PlaylistEntry(song=self, adder=user)
+    if len(PlaylistEntry.objects.filter(playing=True)) == 0:
+      p.playing=True
+      p.playtime = datetime.datetime.today()
     p.save()
   
   def __unicode__(self): return self.artist.name + ' - ' + self.title
@@ -173,15 +206,24 @@ class Song(models.Model):
     self.save()
     
   def comment(self, user, comment):
-      c = Comment(text=comment, user=user, song=self)
-      c.save()
-      print "Commented: %s" % comment
-  
+    c = Comment(text=comment, user=user, song=self)
+    c.save()
+    print "Commented: %s" % comment
+    
+    
+  def save(self):
+    #ensure add_date is creation date
+    if not self.id:
+        self.add_date = datetime.datetime.today()
+    super(Song, self).save()
+
   class Meta:
     permissions = (
     ("view_song",  "Can view song pages"), 
     ("upload_song",  "Can upload songs"), 
     )
+    
+
     
 class Comment(models.Model):
   text = models.CharField(max_length=400)
@@ -198,7 +240,7 @@ class Comment(models.Model):
     
 class PlaylistEntry(models.Model):
   
-  song = models.ForeignKey(Song)
+  song = models.ForeignKey(Song, related_name="entries")
   adder = models.ForeignKey(User)
   addtime = models.DateTimeField()
   playtime = models.DateTimeField(null=True, blank=True)
@@ -208,7 +250,7 @@ class PlaylistEntry(models.Model):
   def next(self):
     try:
       #set up new entry
-      new = PlaylistEntry.objects.get(id__gt=self.id)[0]
+      new = PlaylistEntry.objects.filter(id__gt=self.id)[0]
       new.playing = True
       new.playtime = datetime.datetime.today()
       #record old one
@@ -246,7 +288,7 @@ class PlaylistEntry(models.Model):
     verbose_name_plural = "Playlist"
     
 class OldPlaylistEntry(models.Model):
-  song = models.ForeignKey(Song)
+  song = models.ForeignKey(Song, related_name="oldentries")
   adder = models.ForeignKey(User)
   addtime = models.DateTimeField()
   playtime = models.DateTimeField()
