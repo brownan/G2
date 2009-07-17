@@ -14,7 +14,7 @@ from django.forms.models import modelformset_factory
 import itertools
 
 
-permissions = ["upload_song", "view_artist", "view_playlist", "view_song", "view_user", "queue_song"]
+permissions = ["upload_song", "view_artist", "view_playlist", "view_song", "view_user", "queue_song", "ban_song"]
 
 
 from django.contrib.auth.decorators import permission_required, login_required
@@ -51,6 +51,8 @@ class SettingsForm(forms.ModelForm):
 class CommentForm(forms.Form):
   comment = forms.CharField(max_length=400)
   
+class BanForm(forms.Form):
+  reason = forms.CharField(max_length=100)
   
 
 @permission_required('playlist.view_playlist')
@@ -78,10 +80,33 @@ def song(request, songid=0, edit=None):
     editform = SongForm(instance=song)
   commentform = CommentForm()
   comments = Comment.objects.filter(song=song)
+  banform = BanForm()
+  can_ban = request.user.has_perm('playlist.ban_song')
   
-  return render_to_response('playlist/song.html', {'song': song, 'editform':editform, 'edit':edit, \
-                                                   'commentform':commentform, 'currentuser':request.user, \
-                                                   'comments':comments})
+  return render_to_response('playlist/song.html', \
+  {'song': song, 'editform':editform, 'edit':edit,'commentform':commentform, \
+  'currentuser':request.user, 'comments':comments, 'can_ban':can_ban, \
+  'banform':banform})
+  
+@permission_required('playlist.ban_song')
+def bansong(request, songid=0):
+  if request.method == "POST":
+    form = BanForm(request.POST)
+    if form.is_valid():
+      print 11
+      song = Song.objects.get(id=songid)
+      reason = form.cleaned_data['reason']
+      print reason
+      song.ban(reason)
+      song.save()
+      print 22
+  return HttpResponseRedirect(reverse('song', args=[songid]))
+
+@permission_required('playlist.ban_song')
+def unbansong(request, songid=0, plays=0):
+  song = Song.objects.get(id=songid)
+  song.unban(plays)
+  return HttpResponseRedirect(reverse('song', args=[songid]))
   
 @login_required()
 def user(request, userid):

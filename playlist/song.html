@@ -168,11 +168,30 @@ document.getElementById("link"+id).innerHTML = "Explain";
     <td>Add to playlist:</td>
     <td>{% include "playlist/add.html" %}</td>
   </tr>
-<!--  <tr>
-    <td colspan="2" > <input type="submit" value="Update" class="details"/> </td>
-  </tr>-->
+  {% if can_ban and not song.banned %}
+  <tr>
+    <td>Ban:</td>
+    <form action='{% url playlist.views.bansong song.id%}' method="post">
+    <td><input id="id_reason" type="text" name="reason" maxlength="100" /> </td>
+    <td><input type="submit" value="Ban" /></td>
+    </form>
+  </tr>
+  {% endif %}
 </table>
 <table>
+{% if song.banned %}
+<tr>
+  <th class="song" colspan="4">
+    Banned {% if can_ban %}
+      <a href="{% url playlist.views.unbansong song.id,0 %}">(unban)</a>
+      <a href="{% url playlist.views.unbansong song.id,1 %}">(one play)</a>
+      {% endif %}
+  </th>
+</tr>
+<tr>
+  <td colspan="4">{{ song.banreason }}</td>
+</tr>
+{% endif %}
 <tr> <th class="song" colspan="4">Comments</th> </tr>
 <tr>
   <td>{{ currentuser.username }}</td>

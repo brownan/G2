@@ -12,11 +12,7 @@ from mutagen.mp3 import MP3
 from django.contrib.auth.models import User
 
 class DuplicateError(Exception): pass
-#class AlreadyOnPlaylistError(Exception): pass
-#class ScoreOutOfRangeError(Exception): pass
-#class AddedTooManyError(Exception): pass
-#class AddedTooSoonError(Exception): pass
-#class SongBannedError(Exception): pass
+class ScoreOutOfRangeError(Exception): pass
 class AddError(Exception): pass
 
 class Artist(models.Model):
@@ -68,6 +64,8 @@ class UserProfile(models.Model):
       info['uploader'] = self.user
       utils.storeSong(file,  info)
       s = Song(**info)
+      if s.length > 60*10: #10 mins
+        s.ban("Autobahned because the dong is too long. Ask a mod to unban it if you want to play it.")
       s.save()
       self.user.get_profile().uploads += 1
       self.user.save()
@@ -130,6 +128,12 @@ class UserProfile(models.Model):
     )
 
   def __unicode__(self): return self.user.name
+  
+class ChatboxPost(models.Model):
+  user = models.ForeignKey(User)
+  postdate = models.DateTimeField()
+  post = models.CharField(max_length=300)
+  
 
 class Song(models.Model):
   #TODO: sort out artist/composer/lyricist/remixer stuff as per note
@@ -146,8 +150,12 @@ class Song(models.Model):
   add_date = models.DateTimeField(editable=False)
   format = models.CharField(max_length=3, editable=False)
   uploader = models.ForeignKey(User, editable=False)
-  category = models.CharField(max_length=20, default="regular")
+  category = models.CharField(max_length=20, default="regular", editable=False)
+  
   banned = models.BooleanField(default=False)
+  banreason = models.CharField(max_length=100, blank=True)
+  unban_adds = models.IntegerField(default=0) #number of plays till rebanned: 0 is forever
+  
   avgscore = models.FloatField(default=0)
   voteno = models.IntegerField(default=0)
   # ratings, comments, entries & oldentries are related_names
@@ -178,7 +186,11 @@ class Song(models.Model):
     if reasons:
       reason, shortreason = reasons
       raise AddError, reason, shortreason
-    
+    if self.unban_adds:
+      self.unban_adds -= 1
+      if self.unban_adds == 0:
+        self.ban() #assume reason already there
+      self.save()
     p = PlaylistEntry(song=self, adder=user)
     if len(PlaylistEntry.objects.filter(playing=True)) == 0:
       p.playing=True
@@ -186,6 +198,18 @@ class Song(models.Model):
     p.save()
   
   def __unicode__(self): return self.artist.name + ' - ' + self.title
+  
+  def ban(self, reason=""):
+    print "bannned"
+    self.banned = True
+    if reason:
+      self.banreason = reason
+    self.save()
+
+  def unban(self, plays=0):
+    self.banned = False
+    self.unban_adds = plays
+    self.save()
 
   def metadataString(self, user=None):
     #TODO: implement user customisable format strings & typed strings
@@ -220,7 +244,8 @@ class Song(models.Model):
   class Meta:
     permissions = (
     ("view_song",  "Can view song pages"), 
-    ("upload_song",  "Can upload songs"), 
+    ("upload_song",  "Can upload songs"),
+    ("ban_song",  "Can ban songs"),
     )
     
 
@@ -251,15 +276,6 @@ class PlaylistEntry(models.Model):
     try:
       #set up new entry
       new = PlaylistEntry.objects.filter(id__gt=self.id)[0]
-      new.playing = True
-      new.playtime = datetime.datetime.today()
-      #record old one
-      old = OldPlaylistEntry(song=self.song, adder=self.adder, addtime=self.addtime, playtime=self.playtime)
-      old.save()
-      
-      self.delete()
-      new.save()
-      return new
     except PlaylistEntry.DoesNotExist:
       #no more songs :(
       #oh well, repeat this one and record it as having played
@@ -267,6 +283,17 @@ class PlaylistEntry(models.Model):
       old.save()
       self.playtime=datetime.datetime.today()
       return self
+      
+    new.playing = True
+    new.playtime = datetime.datetime.today()
+    #record old one
+    old = OldPlaylistEntry(song=self.song, adder=self.adder, addtime=self.addtime, playtime=self.playtime)
+    old.save()
+    
+    self.delete()
+    new.save()
+    return new
+
       
   def save(self):
     if not self.id:

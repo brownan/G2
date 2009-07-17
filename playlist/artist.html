@@ -18,11 +18,11 @@
 			{% for song in songs %}
         {% ifchanged song.album %} 
         <tr>
-        <td class="album"> <a name="{{song.album.id}}" id="{{song.album.id}}"> </a> {{ song.album.name }}</td>
+        <td class="album" colspan=3> <a name="{{song.album.id}}" id="{{song.album.id}}"> </a> {{ song.album.name }}</td>
         </tr> 
         {% endifchanged %}
         <tr>
-          <td><a href="{% url playlist.views.song song.id %}">{{ song.title }}</a></td>
+          <td {% if song.banned %}class="banned"{% endif %}><a href="{% url playlist.views.song song.id %}">{{ song.title }}</a></td>
           <td>{{ song.length|stom }}</td>
           <td>{% include "playlist/add.html" %}</td>
         </tr>

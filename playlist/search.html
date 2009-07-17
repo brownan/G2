@@ -34,8 +34,7 @@
       <th>Add</th>
     </tr>
     {% for song in songs %}
-    <tr>
-    
+    <tr {% if song.banned %} class="banned" {% endif %}>
       <td><a href='{% url playlist.views.artist song.artist.id %}'>{{ song.artist }}</a></td>
       <td><a href='{% url playlist.views.song song.id %}'>{{ song.title }}</a></td>
       <td>{{ song.length|stom }}</td>
