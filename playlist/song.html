@@ -73,7 +73,12 @@ document.getElementById("link"+id).innerHTML = "Explain";
 <img class="center" src = "images/down.png" style="float: right;">-->
 <div style="float: right; font-size: 24px; font-weight: bold; color: grey;">{{song.id}}</div>
 <table>
-<tr> <th class="song" colspan="2">Dong <a href='{% url playlist.views.song song.id,"/edit" %}'>(edit)</a></th> </tr>
+<tr> 
+  <th class="song" colspan="2">Dong 
+    {% if can_edit %}<a href='{% url playlist.views.song song.id,"/edit" %}'>(edit)</a>{% endif %}
+    {% if can_delete %}<a href='{% url playlist.views.deletesong song.id %}'>(delete)</a>{% endif %}
+  </th>
+</tr>
 {% if edit %}
 <form action='{% url playlist.views.song song.id %}' method="post">
     {% for field in editform %}
@@ -169,13 +174,13 @@ document.getElementById("link"+id).innerHTML = "Explain";
     <td>{% include "playlist/add.html" %}</td>
   </tr>
   {% if can_ban and not song.banned %}
+  <form action='{% url playlist.views.bansong song.id%}' method="post">
   <tr>
     <td>Ban:</td>
-    <form action='{% url playlist.views.bansong song.id%}' method="post">
-    <td><input id="id_reason" type="text" name="reason" maxlength="100" /> </td>
-    <td><input type="submit" value="Ban" /></td>
-    </form>
+    <td><input id="id_reason" type="text" name="reason" maxlength="100" /></td>
+    <!--<td><input type="submit" value="Ban" /></td>-->
   </tr>
+  </form>
   {% endif %}
 </table>
 <table>

@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/69/trunk/dbsettings
+END
+group.py
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/!svn/ver/63/trunk/dbsettings/group.py
+END
+dbsettings.txt
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/59/trunk/dbsettings/dbsettings.txt
+END
+loading.py
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/!svn/ver/69/trunk/dbsettings/loading.py
+END
+views.py
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/!svn/ver/60/trunk/dbsettings/views.py
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/43/trunk/dbsettings/__init__.py
+END
+values.py
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/!svn/ver/64/trunk/dbsettings/values.py
+END
+utils.py
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/!svn/ver/57/trunk/dbsettings/utils.py
+END
+tests.py
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/!svn/ver/66/trunk/dbsettings/tests.py
+END
+models.py
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/!svn/ver/43/trunk/dbsettings/models.py
+END
+urls.py
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/svn/!svn/ver/46/trunk/dbsettings/urls.py
+END
+forms.py
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/!svn/ver/62/trunk/dbsettings/forms.py
+END

@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/60/trunk/dbsettings/templates/dbsettings
+END
+app_settings.html
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/60/trunk/dbsettings/templates/dbsettings/app_settings.html
+END
+site_settings.html
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/60/trunk/dbsettings/templates/dbsettings/site_settings.html
+END

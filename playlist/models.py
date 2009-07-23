@@ -14,6 +14,8 @@ from django.contrib.auth.models import User
 class DuplicateError(Exception): pass
 class ScoreOutOfRangeError(Exception): pass
 class AddError(Exception): pass
+class FileTooBigError(Exception): pass
+
 
 class Artist(models.Model):
   name = models.CharField(max_length=300)
@@ -61,6 +63,8 @@ class UserProfile(models.Model):
       except Song.DoesNotExist: pass
       else:
         raise DuplicateError
+      if file.size > 50000000: #SETTING
+        raise FileTooBigError
       info['uploader'] = self.user
       utils.storeSong(file,  info)
       s = Song(**info)
@@ -90,6 +94,7 @@ class UserProfile(models.Model):
   
     d['length'] = round(song.info.length)
     d['bitrate'] = song.info.bitrate/1000 #b/s -> kb/s
+    #d['filesize'] = file.size
     
     if not ("title" in d.keys()):
       d['title'] = file.name
@@ -112,6 +117,15 @@ class UserProfile(models.Model):
     
     return d
     
+  def canDelete(self, song):
+    if self.user.has_perm('playlist.delete_song'):
+      return True
+    td = datetime.timedelta(days=1)
+    now = datetime.datetime.now()
+    if (now > song.add_date-td) and (self.user == song.uploader):
+      return True
+    return False
+  
   #def _getObj(self, name, table):
     #"""get object if it exists; otherwise create it"""
     #try:
@@ -138,8 +152,8 @@ class ChatboxPost(models.Model):
 class Song(models.Model):
   #TODO: sort out artist/composer/lyricist/remixer stuff as per note
   title = models.CharField(max_length=300)
-  artist = models.ForeignKey(Artist, blank=True)
-  album = models.ForeignKey(Album, blank=True)
+  artist = models.ForeignKey(Artist, blank=True, related_name='songs')
+  album = models.ForeignKey(Album, blank=True, related_name='songs')
   composer = models.CharField(max_length=300, blank=True) #balthcat <3
   lyricist = models.CharField(max_length=300, blank=True)
   remixer = models.CharField(max_length=300, blank=True) #balthcat <3
@@ -152,12 +166,12 @@ class Song(models.Model):
   uploader = models.ForeignKey(User, editable=False)
   category = models.CharField(max_length=20, default="regular", editable=False)
   
-  banned = models.BooleanField(default=False)
-  banreason = models.CharField(max_length=100, blank=True)
-  unban_adds = models.IntegerField(default=0) #number of plays till rebanned: 0 is forever
+  banned = models.BooleanField(default=False, editable=False)
+  banreason = models.CharField(max_length=100, blank=True, editable=False)
+  unban_adds = models.IntegerField(default=0, editable=False) #number of plays till rebanned: 0 is forever
   
-  avgscore = models.FloatField(default=0)
-  voteno = models.IntegerField(default=0)
+  avgscore = models.FloatField(default=0, editable=False)
+  voteno = models.IntegerField(default=0, editable=False)
   # ratings, comments, entries & oldentries are related_names
   
   def addDisallowed(self):
@@ -181,11 +195,11 @@ class Song(models.Model):
     reasons = self.addDisallowed()
     if reasons:
       reason, shortreason = reasons
-      raise AddError, reason, shortreason
+      raise AddError, (reason, shortreason)
     reasons = user.get_profile().addDisallowed()
     if reasons:
       reason, shortreason = reasons
-      raise AddError, reason, shortreason
+      raise AddError, (reason, shortreason)
     if self.unban_adds:
       self.unban_adds -= 1
       if self.unban_adds == 0:
@@ -246,6 +260,7 @@ class Song(models.Model):
     ("view_song",  "Can view song pages"), 
     ("upload_song",  "Can upload songs"),
     ("ban_song",  "Can ban songs"),
+    ("edit_song", "Can edit all songs.")
     )
     
 
@@ -262,7 +277,8 @@ class Comment(models.Model):
     if not self.id:
         self.datetime = datetime.datetime.today()
     super(Comment, self).save()
-    
+  class Meta:
+    ordering = ['-datetime']
 class PlaylistEntry(models.Model):
   
   song = models.ForeignKey(Song, related_name="entries")
@@ -276,7 +292,7 @@ class PlaylistEntry(models.Model):
     try:
       #set up new entry
       new = PlaylistEntry.objects.filter(id__gt=self.id)[0]
-    except PlaylistEntry.DoesNotExist:
+    except IndexError:
       #no more songs :(
       #oh well, repeat this one and record it as having played
       old = OldPlaylistEntry(song=self.song, adder=self.adder, addtime=self.addtime, playtime=self.playtime)
@@ -311,6 +327,8 @@ class PlaylistEntry(models.Model):
     permissions = (
     ("view_playlist",  "Can view the playlist"), 
     ("queue_song",  "Can add song to the playlist"), #golden_appel <3
+    ("remove_entry", "Can remove all playlist entries"),
+    ("skip_song", "Can skip currently playing song")
     ) 
     verbose_name_plural = "Playlist"
     

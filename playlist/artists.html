@@ -1,0 +1,26 @@
+{% extends "playlist/master.html" %}
+
+{% block title %}Artists - GBS-FM{% endblock %}
+  
+  {% load filters %}
+  
+{% block main %}
+  <div class="artists">
+  <div class="page-links">
+    {% if artists.has_previous %}
+      <a href="{% url playlist.views.listartists artists.previous_page_number %}">previous</a>
+    {% endif %}
+    Artists: page {{ artists.number }} of {{ artists.paginator.num_pages }}
+    {% if artists.has_next %}
+      <a href="{% url playlist.views.listartists artists.next_page_number %}">next</a>
+    {% endif %}
+  </div>
+    <ul>
+      {% for artist in artists.object_list %}
+        <li><a href="{% url artist artist.id %}"> {{ artist.name }}</a> ({{artist.songs.count}} songs)</li>
+      {% endfor %}
+    </ul>
+
+  </div>
+ 
+{% endblock %} 

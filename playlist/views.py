@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
-from django.http import HttpResponse,  HttpResponseRedirect
+import os
+import signal
+import itertools
+import datetime
+
+from django.http import HttpResponse,  HttpResponseRedirect, Http404
 from django.template import Context, loader
 from django.core.urlresolvers import reverse
 from pydj.playlist.models import *
@@ -7,15 +12,17 @@ from django.contrib.auth.models import User,  UserManager, Group, Permission
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.shortcuts import render_to_response
-from utils import getSong
 import django.contrib.auth.views
 import django.contrib.auth as auth
 from django.forms.models import modelformset_factory
-import itertools
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
+
+from utils import getSong
 
 
-permissions = ["upload_song", "view_artist", "view_playlist", "view_song", "view_user", "queue_song", "ban_song"]
+permissions = ["upload_song", "view_artist", "view_playlist", "view_song", "view_user", "queue_song"]
 
+PIDFILE = "/home/jadh/Python/pydj/pydj/playlist/logic/pid"
 
 from django.contrib.auth.decorators import permission_required, login_required
 
@@ -54,9 +61,11 @@ class CommentForm(forms.Form):
 class BanForm(forms.Form):
   reason = forms.CharField(max_length=100)
   
+class RegisterForm(UserCreationForm):
+  passcode = forms.CharField(max_length=50)
 
 @permission_required('playlist.view_playlist')
-def playlist(request, msg=""):
+def playlist(request, msg="", js=""):
   historylength = request.user.get_profile().s_playlistHistory
   #historylength = 10
   oldentries = OldPlaylistEntry.objects.all()
@@ -64,7 +73,42 @@ def playlist(request, msg=""):
     playlist = list(oldentries[oldentries.count()-historylength:]) + list(PlaylistEntry.objects.all().order_by('addtime'))
   else:
     playlist = list(oldentries) + list(PlaylistEntry.objects.all().order_by('addtime'))
-  return render_to_response('playlist/index.html',  {'playlist': playlist, 'msg':msg})
+  aug_playlist= []
+  for entry in playlist:
+    if isinstance(entry, PlaylistEntry) and not entry.playing and (request.user.has_perm('remove_entry') or request.user == entry.adder):
+      aug_playlist.append((entry, True))
+    else:
+      aug_playlist.append((entry, False))
+  can_skip = request.user.has_perm('playlist.skip_song')
+  if js:
+    return render_to_response('playlist/jsplaylist.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))
+
+    
+  return render_to_response('playlist/index.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))
+  
+@login_required()
+def ajax(request, resource=""):
+  if resource == "nowplaying":
+    entryid = PlaylistEntry.objects.get(playing=True).id
+    return HttpResponse(str(entryid))
+  
+  raise Http404
+
+@login_required()
+def removeentry(request, entryid):
+  entry = PlaylistEntry.objects.get(id=entryid)
+  if ((entry.adder == request.user) or request.user.has_perm("remove_entry")) and not entry.playing:
+    entry.delete()
+  return HttpResponseRedirect(reverse('playlist'))
+  
+@permission_required('playlist.skip_song')
+def skip(request):
+  #FIXME: abstract this in a useful way
+  f = open(PIDFILE)
+  pid = int(f.read())
+  f.close()
+  os.kill(pid, signal.SIGUSR1)
+  return HttpResponseRedirect(reverse('playlist'))
 
 @permission_required('playlist.view_song')
 def song(request, songid=0, edit=None):
@@ -72,7 +116,7 @@ def song(request, songid=0, edit=None):
     song = Song.objects.get(id=songid)
   except Song.DoesNotExist:
     return render_to_response('playlist/song.html', {'error': 'Song not found.'})
-  if request.method == "POST":
+  if request.method == "POST" and (request.user.has_perm('playlist.edit_song') or (request.user == song.uploader)):
     editform = SongForm(request.POST, instance=song)
     if editform.is_valid():
       editform.save()
@@ -82,11 +126,38 @@ def song(request, songid=0, edit=None):
   comments = Comment.objects.filter(song=song)
   banform = BanForm()
   can_ban = request.user.has_perm('playlist.ban_song')
+  if request.user.get_profile().canDelete(song):
+    can_delete = True
+  else:
+    can_delete = False
+  if request.user.has_perm('playlist.edit_song') or (request.user == song.uploader):
+    can_edit = True
+  else:
+    can_edit = False
+    edit = None
   
   return render_to_response('playlist/song.html', \
   {'song': song, 'editform':editform, 'edit':edit,'commentform':commentform, \
   'currentuser':request.user, 'comments':comments, 'can_ban':can_ban, \
-  'banform':banform})
+  'banform':banform, 'can_delete':can_delete, 'can_edit':can_edit}, \
+  context_instance=RequestContext(request))
+
+  
+@login_required()
+def listartists(request, page=1):
+  try:
+    page = int(page)
+  except:
+    page = 1
+  artists = Artist.objects.all().order_by("name")
+  p = Paginator(artists, 50)
+  try:
+    artists = p.page(page)
+  except (EmptyPage, InvalidPage):
+    #page no. out of range
+    artists = p.page(p.num_pages)
+  return render_to_response('playlist/artists.html', {"artists": artists}, context_instance=RequestContext(request))
+
   
 @permission_required('playlist.ban_song')
 def bansong(request, songid=0):
@@ -107,6 +178,15 @@ def unbansong(request, songid=0, plays=0):
   song = Song.objects.get(id=songid)
   song.unban(plays)
   return HttpResponseRedirect(reverse('song', args=[songid]))
+
+@login_required()
+def deletesong(request, songid=0):
+  """Deletes song with songid from db. Does not yet delete file."""
+  song = Song.objects.get(id=songid)
+  if request.user.get_profile().canDelete(song):
+    song.delete()
+    return HttpResponseRedirect(reverse(playlist))
+  return HttpResponseRedirect(reverse('song', args=[songid]))
   
 @login_required()
 def user(request, userid):
@@ -116,7 +196,7 @@ def user(request, userid):
 def comment(request, songid): 
   song = Song.objects.get(id=songid)
   if request.method == "POST":
-    form = CommentForm(request.POST)
+    form = CommentForm(requiest.POST)
     if form.is_valid():
       #TODO: include song time
       song.comment(request.user, form.cleaned_data['comment'])
@@ -127,7 +207,7 @@ def comment(request, songid):
 def rate(request, songid, vote):
   song = Song.objects.get(id=songid)
   song.rate(vote, request.user)
-  return render_to_response('playlist/song.html', {'song': song})  
+  return render_to_response('playlist/song.html', {'song': song}, context_instance=RequestContext(request))
 
 @permission_required('playlist.upload_song')
 def upload(request):
@@ -142,19 +222,22 @@ def upload(request):
         p.save()
         request.user.get_profile().addSong(request.FILES['file'])
       except DuplicateError:
-          return render_to_response('playlist/upload.html', {'form': form, 'message': "Track already uploaded"})
-          
-      return render_to_response('playlist/upload.html', {'form': form, 'message': "Uploaded file successfully!"})
+        message = "Track already uploaded"
+      except FileTooBigError:
+        message = "File too big"
+      else:
+        message = "Uploaded file successfully!"
+      return render_to_response('playlist/upload.html', {'form': form, 'message': message}, context_instance=RequestContext(request))
   else:
     form = UploadFileForm()
-  return render_to_response('playlist/upload.html', {'form': form, 'message': None})
+  return render_to_response('playlist/upload.html', {'form': form, 'message': None}, context_instance=RequestContext(request))
 
 
 @permission_required('playlist.view_artist')
 def artist(request, artistid=None):
   artist = Artist.objects.get(id=artistid)
   songs = Song.objects.filter(artist=artist).order_by("album")
-  return render_to_response("playlist/artist.html", {'songs': songs, 'artist': artist} )
+  return render_to_response("playlist/artist.html", {'songs': songs, 'artist': artist}, context_instance=RequestContext(request))
     
 @permission_required('playlist.queue_song')
 def add(request, songid=0): 
@@ -178,8 +261,11 @@ def next(request, authid):
 
 def register(request):
   if request.method == "POST":
-    form = UserCreationForm(request.POST, request.FILES)
+    form = RegisterForm(request.POST, request.FILES)
     if form.is_valid():
+      if form.cleaned_data['passcode'] != 'dongboners':
+        error = "Incorrect passcode"
+        return render_to_response('playlist/register.html', {'form': form, 'error':error})
       username = form.cleaned_data['username']
       password = form.cleaned_data['password1']
       user = User.objects.create_user(username=username, email="", password=password)
@@ -194,9 +280,9 @@ def register(request):
       UserProfile(user=user).save()
       return HttpResponseRedirect(reverse(django.contrib.auth.views.login))
   else:
-    form = UserCreationForm()
+    form = RegisterForm()
     error = "Fill in the form properly"
-  return render_to_response('playlist/register.html', {'form': form})
+  return render_to_response('playlist/register.html', {'form': form}, context_instance=RequestContext(request))
   
 @login_required()
 def search(request):
@@ -207,10 +293,11 @@ def search(request):
       
       artists = Artist.objects.filter(name__icontains=query).order_by('name')
       songs = Song.objects.filter(title__icontains=query).order_by('title')
-      return render_to_response('playlist/search.html', {'form':form, 'artists':list(artists), 'songs':songs, 'query':query})
+      return render_to_response('playlist/search.html', {'form':form, 'artists':list(artists), 'songs':songs, 'query':query},\
+      context_instance=RequestContext(request))
   else:
     form = SearchForm()
-  return render_to_response('playlist/search.html', {'form':form})
+  return render_to_response('playlist/search.html', {'form':form}, context_instance=RequestContext(request))
 
 
 def info(request):

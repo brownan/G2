@@ -6,25 +6,37 @@
 
 	<div class="playlist">
     {% if msg %}<p class="message">{{msg}}</p>{% endif %}
-    {% if playlist %}
+    {% if aug_playlist %}
 		<table width="620">
-			<img src = "images/down.png" align = "left">
 			<tr>
 				<th>Artist</th>
         <th>Title</th>
         <th>Time</th>
         <th>Added by</th>
 			</tr>
-			{% for entry in playlist %}
-        <tr {% if entry.playing %}class="playing"{% endif %}>
+			{% for entry in aug_playlist %}
+        <tr {% if entry.0.playing %}class="playing"{% endif %}>
         
-        <td><a href='{% url playlist.views.artist entry.song.artist.id %}'>{{ entry.song.artist }}</a></td>
-        <td><a href='{% url playlist.views.song entry.song.id %}'>{{ entry.song.title }}</a></td>
-        <td>{{ entry.song.length|stom }}</td>
-        <td><a href='{% url playlist.views.user entry.song.artist.id %}'>{{ entry.adder.username }}</a></td>
+        <td><a href='{% url playlist.views.artist entry.0.song.artist.id %}'>{{ entry.0.song.artist }}</a></td>
+        <td><a href='{% url playlist.views.song entry.0.song.id %}'>{{ entry.0.song.title }}</a></td>
+        <td>{{ entry.0.song.length|stom }}</td>
+        <td><a href='{% url playlist.views.user entry.0.song.artist.id %}'>{{ entry.0.adder.username }}</a></td>
+        {% if entry.1 %}
+        <td>
+          <a href='{% url playlist.views.removeentry entry.0.id %}'>
+          <img src = "images/cross.png" title="Remove song from playlist" alt="cross" >
+          </a>
+        </td>
+        {% endif %}
+        {% if can_skip and entry.0.playing %}
+        <td>
+          <a href='{% url playlist.views.skip %}'>
+          <img src = "images/skip.png" title="Skip currently playing song" alt="skip" >
+          </a>
+        </td>
+        {% endif %}
         </tr>
       {% endfor %}
-			<img class="center" src = "images/down.png" align="right">
 		</table>
 		{% else %}
     <p>Playlist empty!</p>

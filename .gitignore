@@ -3,3 +3,5 @@ db.sqlite
 *~
 *.pyc
 playlist/logic/ices.log
+playlist/logic/pid
+playlist/songs

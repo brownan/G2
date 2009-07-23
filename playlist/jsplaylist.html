@@ -1,0 +1,86 @@
+{% extends "playlist/master.html" %}
+{% block title %}GBS-FM{% endblock %}
+{% load filters %}
+
+{% block head %}
+    
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+var DELAY = 10000;
+
+var nowPlaying = function(){
+  $.get("{% url playlist.views.ajax resource="nowplaying" %}", function(data){
+    var nowplaying = document.getElementById(data);
+  $(nowplaying).addClass("playing");
+  setTimeout('nowPlaying()', DELAY);
+  });
+}
+
+var slideFix = function(){
+  $(document.getElementById("700")).attr("style", "");
+}
+
+$(document).ready(function(){
+  nowPlaying();
+  $('tbody').append("\
+      <tr id='700'>\
+        <td><a href='/artist/1'>A Song</a></td>\
+        <td><a href='/song/1'>An Album</a></td>\
+        <td>4:38</td>\
+        <td><a href='/user/1'>jj</a></td>\
+      </tr>");
+  $(document.getElementById("700")).hide();
+  setTimeout('$(document.getElementById("700")).fadeIn("slow")', 3000);
+  setTimeout('$(document.getElementById("1")).fadeOut("slow")', 3500);
+});
+
+
+</script>
+
+
+{% endblock %}
+
+{% block main %}  
+
+  <div class="playlist">
+    {% if msg %}<p class="message">{{msg}}</p>{% endif %}
+    {% if aug_playlist %}
+    <table width="620">
+    <tbody>
+      <tr>
+        <th>Artist</th>
+        <th>Title</th>
+        <th>Time</th>
+        <th>Added by</th>
+      </tr>
+      {% for entry in aug_playlist %}
+        <tr id="{{ entry.0.id }}" {# {% if entry.0.playing %}class="playing"{% endif %} #}>
+        
+        <td><a href='{% url playlist.views.artist entry.0.song.artist.id %}'>{{ entry.0.song.artist }}</a></td>
+        <td><a href='{% url playlist.views.song entry.0.song.id %}'>{{ entry.0.song.title }}</a></td>
+        <td>{{ entry.0.song.length|stom }}</td>
+        <td><a href='{% url playlist.views.user entry.0.song.artist.id %}'>{{ entry.0.adder.username }}</a></td>
+        {% if entry.1 %}
+        <td>
+          <a href='{% url playlist.views.removeentry entry.0.id %}'>
+          <img src = "images/cross.png" title="Remove song from playlist" alt="cross" >
+          </a>
+        </td>
+        {% endif %}
+        {% if can_skip and entry.0.playing %}
+        <td>
+          <a href='{% url playlist.views.skip %}'>
+          <img src = "images/skip.png" title="Skip currently playing song" alt="skip" >
+          </a>
+        </td>
+        {% endif %}
+        </tr>
+      {% endfor %}
+    </tbody>
+    </table>
+    {% else %}
+    <p>Playlist empty!</p>
+    {% endif %}
+</div>
+{% endblock %}

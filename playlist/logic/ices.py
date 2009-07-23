@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 import urllib
+import os
 NEXT_URL="http://localhost:8000/next/777"
 
 
 def ices_init():
-  pass
+  f = open("pid", "w")
+  f.write(str(os.getpid()))
+  f.close()
+  
 
 def ices_get_next():
 
