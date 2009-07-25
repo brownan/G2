@@ -95,3 +95,5 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 0
 TEMPLATE_STRING_IF_INVALID = ''
 
 ACCOUNT_ACTIVATION_DAYS= 2
+
+SERIALIZATION_MODULES = { 'json' : 'wadofstuff.django.serializers.json' } 

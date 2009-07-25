@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sha
 
 MUSIC_PATH = '/home/jadh/Music/g2'
@@ -7,12 +8,9 @@ def hashSong(file):
   sha_hash = sha.new("")
   if file.multiple_chunks():
     for chunk in file.chunks():
-      print sha_hash.hexdigest()
       sha_hash.update(chunk)
-      print sha_hash.hexdigest()
   else:
     sha_hash.update(file.read())
-  print sha_hash.hexdigest() 
   return sha_hash.hexdigest()  
   
 def storeSong(file,  info):

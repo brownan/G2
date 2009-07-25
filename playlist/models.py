@@ -78,8 +78,8 @@ class UserProfile(models.Model):
       file.close()
       
   def addDisallowed(self):
-    #check user hasn't got too many songs (currently 3) on the playlist
-    if len(PlaylistEntry.objects.filter(adder=self.user)) >= 3:
+    #check user hasn't got too many songs on the playlist
+    if len(PlaylistEntry.objects.filter(adder=self.user)) >= 6:
       return ("you already have too many songs on the playlist", "user is greedy")
     return None
     
@@ -109,9 +109,7 @@ class UserProfile(models.Model):
       
     for x in ["tracknumber", "version", "date"]:
       if x in d.keys():
-        del d[x]
-    print d.keys()
-      
+        del d[x]      
     
     d['format'] = "mp3"
     
@@ -214,7 +212,6 @@ class Song(models.Model):
   def __unicode__(self): return self.artist.name + ' - ' + self.title
   
   def ban(self, reason=""):
-    print "bannned"
     self.banned = True
     if reason:
       self.banreason = reason
@@ -245,9 +242,7 @@ class Song(models.Model):
     
   def comment(self, user, comment):
     c = Comment(text=comment, user=user, song=self)
-    c.save()
-    print "Commented: %s" % comment
-    
+    c.save()    
     
   def save(self):
     #ensure add_date is creation date
@@ -305,12 +300,14 @@ class PlaylistEntry(models.Model):
     #record old one
     old = OldPlaylistEntry(song=self.song, adder=self.adder, addtime=self.addtime, playtime=self.playtime)
     old.save()
-    
     self.delete()
     new.save()
     return new
 
-      
+  def delete(self):
+    RemovedEntry(oldid=self.id).save()
+    super(PlaylistEntry, self).delete()
+  
   def save(self):
     if not self.id:
         self.addtime = datetime.datetime.today()
@@ -331,6 +328,15 @@ class PlaylistEntry(models.Model):
     ("skip_song", "Can skip currently playing song")
     ) 
     verbose_name_plural = "Playlist"
+    
+class RemovedEntry(models.Model):
+  oldid = models.IntegerField()
+  creation_date = models.DateTimeField()
+  
+  def save(self):
+    if not self.id: #populate creation date
+        self.creation_date = datetime.datetime.today()
+    super(RemovedEntry, self).save()
     
 class OldPlaylistEntry(models.Model):
   song = models.ForeignKey(Song, related_name="oldentries")

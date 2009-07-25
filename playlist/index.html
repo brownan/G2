@@ -2,33 +2,35 @@
 {% block title %}GBS-FM{% endblock %}
 {% load filters %}
 
-{% block main %}	
 
-	<div class="playlist">
+{% block main %}  
+
+  <div class="playlist">
     {% if msg %}<p class="message">{{msg}}</p>{% endif %}
     {% if aug_playlist %}
-		<table width="620">
-			<tr>
-				<th>Artist</th>
+    <table width="620">
+    <tbody>
+      <tr>
+        <th>Artist</th>
         <th>Title</th>
         <th>Time</th>
         <th>Added by</th>
-			</tr>
-			{% for entry in aug_playlist %}
-        <tr {% if entry.0.playing %}class="playing"{% endif %}>
+      </tr>
+      {% for entry in aug_playlist %}
+        <tr {% if entry.pl %} id="{{ entry.object.id }}" {% endif %} {% if entry.object.playing %}class="playing"{% endif %} >
         
-        <td><a href='{% url playlist.views.artist entry.0.song.artist.id %}'>{{ entry.0.song.artist }}</a></td>
-        <td><a href='{% url playlist.views.song entry.0.song.id %}'>{{ entry.0.song.title }}</a></td>
-        <td>{{ entry.0.song.length|stom }}</td>
-        <td><a href='{% url playlist.views.user entry.0.song.artist.id %}'>{{ entry.0.adder.username }}</a></td>
-        {% if entry.1 %}
+        <td><a href='{% url playlist.views.artist entry.object.song.artist.id %}'>{{ entry.object.song.artist }}</a></td>
+        <td><a href='{% url playlist.views.song entry.object.song.id %}'>{{ entry.object.song.title }}</a></td>
+        <td>{{ entry.object.song.length|stom }}</td>
+        <td><a href='{% url playlist.views.user entry.object.song.artist.id %}'>{{ entry.object.adder.username }}</a></td>
+        {% if entry.can_remove %}
         <td>
-          <a href='{% url playlist.views.removeentry entry.0.id %}'>
+          <a href='{% url playlist.views.removeentry entry.object.id %}'>
           <img src = "images/cross.png" title="Remove song from playlist" alt="cross" >
           </a>
         </td>
         {% endif %}
-        {% if can_skip and entry.0.playing %}
+        {% if can_skip and entry.object.playing %}
         <td>
           <a href='{% url playlist.views.skip %}'>
           <img src = "images/skip.png" title="Skip currently playing song" alt="skip" >
@@ -37,8 +39,9 @@
         {% endif %}
         </tr>
       {% endfor %}
-		</table>
-		{% else %}
+    </tbody>
+    </table>
+    {% else %}
     <p>Playlist empty!</p>
     {% endif %}
 </div>

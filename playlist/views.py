@@ -7,6 +7,7 @@ import datetime
 from django.http import HttpResponse,  HttpResponseRedirect, Http404
 from django.template import Context, loader
 from django.core.urlresolvers import reverse
+from django.core.serializers import serialize
 from pydj.playlist.models import *
 from django.contrib.auth.models import User,  UserManager, Group, Permission
 from django.contrib.auth.forms import UserCreationForm
@@ -16,6 +17,7 @@ import django.contrib.auth.views
 import django.contrib.auth as auth
 from django.forms.models import modelformset_factory
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.template import RequestContext
 
 from utils import getSong
 
@@ -76,21 +78,76 @@ def playlist(request, msg="", js=""):
   aug_playlist= []
   for entry in playlist:
     if isinstance(entry, PlaylistEntry) and not entry.playing and (request.user.has_perm('remove_entry') or request.user == entry.adder):
-      aug_playlist.append((entry, True))
+      aug_playlist.append({'can_remove':True, 'object':entry, 'pl':True})
+    elif isinstance(entry, PlaylistEntry):
+      aug_playlist.append({'can_remove':False, 'object':entry, 'pl':True})
     else:
-      aug_playlist.append((entry, False))
-  can_skip = request.user.has_perm('playlist.skip_song')
-  if js:
-    return render_to_response('playlist/jsplaylist.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))
-
+      aug_playlist.append({'can_remove':False, 'object':entry, 'pl':False})
     
-  return render_to_response('playlist/index.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))
+  can_skip = request.user.has_perm('playlist.skip_song')
+
+  removals = RemovedEntry.objects.all()
+  if removals.count():
+    lastremoval = removals[removals.count()-1].id
+  else:
+    lastremoval = 0
+  return render_to_response('playlist/jsplaylist.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip, 'lastremoval':lastremoval}, context_instance=RequestContext(request))
+
+  
+ # return render_to_response('playlist/index.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))
   
 @login_required()
 def ajax(request, resource=""):
   if resource == "nowplaying":
     entryid = PlaylistEntry.objects.get(playing=True).id
     return HttpResponse(str(entryid))
+    
+  #if resource == "olsequence":
+    #historylength = request.user.get_profile().s_playlistHistory
+    #oldentries = OldPlaylistEntry.objects.all()
+    #if historylength <= oldentries.count():
+      #oldlist = list(oldentries[oldentries.count()-historylength:])
+    #else:
+      #oldlist = list(oldentries)
+    #data = serialize("json", oldlist, fields=('id'))
+    #return HttpResponse(data)
+      
+  #if resource == "plsequence":
+    #playlist = PlaylistEntry.objects.all()
+    #oldentries = OldPlaylistEntry.objects.all()
+    #data = serialize("json", playlist, fields=('id', 'playing'))
+    #return HttpResponse(data)
+  
+  if resource == "deletions":
+    try:
+      lastid = request.REQUEST['lastid']
+    except KeyError:
+      lastid = 0
+    if not lastid: lastid = 0
+    deletions = RemovedEntry.objects.filter(id__gt=lastid)
+    data = serialize("json", deletions, fields=('oldid'))
+    return HttpResponse(data)
+
+  if resource == "adds":
+    try:
+      lastid = request.REQUEST['lastid']
+    except KeyError:
+      lastid = 0
+    if not lastid: lastid = 0
+    deletions = PlaylistEntry.objects.filter(id__gt=lastid)
+    data = serialize("json", deletions, relations={'song':{'relations':('artist'), 'fields':('title', 'length', 'artist')}, 'adder':{'fields':('username')}})
+    return HttpResponse(data)
+    
+  if resource == "history":
+    try:
+      lastid = request.REQUEST['lastid']
+    except KeyError:
+      raise Http404
+    if not lastid: raise Http404
+    lastid = lastid[1:] #get rid of leading 'h'
+    history = OldPlaylistEntry.objects.filter(id__gt=lastid)
+    data = serialize("json", history, relations={'song':{'relations':('artist'), 'fields':('title', 'length', 'artist')}, 'adder':{'fields':('username')}})
+    return HttpResponse(data)
   
   raise Http404
 
@@ -99,7 +156,13 @@ def removeentry(request, entryid):
   entry = PlaylistEntry.objects.get(id=entryid)
   if ((entry.adder == request.user) or request.user.has_perm("remove_entry")) and not entry.playing:
     entry.delete()
-  return HttpResponseRedirect(reverse('playlist'))
+    success = 1
+  else:
+    success = 0
+  if request.is_ajax():
+    return HttpResponse(str(success))
+  else:
+    return HttpResponseRedirect(reverse('playlist'))
   
 @permission_required('playlist.skip_song')
 def skip(request):
@@ -164,13 +227,10 @@ def bansong(request, songid=0):
   if request.method == "POST":
     form = BanForm(request.POST)
     if form.is_valid():
-      print 11
       song = Song.objects.get(id=songid)
       reason = form.cleaned_data['reason']
-      print reason
       song.ban(reason)
       song.save()
-      print 22
   return HttpResponseRedirect(reverse('song', args=[songid]))
 
 @permission_required('playlist.ban_song')
@@ -211,7 +271,6 @@ def rate(request, songid, vote):
 
 @permission_required('playlist.upload_song')
 def upload(request):
-  print request.method
   if request.method == "POST":
     form = UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
@@ -253,7 +312,6 @@ def next(request, authid):
       entry = PlaylistEntry.objects.get(playing=True).next()
       location = getSong(entry.song)
       metadata = "%s [blame %s]" % (entry.song.metadataString(request.user), entry.adder.username)
-      print 1
       return HttpResponse(location +'\n'+ metadata)
     except PlaylistEntry.DoesNotExist:
       pass

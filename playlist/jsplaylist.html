@@ -9,30 +9,135 @@
 
 var DELAY = 10000;
 
-var nowPlaying = function(){
-  $.get("{% url playlist.views.ajax resource="nowplaying" %}", function(data){
-    var nowplaying = document.getElementById(data);
-  $(nowplaying).addClass("playing");
-  setTimeout('nowPlaying()', DELAY);
-  });
-}
+
 
 var slideFix = function(){
   $(document.getElementById("700")).attr("style", "");
 }
 
+var olHandler = function(data){
+  alert(data);
+}
+  
+var lastremoval = {{ lastremoval|default:"0" }};
+var userid = {{user.id}}; //you're wasting your time, I'm not that stupid
+
+
+var getLastEntry = function(){
+  return $('#playlist > :last-child').attr('id');
+}
+var getLastOldEntry = function(){
+  playlist = $('#playlist > tr')
+  for (i=0; i<playlist.length; i++) {
+    if ($(playlist[i]).is('.playing')) {
+      return $(playlist[i-1]).attr('id')
+    }
+  }
+}
+
+var removeCallback = function() {
+  $(this).remove();
+}
+
+var nowPlayingHandler = function(data){  
+  currplaying = $(".playing");
+  if (currplaying.attr('id') != data) {
+    currplaying.removeClass('playing');
+    $(document.getElementById(data)).addClass('playing');
+  }
+}
+
+var delHandler = function(data){
+  for (var i=0; i < data.length; i++) {
+    deleted = $(document.getElementById(data[i].fields.oldid));
+    if (deleted.hasClass("playing")) {
+      deleted.remove();
+    } else {
+      deleted.fadeOut("slow", removeCallback);
+    }
+    lastremoval = data[i].pk;
+  }
+}
+
+var stom = function(time){
+  seconds = time%60;
+  minutes = parseInt(time/60);
+  if (seconds < 10) { 
+    seconds = "0" + seconds.toString(); //add zero to single digit numbers
+  } else {
+    seconds = seconds.toString();
+  }
+  return minutes.toString() + ':' + seconds;
+}
+
+var addHandler = function(data){
+  playlist = $('#playlist')
+  for (var i=0; i < data.length; i++) {
+    entry = data[i];
+    if (entry.fields.adder.pk == userid) {
+      removebutton = "<td>\
+          <a href='{% url removeentry_js %}"+ entry.pk +"'>\
+          <img src = 'images/cross.png' title='Remove song from playlist' alt='cross' >\
+          </a>\
+        </td>";
+    } else {
+      removebutton = "";
+    }
+    playlist.append("\
+    <tr id='" + entry.pk + "'>\
+        <td><a href='{% url artist_js %}"+ entry.fields.song.fields.artist.pk+"'>"+ entry.fields.song.fields.artist.fields.name +"</a></td>\
+        <td><a href='{% url song_js %}"+ entry.fields.song.pk +"'>"+ entry.fields.song.fields.title +"</a></td>\
+        <td>"+ stom(entry.fields.song.fields.length) + "</td>\
+        <td><a href='{% url user_js %}"+ entry.id +"'>"+ entry.fields.adder.fields.username +"</a></td>\
+        "+ removebutton +"\
+    </tr>")
+  }
+}
+
+var oldEntryHandler = function(data){
+  for (var i=0; i < data.length; i++) {
+    entry = data[i];
+    $(document.getElementById(getLastOldEntry())).after("\
+    <tr id='h" + entry.pk + "'>\
+        <td><a href='{% url artist_js %}"+ entry.fields.song.fields.artist.pk +"'>"+ entry.fields.song.fields.artist.fields.name +"</a></td>\
+        <td><a href='{% url song_js %}"+ entry.fields.song.pk +"'>"+ entry.fields.song.fields.title +"</a></td>\
+        <td>"+ stom(entry.fields.song.fields.length) + "</td>\
+        <td><a href='{% url user_js %}"+ entry.id +"'>"+ entry.fields.adder.fields.username +"</a></td>\
+    </tr>")
+  }
+}
+
+var pruneHandler = function(){
+  oldplaylist = $("#playlist > tr[id^='h']");
+  for (var i=0; i<(oldplaylist.length - 10); i++) {
+    $(oldplaylist[i]).fadeOut('slow', removeCallback);
+  }
+}
+
+
+
+var checkLoop = function(){
+  $.getJSON("{% url playlist.views.ajax resource="deletions" %}", {'lastid': lastremoval}, delHandler);
+  $.getJSON("{% url playlist.views.ajax resource="adds" %}", {'lastid': getLastEntry()}, addHandler);
+  $.getJSON("{% url playlist.views.ajax resource="nowplaying" %}", nowPlayingHandler);
+  $.getJSON("{% url playlist.views.ajax resource="history" %}", {'lastid': getLastOldEntry()}, oldEntryHandler);
+  pruneHandler();
+  setTimeout('checkLoop()', DELAY);
+}
+
 $(document).ready(function(){
-  nowPlaying();
-  $('tbody').append("\
-      <tr id='700'>\
-        <td><a href='/artist/1'>A Song</a></td>\
-        <td><a href='/song/1'>An Album</a></td>\
-        <td>4:38</td>\
-        <td><a href='/user/1'>jj</a></td>\
-      </tr>");
-  $(document.getElementById("700")).hide();
-  setTimeout('$(document.getElementById("700")).fadeIn("slow")', 3000);
-  setTimeout('$(document.getElementById("1")).fadeOut("slow")', 3500);
+  checkLoop();
+//   nowPlaying();
+//   $('tbody').append("\
+//       <tr id='700'>\
+//         <td><a href='/artist/1'>A Song</a></td>\
+//         <td><a href='/song/1'>An Album</a></td>\
+//         <td>4:38</td>\
+//         <td><a href='/user/1'>jj</a></td>\
+//       </tr>");
+//   $(document.getElementById("700")).hide();
+//   setTimeout('$(document.getElementById("700")).fadeIn("slow")', 3000);
+//   setTimeout('$(document.getElementById("1")).fadeOut("slow")', 3500);
 });
 
 
@@ -47,28 +152,29 @@ $(document).ready(function(){
     {% if msg %}<p class="message">{{msg}}</p>{% endif %}
     {% if aug_playlist %}
     <table width="620">
-    <tbody>
+    <tbody id='playlist'>
       <tr>
         <th>Artist</th>
         <th>Title</th>
         <th>Time</th>
         <th>Added by</th>
+        <th>Actions</th>
       </tr>
       {% for entry in aug_playlist %}
-        <tr id="{{ entry.0.id }}" {# {% if entry.0.playing %}class="playing"{% endif %} #}>
+        <tr {% if entry.pl %} id="{{ entry.object.id }}" {% else %} id="h{{ entry.object.id }}" {% endif %} {% if entry.object.playing %}class="playing"{% endif %} >
         
-        <td><a href='{% url playlist.views.artist entry.0.song.artist.id %}'>{{ entry.0.song.artist }}</a></td>
-        <td><a href='{% url playlist.views.song entry.0.song.id %}'>{{ entry.0.song.title }}</a></td>
-        <td>{{ entry.0.song.length|stom }}</td>
-        <td><a href='{% url playlist.views.user entry.0.song.artist.id %}'>{{ entry.0.adder.username }}</a></td>
-        {% if entry.1 %}
+        <td><a href='{% url playlist.views.artist entry.object.song.artist.id %}'>{{ entry.object.song.artist }}</a></td>
+        <td><a href='{% url song entry.object.song.id %}'>{{ entry.object.song.title }}</a></td>
+        <td>{{ entry.object.song.length|stom }}</td>
+        <td><a href='{% url playlist.views.user entry.object.song.artist.id %}'>{{ entry.object.adder.username }}</a></td>
+        {% if entry.can_remove %}
         <td>
-          <a href='{% url playlist.views.removeentry entry.0.id %}'>
+          <a href='{% url playlist.views.removeentry entry.object.id %}'>
           <img src = "images/cross.png" title="Remove song from playlist" alt="cross" >
           </a>
         </td>
         {% endif %}
-        {% if can_skip and entry.0.playing %}
+        {% if can_skip and entry.object.playing %}
         <td>
           <a href='{% url playlist.views.skip %}'>
           <img src = "images/skip.png" title="Skip currently playing song" alt="skip" >

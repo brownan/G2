@@ -17,8 +17,8 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
 url(r'^admin/(.*)', admin.site.root, {}, "admin_site"),
-(r'^playlist(/?|(?P<js>/js))$', 'pydj.playlist.views.playlist', {}, "playlist"),
-(r'^$', 'pydj.playlist.views.playlist'),
+(r'^$', 'pydj.playlist.views.playlist', {}, "playlist"),
+(r'^playlist(/?|(?P<js>/js))$', 'pydj.playlist.views.playlist'),
 (r'^images/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/home/jadh/Python/pydj/pydj/playlist/images'}),
 (r'^upload/?$', 'pydj.playlist.views.upload'),
 (r'^search/?$', 'pydj.playlist.views.search'),
@@ -40,6 +40,10 @@ url(r'^admin/(.*)', admin.site.root, {}, "admin_site"),
 (r'^skip$', 'pydj.playlist.views.skip'), 
 (r'^artists/(\d*)$', 'pydj.playlist.views.listartists'), 
 (r'^ajax/(?P<resource>.+)$', 'pydj.playlist.views.ajax'), 
+(r'^artist/$', 'pydj.playlist.views.artist', {}, "artist_js"),
+(r'^song/$', 'pydj.playlist.views.song', {}, "song_js"),
+(r'^user/$', 'pydj.playlist.views.user', {}, "user_js"),
+(r'^playlist/remove/$', 'pydj.playlist.views.removeentry', {}, "removeentry_js"), 
 
 #(r'', 'django.contrib.auth.views.redirect_to_login', {'next': 'playlist'}),
 
