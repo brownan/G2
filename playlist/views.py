@@ -57,6 +57,9 @@ class SettingsForm(forms.ModelForm):
     #model = UserProfile
     fields = ()
     
+class SearchForm(forms.Form):
+  
+    
 class CommentForm(forms.Form):
   comment = forms.CharField(max_length=400)
   
@@ -156,8 +159,10 @@ def removeentry(request, entryid):
   entry = PlaylistEntry.objects.get(id=entryid)
   if ((entry.adder == request.user) or request.user.has_perm("remove_entry")) and not entry.playing:
     entry.delete()
+    request.user.message_set.create(message="Entry deleted successfully.")
     success = 1
   else:
+    request.user.message_set.create(message="Error: insufficient permissions to remove entry")
     success = 0
   if request.is_ajax():
     return HttpResponse(str(success))
@@ -246,17 +251,20 @@ def deletesong(request, songid=0):
   if request.user.get_profile().canDelete(song):
     song.delete()
     return HttpResponseRedirect(reverse(playlist))
-  return HttpResponseRedirect(reverse('song', args=[songid]))
+  else:
+    request.user.message_set.create(message="Error: you are not allowed to delete that song")
+    return HttpResponseRedirect(reverse('song', args=[songid]))
   
 @login_required()
 def user(request, userid):
-  pass
+  owner=  User.objects.get(id=userid)
+  return render_to_response("playlist/user.html", {'owner':owner}, context_instance=RequestContext(request))
 
 @login_required()
 def comment(request, songid): 
   song = Song.objects.get(id=songid)
   if request.method == "POST":
-    form = CommentForm(requiest.POST)
+    form = CommentForm(request.POST)
     if form.is_valid():
       #TODO: include song time
       song.comment(request.user, form.cleaned_data['comment'])
@@ -281,15 +289,15 @@ def upload(request):
         p.save()
         request.user.get_profile().addSong(request.FILES['file'])
       except DuplicateError:
-        message = "Track already uploaded"
+        request.user.message_set.create(message="Error: track already uploaded")
       except FileTooBigError:
-        message = "File too big"
+        message = request.user.message_set.create(message="Error: file too big")
       else:
-        message = "Uploaded file successfully!"
-      return render_to_response('playlist/upload.html', {'form': form, 'message': message}, context_instance=RequestContext(request))
+        request.user.message_set.create(message="Uploaded file successfully!")
+      return render_to_response('playlist/upload.html', {'form': form}, context_instance=RequestContext(request))
   else:
     form = UploadFileForm()
-  return render_to_response('playlist/upload.html', {'form': form, 'message': None}, context_instance=RequestContext(request))
+  return render_to_response('playlist/upload.html', {'form': form}, context_instance=RequestContext(request))
 
 
 @permission_required('playlist.view_artist')
@@ -303,8 +311,12 @@ def add(request, songid=0):
   try:
     Song.objects.get(id=songid).playlistAdd(request.user)
   except AddError, e:
-    return playlist(request, msg="Error: " + e.args[0])        
-  return playlist(request, msg="Track successfully added!")
+    msg = "Error: %s" % (e.args[0])
+    request.user.message_set.create(message=msg)
+    return HttpResponseRedirect(reverse("playlist"))      
+  else:
+    request.user.message_set.create(message="Track added successfully!")
+    return HttpResponseRedirect(reverse("playlist"))
   
 def next(request, authid):
   if authid == "777":

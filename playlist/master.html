@@ -5,15 +5,19 @@
 <title>{% block title %}g2{% endblock %}</title>
 <style type="text/css">
   body, th, td { font:12px/1.4em Verdana,sans-serif; }
-  div.playlist {margin-left: auto; margin-right:auto; width: 640px; float: center;}
+  div.playlist {margin-left: auto; margin-right:auto; width: 640px; }
   div.sidebar {margin-left: 10px; float: left;}
   div.banner {clear: both; float: center; margin-left: auto; margin-right:auto; width: 640px;}
   div.song {margin-left: auto; margin-right:auto; width: 630px; float: center; border-style: dotted; border-width: 1px; padding: 5px;}
   div.page-links {text-align: center; border-style: dotted; border-width: 1px; padding: 3px;}
   div.artists {margin-left: auto; margin-right:auto; width: 640px; float: center; border-width: 1px;}
+  table.playlist {width: 640px;}
   p.artists {border-width: 1px; border-style: dotted; padding: 5px;}
   p.copyright {font-size: 0.7em; color: grey;}
   ol.menu {list-style-type: lower-greek;}
+  div.messages {border-width: 1px; border-style: solid; width: auto; padding: 5px; border-color: red;}
+  div.content {width: 640px; margin-right: auto; margin-left: auto; }
+  em.bold {font-weight: bold; font-style: normal;}
   /*table.songs {text-align: center;}*/
   th.song {
   font-family: "Lucida Grande","Lucida Sans",Helvetica,Geneva,Verdana,Arial;
@@ -38,6 +42,7 @@
     <img src = "images/banner.png" alt="gbs-fm banner" title="gbs-fm" />
 </div>-->
 
+  
   <div class="sidebar">
     <img src = "images/logo.png" alt="g2 logo" title="g2" />
     <ol class='menu'>
@@ -45,15 +50,24 @@
       <li><a href="{% url playlist.views.search %}">Search</a></li>
       <li><a href="{% url playlist.views.upload %}">Upload</a></li>
       <li><a href="{% url playlist.views.listartists "1" %}">Artists</a></li>
+      <li><a href="http://95.172.21.194:8001">Listen!</a></li>
       <li><a href="{% url django.contrib.auth.views.logout %}">Logout</a></li>
       <li><a href="{% url admin_site None %}">Admin</a></li>
     </ol>
     
     <p class="copyright">Icons from <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a>.</p>
   </div>
-      
+  
+<div class="content">
+{% if messages %}
+  <div class="messages">
+  {% for message in messages %}
+    {{ message }}
+  {% endfor %}
+  </div>
+{% endif %}
 {% block main %}
 {% endblock %}
-
+</div>
 </body>
 </html>

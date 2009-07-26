@@ -348,11 +348,52 @@ class OldPlaylistEntry(models.Model):
   class Meta:
     ordering = ['id']
 
-  
-      
-    
-  
+## DJ Shows ##
 
+class Show(models.Model):
+  """A DJ show scheduled for the future"""
+  start_time = models.DateTimeField()
+  end_time = models.DateTimeField()
+  owner = models.ForeignKey(User, related_name="shows")
+  name = models.CharField(max_length=200)
+  description = models.CharField(max_length=2500)
+  reschedule = models.BooleanField()
+
+class OldShow(models.Model):
+  """Recorded show. Also used for current shows"""
+  start_time = models.DateTimeField(blank=True, null=True)
+  end_time = models.DateTimeField(blank=True, null=True)
+  owner = models.ForeignKey(User, related_name="shows")
+  name = models.CharField(max_length=200)
+  description = models.CharField(max_length=2500)
+  playing = BooleanField(default=True)
+  
+class ShowRating(models.Model):
+  score = models.FloatField()
+  user = models.ForeignKey(User, related_name='ratings', unique=True)
+  show = models.ForeignKey(OldShow, related_name='ratings')
+  
+  def __unicode__(self): return unicode(self.rating)
+
+class ShowComment(models.Model):
+  text = models.CharField(max_length=400)
+  user = models.ForeignKey(User, editable=False)
+  show = models.ForeignKey(OldShow, editable=False, related_name="comments")
+  time = models.DateTimeField()
+  
+  def save(self):
+    #ensure datetime is creation date
+    if not self.id:
+        self.datetime = datetime.datetime.today()
+    super(Comment, self).save()
+  class Meta:
+    ordering = ['-datetime']
+
+class ShowMinute(models.Model):
+  """Minutely recording of various show statistics"""
+  show = models.ForeignKey(OldShow, related_name="minutes")
+  
+  
 
 
 

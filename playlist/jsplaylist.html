@@ -88,7 +88,7 @@ var addHandler = function(data){
         <td><a href='{% url artist_js %}"+ entry.fields.song.fields.artist.pk+"'>"+ entry.fields.song.fields.artist.fields.name +"</a></td>\
         <td><a href='{% url song_js %}"+ entry.fields.song.pk +"'>"+ entry.fields.song.fields.title +"</a></td>\
         <td>"+ stom(entry.fields.song.fields.length) + "</td>\
-        <td><a href='{% url user_js %}"+ entry.id +"'>"+ entry.fields.adder.fields.username +"</a></td>\
+        <td><a href='{% url user_js %}"+ entry.fields.adder.pk +"'>"+ entry.fields.adder.fields.username +"</a></td>\
         "+ removebutton +"\
     </tr>")
   }
@@ -102,7 +102,7 @@ var oldEntryHandler = function(data){
         <td><a href='{% url artist_js %}"+ entry.fields.song.fields.artist.pk +"'>"+ entry.fields.song.fields.artist.fields.name +"</a></td>\
         <td><a href='{% url song_js %}"+ entry.fields.song.pk +"'>"+ entry.fields.song.fields.title +"</a></td>\
         <td>"+ stom(entry.fields.song.fields.length) + "</td>\
-        <td><a href='{% url user_js %}"+ entry.id +"'>"+ entry.fields.adder.fields.username +"</a></td>\
+        <td><a href='{% url user_js %}"+ entry.fields.adder.pk +"'>"+ entry.fields.adder.fields.username +"</a></td>\
     </tr>")
   }
 }
@@ -151,7 +151,7 @@ $(document).ready(function(){
   <div class="playlist">
     {% if msg %}<p class="message">{{msg}}</p>{% endif %}
     {% if aug_playlist %}
-    <table width="620">
+    <table class="playlist">
     <tbody id='playlist'>
       <tr>
         <th>Artist</th>
@@ -161,12 +161,12 @@ $(document).ready(function(){
         <th>Actions</th>
       </tr>
       {% for entry in aug_playlist %}
-        <tr {% if entry.pl %} id="{{ entry.object.id }}" {% else %} id="h{{ entry.object.id }}" {% endif %} {% if entry.object.playing %}class="playing"{% endif %} >
+        <tr {% if entry.pl %} id="{{ entry.object.id }}" {% else %} id="h{{ entry.object.id }}" {% endif %} {% if entry.object.playing %} class="playing"{% endif %} >
         
         <td><a href='{% url playlist.views.artist entry.object.song.artist.id %}'>{{ entry.object.song.artist }}</a></td>
         <td><a href='{% url song entry.object.song.id %}'>{{ entry.object.song.title }}</a></td>
         <td>{{ entry.object.song.length|stom }}</td>
-        <td><a href='{% url playlist.views.user entry.object.song.artist.id %}'>{{ entry.object.adder.username }}</a></td>
+        <td><a href='{% url playlist.views.user entry.object.adder.id %}'>{{ entry.object.adder.username }}</a></td>
         {% if entry.can_remove %}
         <td>
           <a href='{% url playlist.views.removeentry entry.object.id %}'>
