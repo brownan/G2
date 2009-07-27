@@ -18,13 +18,14 @@ import django.contrib.auth as auth
 from django.forms.models import modelformset_factory
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.template import RequestContext
+from django.conf import settings
 
 from utils import getSong
 
 
 permissions = ["upload_song", "view_artist", "view_playlist", "view_song", "view_user", "queue_song"]
 
-PIDFILE = "/home/jadh/Python/pydj/pydj/playlist/logic/pid"
+PIDFILE = settings.LOGIC_DIR+"/pid"
 
 from django.contrib.auth.decorators import permission_required, login_required
 

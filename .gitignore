@@ -5,3 +5,4 @@ db.sqlite
 playlist/logic/ices.log
 playlist/logic/pid
 playlist/songs
+settings.py

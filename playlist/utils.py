@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import sha
+from django.conf import settings
 
-MUSIC_PATH = '/home/jadh/Music/g2'
+MUSIC_PATH = settings.MUSIC_DIR
 
 def hashSong(file):
   """Returns sha5 hash of uploaded file. Assumes file is safely closed outside"""
