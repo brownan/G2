@@ -40,9 +40,9 @@ url(r'^admin/(.*)', admin.site.root, {}, "admin_site"),
 (r'^skip$', 'pydj.playlist.views.skip'), 
 (r'^artists/(\d*)$', 'pydj.playlist.views.listartists'), 
 (r'^ajax/(?P<resource>.+)$', 'pydj.playlist.views.ajax'), 
-(r'^g2admin$', 'pydj.playlist.views.g2admin'), 
-(r'^stop_stream$', 'pydj.playlist.views.stop_stream'), 
-(r'^start_stream$', 'pydj.playlist.views.start_stream'), 
+(r'^g2admin$', 'pydj.playlist.views.g2admin', {}, 'g2admin'), 
+(r'^stop_stream$', 'pydj.playlist.views.stop_stream', {}, 'g2admin'), 
+(r'^start_stream$', 'pydj.playlist.views.start_stream', {}, 'g2admin'), 
 
 #javascript stuff
 (r'^artist/$', 'pydj.playlist.views.artist', {}, "artist_js"),

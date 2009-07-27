@@ -2,6 +2,7 @@
 import sha
 from subprocess import Popen
 import os
+from os import signal
 
 from django.conf import settings
 MUSIC_PATH = settings.MUSIC_DIR
@@ -32,9 +33,9 @@ def getSong(song):
   
 def start_stream():
   olddir = os.curdir
-  os.chdir(setting.LOGIC_DIR)
+  os.chdir(settings.LOGIC_DIR)
   #f = open(settings.LOGIC_DIR+"/pid", 'w')
-  #f.write(Popen(["ices", "-c", settings.ICES_CONF]).pid)
+  Popen(["ices", "-c", settings.ICES_CONF])
   #f.close()
   os.chdir(olddir)
   

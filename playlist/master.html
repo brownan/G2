@@ -53,8 +53,8 @@
       <li><a href="http://95.172.21.194:8001">Listen!</a></li>
       <li><a href="{% url django.contrib.auth.views.logout %}">Logout</a></li>
       {% if perms.playlist.view_g2admin %}
-      <li><a href="{% url admin_site None %}">Admin</a></li>
-      <li><a href="{% url g2admin None %}">Admin</a></li>
+      <li><a href="{% url admin_site %}">Admin</a></li>
+      <li><a href="{% url g2admin %}">Admin</a></li>
       {% endif %}
     </ol>
     

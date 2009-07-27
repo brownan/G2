@@ -10,7 +10,7 @@ from os.path import basename
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 from django.contrib.auth.models import User
-import dbsettings
+import pydj.dbsettings as dbsettings
 
 
 class DuplicateError(Exception): pass
@@ -385,7 +385,7 @@ class OldShow(models.Model):
   owner = models.ForeignKey(User, related_name="oldshows")
   name = models.CharField(max_length=200)
   description = models.CharField(max_length=2500)
-  playing = BooleanField(default=True)
+  playing = models.BooleanField(default=True)
   
 class ShowRating(models.Model):
   score = models.FloatField()

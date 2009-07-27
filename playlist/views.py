@@ -59,7 +59,7 @@ class SettingsForm(forms.ModelForm):
     fields = ()
     
 class SearchForm(forms.Form):
-  
+  pass
     
 class CommentForm(forms.Form):
   comment = forms.CharField(max_length=400)
