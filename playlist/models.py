@@ -10,6 +10,8 @@ from os.path import basename
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 from django.contrib.auth.models import User
+import dbsettings
+
 
 class DuplicateError(Exception): pass
 class ScoreOutOfRangeError(Exception): pass
@@ -147,6 +149,10 @@ class ChatboxPost(models.Model):
   post = models.CharField(max_length=300)
   
 
+class StreamOptions(dbsettings.Group):
+  pid  = dbsettings.PositiveIntegerValue()
+  
+
 class Song(models.Model):
   #TODO: sort out artist/composer/lyricist/remixer stuff as per note
   title = models.CharField(max_length=300)
@@ -172,6 +178,8 @@ class Song(models.Model):
   voteno = models.IntegerField(default=0, editable=False)
   # ratings, comments, entries & oldentries are related_names
   
+  stream_options = StreamOptions()
+  
   def addDisallowed(self):
     """Returns (reason, shortreason) tuple. 
     Reason for user, shortreason for add button.
@@ -182,7 +190,7 @@ class Song(models.Model):
     if len(PlaylistEntry.objects.filter(song=self)) > 0:
       return ("song already on playlist", "on playlist")
     #check song hasn't been played recently: dt is definition of 'recently'
-    dt = datetime.datetime.now()-datetime.timedelta(days=3)
+    dt = datetime.datetime.now()-datetime.timedelta(hours=2)
     if len(OldPlaylistEntry.objects.filter(song=self, playtime__gt=dt)) > 0:
       return ("song played too recently", "recently played")
     return None
@@ -255,7 +263,10 @@ class Song(models.Model):
     ("view_song",  "Can view song pages"), 
     ("upload_song",  "Can upload songs"),
     ("ban_song",  "Can ban songs"),
-    ("edit_song", "Can edit all songs.")
+    ("edit_song", "Can edit all songs."),
+    ("start_stream", "Can start the stream."),
+    ("stop_stream", "Can stop the stream"),
+    ("view_g2admin", "Can view g2 Admin page."),
     )
     
 

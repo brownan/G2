@@ -1,0 +1,11 @@
+{% extends "playlist/master.html" %}
+
+{% block title %}Admin - GBS-FM{% endblock %}
+  
+{% block main %}
+  <div class="playlist">
+    <a href="{% url start_stream %}" class="button">Start Stream</a>
+    <a href="{% url stop_stream %}" class="button">Stop Stream</a>    
+  </div>
+ 
+{% endblock %} 

@@ -52,7 +52,10 @@
       <li><a href="{% url playlist.views.listartists "1" %}">Artists</a></li>
       <li><a href="http://95.172.21.194:8001">Listen!</a></li>
       <li><a href="{% url django.contrib.auth.views.logout %}">Logout</a></li>
+      {% if perms.playlist.view_g2admin %}
       <li><a href="{% url admin_site None %}">Admin</a></li>
+      <li><a href="{% url g2admin None %}">Admin</a></li>
+      {% endif %}
     </ol>
     
     <p class="copyright">Icons from <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a>.</p>

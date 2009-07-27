@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import sha
-from django.conf import settings
+from subprocess import Popen
+import os
 
+from django.conf import settings
 MUSIC_PATH = settings.MUSIC_DIR
 
 def hashSong(file):
@@ -27,6 +29,22 @@ def storeSong(file,  info):
     
 def getSong(song):
   return MUSIC_PATH+'/'+ song.sha_hash+ '.' + song.format
+  
+def start_stream():
+  olddir = os.curdir
+  os.chdir(setting.LOGIC_DIR)
+  #f = open(settings.LOGIC_DIR+"/pid", 'w')
+  #f.write(Popen(["ices", "-c", settings.ICES_CONF]).pid)
+  #f.close()
+  os.chdir(olddir)
+  
+def stop_stream():
+  f = open(settings.LOGIC_DIR+"/pid")
+  pid = int(f.read())
+  f.close()
+  os.kill(pid, signal.KILL)
+  
+  
 #  
 #  d = {}
 #  song = MP3(MUSIC_PATH+'/'+sha_hash+'.mp3', ID3=EasyID3)

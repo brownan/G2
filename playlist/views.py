@@ -70,6 +70,20 @@ class BanForm(forms.Form):
 class RegisterForm(UserCreationForm):
   passcode = forms.CharField(max_length=50)
 
+@permission_required('playlist.start_stream')
+def start_stream(request):
+  utils.start_stream()
+  return HttpResponseRedirect(reverse('g2admin'))
+
+@permission_required('playlist.stop_stream')
+def stop_stream(request):
+  utils.stop_stream()
+  return HttpResponseRedirect(reverse('g2admin'))  
+  
+@permission_required('playlist.view_g2admin')
+def g2admin(request):
+  return render_to_response('playlist/admin.html',  {}, context_instance=RequestContext(request))
+
 @permission_required('playlist.view_playlist')
 def playlist(request, msg="", js=""):
   historylength = request.user.get_profile().s_playlistHistory
