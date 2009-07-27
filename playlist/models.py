@@ -350,6 +350,13 @@ class OldPlaylistEntry(models.Model):
 
 ## DJ Shows ##
 
+class Series(models.Model):
+  name = models.CharField(max_length=200)
+  short_name = models.CharField(max_length=15)
+  description = models.CharField(max_length=2500)
+  
+  def __unicode__(): unicode(short_name)
+
 class Show(models.Model):
   """A DJ show scheduled for the future"""
   start_time = models.DateTimeField()
@@ -358,26 +365,30 @@ class Show(models.Model):
   name = models.CharField(max_length=200)
   description = models.CharField(max_length=2500)
   reschedule = models.BooleanField()
+  series = Series
 
 class OldShow(models.Model):
   """Recorded show. Also used for current shows"""
   start_time = models.DateTimeField(blank=True, null=True)
   end_time = models.DateTimeField(blank=True, null=True)
-  owner = models.ForeignKey(User, related_name="shows")
+  owner = models.ForeignKey(User, related_name="oldshows")
   name = models.CharField(max_length=200)
   description = models.CharField(max_length=2500)
   playing = BooleanField(default=True)
   
 class ShowRating(models.Model):
   score = models.FloatField()
-  user = models.ForeignKey(User, related_name='ratings', unique=True)
+  user = models.ForeignKey(User, related_name='show_ratings', unique=True)
   show = models.ForeignKey(OldShow, related_name='ratings')
   
   def __unicode__(self): return unicode(self.rating)
+  
+  class Meta:
+    unique_together = ('user', 'song')
 
 class ShowComment(models.Model):
   text = models.CharField(max_length=400)
-  user = models.ForeignKey(User, editable=False)
+  user = models.ForeignKey(User, editable=False, related_name="show_comments")
   show = models.ForeignKey(OldShow, editable=False, related_name="comments")
   time = models.DateTimeField()
   
@@ -392,6 +403,10 @@ class ShowComment(models.Model):
 class ShowMinute(models.Model):
   """Minutely recording of various show statistics"""
   show = models.ForeignKey(OldShow, related_name="minutes")
+  time = models.DateTimeField()
+  listeners = models.IntegerField()
+  metadata = models.CharField(max_length=300)
+  avg_score = models.FloatField()
   
   
 
