@@ -58,8 +58,8 @@ class SettingsForm(forms.ModelForm):
     #model = UserProfile
     fields = ()
     
-class SearchForm(forms.Form):
-  pass
+#class SearchForm(forms.Form):
+ # pass
     
 class CommentForm(forms.Form):
   comment = forms.CharField(max_length=400)

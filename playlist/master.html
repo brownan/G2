@@ -1,9 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <head>
 <title>{% block title %}g2{% endblock %}</title>
-<style type="text/css">
+<link href="images/style.css" rel="stylesheet" type="text/css">
+<!-- <style type="text/css">
   body, th, td { font:12px/1.4em Verdana,sans-serif; }
   div.playlist {margin-left: auto; margin-right:auto; width: 640px; }
   div.sidebar {margin-left: 10px; float: left;}
@@ -32,7 +34,7 @@
   .album {font-weight: bold; text-align: center;}
   .playing {background-color: #4466bb;}
   .banned {text-decoration: line-through;}
-</style>
+</style>-->
 {% block head %}
 {% endblock %}
 </head>
@@ -42,25 +44,31 @@
     <img src = "images/banner.png" alt="gbs-fm banner" title="gbs-fm" />
 </div>-->
 
-  
+<div class="leftside"> <!-- ADDED DIV: to keep playlist from sliding under the menu when window is too small -->
   <div class="sidebar">
-    <img src = "images/logo.png" alt="g2 logo" title="g2" />
+  <div id="sidebarbg">
+
+    <img src = "images/newlogo.png" alt="g2 logo" title="g2" />
     <ol class='menu'>
-      <li><a href="{% url playlist.views.playlist %}">Playlist</a></li>
-      <li><a href="{% url playlist.views.search %}">Search</a></li>
-      <li><a href="{% url playlist.views.upload %}">Upload</a></li>
-      <li><a href="{% url playlist.views.listartists "1" %}">Artists</a></li>
-      <li><a href="http://95.172.21.194:8001">Listen!</a></li>
-      <li><a href="{% url django.contrib.auth.views.logout %}">Logout</a></li>
+      <a href="{% url playlist.views.playlist %}"><li>Playlist<img alt="" src="images/butte.png" /></li></a>
+      <a href="{% url playlist.views.search %}"><li>Search<img alt="" src="images/butte.png" /></li></a>
+      <a href="{% url playlist.views.upload %}"><li>Upload<img alt="" src="images/butte.png" /></li></a>
+      <a href="{% url playlist.views.listartists "1" %}"><li>Artists<img alt="" src="images/butte.png" /></li></a>
+      <a href="http://95.172.21.194:8001"><li>Listen!<img alt="" src="images/butte.png" /></li></a>
+      <a href="{% url django.contrib.auth.views.logout %}"><li>Logout<img alt="" src="images/butte.png" /></li></a>
       {% if perms.playlist.view_g2admin %}
-      <li><a href="{% url admin_site %}">Admin</a></li>
-      <li><a href="{% url g2admin %}">Admin</a></li>
+      <a href="{% url admin_site %}"><li>Admin<img alt="" src="images/butte.png" /></li></a>
+      <a href="{% url g2admin %}"><li>Admin<img alt="" src="images/butte.png" /></li></a>
       {% endif %}
     </ol>
     
-    <p class="copyright">Icons from <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a>.</p>
+    <p class="copyright">Icons from <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a></p>
+    <p class="copyright">Pretty bits by overdose</p>
+    <img src="images/menubottom.png" alt="" title="" />
   </div>
-  
+  </div>
+</div>
+
 <div class="content">
 {% if messages %}
   <div class="messages">
