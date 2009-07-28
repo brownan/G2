@@ -2,7 +2,7 @@
 import sha
 from subprocess import Popen
 import os
-from os import signal
+import signal
 
 from django.conf import settings
 MUSIC_PATH = settings.MUSIC_DIR
@@ -43,7 +43,7 @@ def stop_stream():
   f = open(settings.LOGIC_DIR+"/pid")
   pid = int(f.read())
   f.close()
-  os.kill(pid, signal.KILL)
+  os.kill(pid, signal.SIGTERM)
   
   
 #  

@@ -395,7 +395,7 @@ class ShowRating(models.Model):
   def __unicode__(self): return unicode(self.rating)
   
   class Meta:
-    unique_together = ('user', 'song')
+    unique_together = ('user', 'show')
 
 class ShowComment(models.Model):
   text = models.CharField(max_length=400)
@@ -409,7 +409,7 @@ class ShowComment(models.Model):
         self.datetime = datetime.datetime.today()
     super(Comment, self).save()
   class Meta:
-    ordering = ['-datetime']
+    ordering = ['-time']
 
 class ShowMinute(models.Model):
   """Minutely recording of various show statistics"""

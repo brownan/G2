@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import urllib
 import os
-NEXT_URL="http://localhost:8000/next/777"
+NEXT_URL="http://localhost/next/777"
 
 
 def ices_init():
