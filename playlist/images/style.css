@@ -23,8 +23,13 @@ body {
   background-image:url('bodystripes1.png');
 }
 #playlist {
-  background-image:url('bgstripes.png');
   background-color:#EEF;
+}
+tr.odd {
+  background-color:#EEEEFF;
+}
+tr.even {
+  background-color:#DEDEEE;
 }
 #columns th {
   background-color:#336;

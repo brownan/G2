@@ -41,7 +41,7 @@ class Rating(models.Model):
   user = models.ForeignKey(User, related_name='ratings', unique=True)
   song = models.ForeignKey('Song', related_name='ratings')
   
-  def __unicode__(self): return unicode(self.rating)
+  def __unicode__(self): return unicode(self.score)
 
   class Meta:
     unique_together = ('user', 'song')
@@ -240,12 +240,11 @@ class Song(models.Model):
     if not (0 <= score and score <= 5):
       raise ScoreOutOfRangeError
     
-    r = Rating.objects.get_or_create(user=user, song=self)[0]
-    r.score = score
+    r = Rating.objects.get_or_create(user=user, song=self, score=score)[0]
     r.save()
-    self.avgscore = 0#Rating.objects.get(song=self).aggregate(average=models.Avg('score'))
-    #FIXME: install trunk and uncomment that to enable avg scoring & counting
-    self.voteno = 0#Rating.objects.get(song=self).count()
+    self.voteno = Rating.objects.filter(song=self).count()
+    ratings = [rating['score'] for rating in Rating.objects.filter(song=self)]
+    self.avgscore = sum(ratings) / self.voteno
     self.save()
     
   def comment(self, user, comment):
@@ -300,10 +299,10 @@ class PlaylistEntry(models.Model):
       new = PlaylistEntry.objects.filter(id__gt=self.id)[0]
     except IndexError:
       #no more songs :(
-      #oh well, repeat this one and record it as having played
-      old = OldPlaylistEntry(song=self.song, adder=self.adder, addtime=self.addtime, playtime=self.playtime)
-      old.save()
-      self.playtime=datetime.datetime.today()
+      #oh well, repeat this one and *don't* record it as having played
+      #old = OldPlaylistEntry(song=self.song, adder=self.adder, addtime=self.addtime, playtime=self.playtime)
+      #old.save()
+      #self.playtime=datetime.datetime.today()
       return self
       
     new.playing = True
