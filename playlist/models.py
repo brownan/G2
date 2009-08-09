@@ -11,6 +11,7 @@ from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 from django.contrib.auth.models import User
 import pydj.dbsettings as dbsettings
+from django.db import IntegrityError 
 
 
 class DuplicateError(Exception): pass
@@ -240,10 +241,16 @@ class Song(models.Model):
     if not (0 <= score and score <= 5):
       raise ScoreOutOfRangeError
     
-    r = Rating.objects.get_or_create(user=user, song=self, score=score)[0]
+    try:
+      r = Rating.objects.get(user=user, song=self)
+      r.score = score
+    except Rating.DoesNotExist:
+      #not yet created (yes I know this is what get_or_create is for but it's stupid
+      #(it can't do required fields properly))
+      r = Rating(user=user, song=self, score=score)
     r.save()
     self.voteno = Rating.objects.filter(song=self).count()
-    ratings = [rating['score'] for rating in Rating.objects.filter(song=self)]
+    ratings = [rating['score'] for rating in Rating.objects.filter(song=self).values()]
     self.avgscore = sum(ratings) / self.voteno
     self.save()
     
