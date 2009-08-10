@@ -121,6 +121,8 @@ class UserProfile(models.Model):
   def canDelete(self, song):
     if self.user.has_perm('playlist.delete_song'):
       return True
+    if PlaylistEntry.objects.filter(song=song) or OldPlaylistEntry.objects.filter(song=song):
+      return False #on playlist
     td = datetime.timedelta(days=1)
     now = datetime.datetime.now()
     if (now > song.add_date-td) and (self.user == song.uploader):
