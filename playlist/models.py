@@ -39,7 +39,7 @@ class Album(models.Model):
 
 class Rating(models.Model):
   score = models.FloatField()
-  user = models.ForeignKey(User, related_name='ratings', unique=True)
+  user = models.ForeignKey(User, related_name='ratings')
   song = models.ForeignKey('Song', related_name='ratings')
   
   def __unicode__(self): return unicode(self.score)
