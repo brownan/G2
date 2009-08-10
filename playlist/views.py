@@ -309,7 +309,6 @@ def upload(request):
         message = request.user.message_set.create(message="Error: file too big")
       else:
         request.user.message_set.create(message="Uploaded file successfully!")
-      return render_to_response('playlist/upload.html', {'form': form}, context_instance=RequestContext(request))
   else:
     form = UploadFileForm()
   uploads = Song.objects.filter(uploader=request.user).order_by("add_date")
