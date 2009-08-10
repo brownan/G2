@@ -234,7 +234,7 @@ class Song(models.Model):
   def metadataString(self, user=None):
     #TODO: implement user customisable format strings & typed strings
     if self.category == 'regular':
-      return "%s (%s) - %s" % (self.artist, self.album, self.title)
+      return u"%s (%s) - %s" % (self.artist, self.album, self.title)
     
   def rate(self, score, user):
     score = int(score)
