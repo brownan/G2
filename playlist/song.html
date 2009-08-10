@@ -75,10 +75,13 @@ document.getElementById("link"+id).innerHTML = "Explain";
 <table>
 <tr> 
   <th class="song" colspan="2">Dong 
-    {% if can_edit %}<a href='{% url playlist.views.song song.id,"/edit" %}'>(edit)</a>{% endif %}
-    {% if can_delete %}<a href='{% url playlist.views.deletesong song.id %}'>(delete)</a>{% endif %}
   </th>
 </tr>
+<tr>
+    <td colspan="2">
+      {% if can_edit %}<a href='{% url playlist.views.song song.id,"/edit" %}'>(edit)</a>{% endif %}
+      {% if can_delete %}<a href='{% url playlist.views.deletesong song.id %}'>(delete)</a>{% endif %}
+    </td>
 {% if edit %}
 <form action='{% url playlist.views.song song.id %}' method="post">
     {% for field in editform %}
