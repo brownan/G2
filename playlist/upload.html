@@ -13,6 +13,14 @@
       {{ form.as_p }}
       <input type="submit" value="Submit" />
     </table>
+    {% if uploads %}
+    <p>Last ten uploads:</p>
+    <ul>
+      {% for upload in uploads %}
+      <li><a href="{% url song upload.id %}">{{upload.metadataString}}</a></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
     </form>
 	</div>
 {% endblock %}

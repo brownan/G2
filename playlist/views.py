@@ -312,7 +312,12 @@ def upload(request):
       return render_to_response('playlist/upload.html', {'form': form}, context_instance=RequestContext(request))
   else:
     form = UploadFileForm()
-  return render_to_response('playlist/upload.html', {'form': form}, context_instance=RequestContext(request))
+  uploads = Song.objects.filter(uploader=request.user).order_by("add_date")
+  if len(uploads) > 10: 
+    recentuploads = uploads[uploads.count()-10:]
+  else: 
+    recentuploads = uploads
+  return render_to_response('playlist/upload.html', {'form': form, 'uploads':recentuploads}, context_instance=RequestContext(request))
 
 
 @permission_required('playlist.view_artist')
