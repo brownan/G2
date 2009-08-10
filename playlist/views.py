@@ -334,7 +334,7 @@ def add(request, songid=0):
     return HttpResponseRedirect(reverse("playlist"))
   
 def next(request, authid):
-  if authid == "777":
+  if authid == settings.NEXT_AUTHID:
     try:
       entry = PlaylistEntry.objects.get(playing=True).next()
       location = getSong(entry.song)

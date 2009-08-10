@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 import urllib
 import os
-NEXT_URL="http://localhost/next/777"
+import sys
+sys.path.append("/home/jonnty/")
+import pydj.settings
+
+NEXT_URL="http://localhost/next/"+pydj.settings.NEXT_AUTHID
 
 
 def ices_init():
