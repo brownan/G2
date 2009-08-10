@@ -338,7 +338,7 @@ def next(request, authid):
     try:
       entry = PlaylistEntry.objects.get(playing=True).next()
       location = getSong(entry.song)
-      metadata = "%s [blame %s]" % (entry.song.metadataString(request.user), entry.adder.username)
+      metadata = u"%s [blame %s]" % (entry.song.metadataString(request.user), entry.adder.username)
       return HttpResponse(location +'\n'+ metadata)
     except PlaylistEntry.DoesNotExist:
       pass
