@@ -47,19 +47,19 @@
 
 <div class="leftside"> <!-- ADDED DIV: to keep playlist from sliding under the menu when window is too small -->
   <div class="sidebar">
-  <div id="sidebarbg">
+  <div class="sidebarbg">
 
-    <img src = "images/newlogo.png" alt="g2 logo" title="g2" />
+    <a href="{% url playlist.views.playlist %}"><img src ="images/newlogo.png" alt="g2 logo" title="g2" /></a>
     <ol class='menu'>
-      <a href="{% url playlist.views.playlist %}"><li>Playlist<img alt="" src="images/butte.png" /></li></a>
-      <a href="{% url playlist.views.search %}"><li>Search<img alt="" src="images/butte.png" /></li></a>
-      <a href="{% url playlist.views.upload %}"><li>Upload<img alt="" src="images/butte.png" /></li></a>
-      <a href="{% url playlist.views.listartists "1" %}"><li>Artists<img alt="" src="images/butte.png" /></li></a>
-      <a href="http://gbsfm.ath.cx:8001"><li>Listen!<img alt="" src="images/butte.png" /></li></a>
-      <a href="{% url django.contrib.auth.views.logout %}"><li>Logout<img alt="" src="images/butte.png" /></li></a>
+      <li><a id="menuitem" href="{% url playlist.views.playlist %}"><img id="butansurface" src="images/butansurface.png" alt="playlist" title="playlist" />Playlist</a></li>
+      <li><a id="menuitem" href="{% url playlist.views.search %}"><img id="butansurface" src="images/butansurface.png" alt="search" title="search" />Search</a></li>
+      <li><a id="menuitem" href="{% url playlist.views.upload %}"><img id="butansurface" src="images/butansurface.png" alt="upload" title="upload" />Upload</a></li>
+      <li><a id="menuitem" href="{% url playlist.views.listartists "1" %}"><img id="butansurface" src="images/butansurface.png" alt="artists" title="Browse Artists" />Artists</a></li>
+      <li><a id="menuitem" href="http://gbsfm.ath.cx:8001"><img id="butansurface" src="images/butansurface.png" alt="listen" title="Listen!" />Listen!</a>
+      <li><a id="menuitem" href="{% url django.contrib.auth.views.logout %}"><img id="butansurface" src="images/butansurface.png" alt="logout" title="Logout" />Logout</a></li>
       {% if perms.playlist.view_g2admin %}
-      <!--<a href="{#{% url admin_site %}#}"><li>Admin<img alt="" src="images/butte.png" /></li></a>-->
-      <a href="{% url g2admin %}"><li>Admin<img alt="" src="images/butte.png" /></li></a>
+      <!--<a href="{#{% url admin_site %}#}"><li>Admin</li></a>-->
+      <li><a id="menuitem" href="{% url g2admin %}"><img id="butansurface" src="images/butansurface.png" alt="admin" title="Admin" />Admin</a></li>
       {% endif %}
     </ol>
     
