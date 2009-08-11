@@ -10,7 +10,7 @@ from os.path import basename
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 from django.contrib.auth.models import User
-import pydj.dbsettings as dbsettings
+#import pydj.dbsettings as dbsettings
 from django.db import IntegrityError 
 
 
@@ -79,6 +79,8 @@ class UserProfile(models.Model):
         
     finally:
       file.close()
+  
+  #def
       
   def addDisallowed(self):
     #check user hasn't got too many songs on the playlist
@@ -152,8 +154,8 @@ class ChatboxPost(models.Model):
   post = models.CharField(max_length=300)
   
 
-class StreamOptions(dbsettings.Group):
-  pid  = dbsettings.PositiveIntegerValue()
+#class StreamOptions(dbsettings.Group):
+  #pid  = dbsettings.PositiveIntegerValue()
   
 
 class Song(models.Model):
@@ -181,7 +183,7 @@ class Song(models.Model):
   voteno = models.IntegerField(default=0, editable=False)
   # ratings, comments, entries & oldentries are related_names
   
-  stream_options = StreamOptions()
+  #stream_options = StreamOptions()
   
   def addDisallowed(self):
     """Returns (reason, shortreason) tuple. 
