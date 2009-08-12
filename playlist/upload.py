@@ -14,15 +14,18 @@ class CorruptFileError(Exception): pass
 
 class UploadedFile:
   supported_types = ['mp3'] #TODO: ogg (and m4a?)
-  def __init__(self, file, filetype=None):
+  def __init__(self, file, realname=None, filetype=None):
     
     self.type = filetype
     
+    if realname is None:
+      realname = os.path.basename(file)
+    
     if self.type is None:
-      self.type = os.path.splitext(file)[1].strip('.')
+      self.type = os.path.splitext(realname)[1].strip('.')
       
     if self.type not in self.supported_types:
-      raise UnsupportedFormatError, "%s not supported" % type
+      raise UnsupportedFormatError, "%s not supported" % self.type
     
     self.info = {}
     self.file = file

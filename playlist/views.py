@@ -21,6 +21,7 @@ from django.template import RequestContext
 from django.conf import settings
 
 from utils import getSong
+from pydj.playlist.upload import UploadedFile
 
 
 permissions = ["upload_song", "view_artist", "view_playlist", "view_song", "view_user", "queue_song"]
@@ -297,12 +298,9 @@ def upload(request):
   if request.method == "POST":
     form = UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
+      f = request.FILES['file']
       try:
-        request.user.get_profile().addSong(request.FILES['file'])
-      except UserProfile.DoesNotExist:
-        p = UserProfile(user=request.user)
-        p.save()
-        request.user.get_profile().addSong(request.FILES['file'])
+        request.user.get_profile().uploadSong(UploadedFile(f.temporary_file_path(), f.name))
       except DuplicateError:
         request.user.message_set.create(message="Error: track already uploaded")
       except FileTooBigError:
