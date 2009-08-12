@@ -1,5 +1,5 @@
 {% extends "playlist/master.html" %}
-{% block title %}GBS-FM{% endblock %}
+{% block title %}{{now_playing}} - GBS-FM{% endblock %}
 {% load filters %}
 
 {% block head %}
@@ -125,13 +125,16 @@ var pruneHandler = function(){
   }
 }
 
-
+var titleHandler = function(data) {
+  $("title").html(data)
+}
 
 var checkLoop = function(){
   $.getJSON("{% url playlist.views.ajax resource="deletions" %}", {'lastid': lastremoval}, delHandler);
   $.getJSON("{% url playlist.views.ajax resource="adds" %}", {'lastid': getLastEntry()}, addHandler);
   $.getJSON("{% url playlist.views.ajax resource="nowplaying" %}", nowPlayingHandler);
   $.getJSON("{% url playlist.views.ajax resource="history" %}", {'lastid': getLastOldEntry()}, oldEntryHandler);
+  $.get("{% url playlist.views.ajax resource="pltitle" %}", {}, titleHandler);
   pruneHandler();
   setTimeout('checkLoop()', DELAY);
 }
@@ -180,7 +183,7 @@ $(document).ready(function(){
         <td><a href='{% url playlist.views.user entry.object.adder.id %}'>{{ entry.object.adder.username }}</a></td>
         {% if entry.can_remove %}
         <td>
-          <a href='{% url playlist.views.removeentry entry.object.id %}'>
+          <a href='{% url playlist.views.removeentry entry.object.id %}' class="removebutton">
           <img src = "images/cross.png" title="Remove song from playlist" alt="cross" >
           </a>
         </td>
