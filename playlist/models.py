@@ -4,7 +4,6 @@ from django.db import models
 from pydj.playlist import utils
 import datetime
 import shutil
-
 import os
 from os.path import basename
 from mutagen.easyid3 import EasyID3
@@ -12,7 +11,7 @@ from mutagen.mp3 import MP3
 from django.contrib.auth.models import User
 #import pydj.dbsettings as dbsettings
 from django.db import IntegrityError 
-
+from django.conf import settings
 
 class DuplicateError(Exception): pass
 class ScoreOutOfRangeError(Exception): pass
@@ -80,7 +79,29 @@ class UserProfile(models.Model):
     finally:
       file.close()
   
-  #def
+  def uploadSong(self, upload):
+    """Add an UploadedSong to the database if allowed"""
+    try:
+      Song.objects.get(sha_hash=upload.info['sha_hash'])
+    except Song.DoesNotExist: pass
+    else:
+      self.user.message_set.create(message="The dong '%s' is already in the database" % upload.info['title'])
+      raise DuplicateError, "song already in database"
+    
+    if os.path.getsize(upload.file) > settings.MAX_UPLOAD_SIZE:
+      self.user.message_set.create(message="The dong %s too big" % upload.info['title'])
+      raise FileTooBigError
+    
+    upload.info['uploader'] = self.user
+    s = Song(**upload.info)
+    utils.storeSong(upload.file,  upload.info)
+    
+    if s.length > settings.MAX_SONG_LENGTH: #10 mins
+      s.ban("Autobahned because the dong is too long. Ask a mod to unban it if you want to play it.")
+    s.save()
+    
+    self.user.get_profile().uploads += 1
+    self.user.save()
       
   def addDisallowed(self):
     #check user hasn't got too many songs on the playlist

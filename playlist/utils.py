@@ -17,16 +17,14 @@ def hashSong(file):
     sha_hash.update(file.read())
   return sha_hash.hexdigest()  
   
-def storeSong(file,  info):
-  f = open(MUSIC_PATH+'/'+info['sha_hash'] + '.' + info['format'],  'w')
+def storeSong(path,  info):
+  new = open(MUSIC_PATH+'/'+info['sha_hash'] + '.' + info['format'],  'w')
+  old = open(path)
   try:
-    if file.multiple_chunks():
-      for chunk in file.chunks():
-        f.write(chunk)
-    else:
-      f.write(file.read())
+    new.write(old.read())
   finally:
-    f.close()
+    old.close()
+    new.close()
     
 def getSong(song):
   return MUSIC_PATH+'/'+ song.sha_hash+ '.' + song.format

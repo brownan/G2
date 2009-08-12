@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
-from django.core.management import setup_environ
 import sys
 import os
-sys.path.append('/home/jonnty/Python/pydj/pydj/playlist')
-from pydj import settings
 import threading
-#from pydj.playlist.upload import UploadedFile
+
+sys.path.append('/home/jonnty/Python/pydj/pydj/playlist')
+sys.path.append('/home/jonnty/Python/pydj/')
 from pyftpdlib import ftpserver
+from upload import UploadedFile
 
-BASE_DIR = settings.FTP_BASE_DIR
-
+from pydj import settings
+from django.core.management import setup_environ
 setup_environ(settings)
-
-#from django.contrib.auth.models import User,  UserManager, Group, Permission
+from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
+
+BASE_DIR = settings.FTP_BASE_DIR
 
 class G2FTPHandler(ftpserver.FTPHandler):
   
@@ -24,9 +25,8 @@ class G2FTPHandler(ftpserver.FTPHandler):
   def on_file_received(self, file):
   
     def handle():
-      #u = UploadedFile(file)
-      #u.process()
-      os.rename(file, file+'aaa')
+      User.objects.get(username=self.username).get_profile().uploadSong(UploadedFile(file))
+      os.remove(file)
       self.sleeping = False
       
     self.sleeping = True
@@ -34,29 +34,17 @@ class G2FTPHandler(ftpserver.FTPHandler):
 
 class G2Authorizer(ftpserver.DummyAuthorizer):
   def validate_authentication(self, username, password):
-    self.add_user(username, 'password', BASE_DIR, perm='lw')
+    try:
+      self.add_user(username, 'password', BASE_DIR, perm='lw')
+    except ftpserver.AuthorizerError:
+      pass #already logged in
+      
     return bool(authenticate(username=username, password=password))
-    
-  #def get_msg_login(self, user):
-    #return "Hello. Insert dongs here."
-  
-  #def get_home_dir(self, user):
-    #return BASE_DIR
-  
-  #def get_perms(self, user):
-    #return 'lw'
-    
-  #def has_perm(self, user, perm, path=None):
-    #if path is None:
-      #return perm in 'lw'
-    #else:
-      #return perm in 'lw' and (path == BASE_DIR)
   
 if __name__ == "__main__":
     authorizer = G2Authorizer()
     ftp_handler = G2FTPHandler
     ftp_handler.authorizer = authorizer
-    #ftp_handler.abstracted_fs.root = BASE_DIR
     address = ('', 2100)
     ftpd = ftpserver.FTPServer(address, ftp_handler)
     ftpd.serve_forever()
