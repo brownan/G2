@@ -61,7 +61,6 @@ class UploadedFile:
   
     tags['length'] = round(song.info.length)
     tags['bitrate'] = song.info.bitrate/1000 #b/s -> kb/s
-    print tags
     if not ("title" in tags.keys()):
       tags['title'] = os.path.basename(self.file)
     if 'artist' in tags.keys():
