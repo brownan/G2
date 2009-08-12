@@ -223,11 +223,15 @@ def song(request, songid=0, edit=None):
   else:
     can_edit = False
     edit = None
-  
+  try:
+    vote = Rating.objects.get(user=request.user, song=song).score
+  except Rating.DoesNotExist:
+    vote = 0
+  print vote
   return render_to_response('playlist/song.html', \
   {'song': song, 'editform':editform, 'edit':edit,'commentform':commentform, \
   'currentuser':request.user, 'comments':comments, 'can_ban':can_ban, \
-  'banform':banform, 'can_delete':can_delete, 'can_edit':can_edit}, \
+  'banform':banform, 'can_delete':can_delete, 'can_edit':can_edit, 'vote':vote}, \
   context_instance=RequestContext(request))
 
   
@@ -295,7 +299,7 @@ def comment(request, songid):
 def rate(request, songid, vote):
   song = Song.objects.get(id=songid)
   song.rate(vote, request.user)
-  return render_to_response('playlist/song.html', {'song': song}, context_instance=RequestContext(request))
+  return HttpResponseRedirect(reverse('song', args=[songid]))
 
 @permission_required('playlist.upload_song')
 def upload(request):

@@ -178,3 +178,10 @@ div.playlist div.playlist {
 div#player1 {
   text-align:center;
 }
+a.voted {
+  background-color: black;
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+}
+

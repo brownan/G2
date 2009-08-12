@@ -165,11 +165,11 @@ document.getElementById("link"+id).innerHTML = "Explain";
   <tr>
     <td>Vote:</td>
     <td class="details">
-      <a href="{% url playlist.views.rate song.id "1" %}">1</a>
-      <a href="{% url playlist.views.rate song.id "2" %}">2</a>
-      <a href="{% url playlist.views.rate song.id "3" %}">3</a>
-      <a href="{% url playlist.views.rate song.id "4" %}">4</a>
-      <a href="{% url playlist.views.rate song.id "5" %}">5</a>
+      <a {% ifequal vote 1 %} class="voted"{% endifequal %} href="{% url playlist.views.rate song.id "1" %}">1</a>
+      <a {% ifequal vote 2 %} class="voted"{% endifequal %} href="{% url playlist.views.rate song.id "2" %}">2</a>
+      <a {% ifequal vote 3 %} class="voted"{% endifequal %} href="{% url playlist.views.rate song.id "3" %}">3</a>
+      <a {% ifequal vote 4 %} class="voted"{% endifequal %} href="{% url playlist.views.rate song.id "4" %}">4</a>
+      <a {% ifequal vote 5 %} class="voted"{% endifequal %} href="{% url playlist.views.rate song.id "5" %}">5</a>
     </td>
   </tr>  
   <tr>
