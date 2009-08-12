@@ -20,6 +20,7 @@ class UploadedFile:
     
     if realname is None:
       realname = os.path.basename(file)
+    self.realname = realname
     
     if self.type is None:
       self.type = os.path.splitext(realname)[1].strip('.')
@@ -31,6 +32,7 @@ class UploadedFile:
     self.file = file
     self.getHash()
     self.getTags()
+    
     
     
   def getHash(self):
@@ -62,11 +64,11 @@ class UploadedFile:
     tags['length'] = round(song.info.length)
     tags['bitrate'] = song.info.bitrate/1000 #b/s -> kb/s
     if not ("title" in tags.keys()):
-      tags['title'] = os.path.basename(self.file)
+      tags['title'] = self.realname
     if 'artist' in tags.keys():
       tags['artist'] = Artist.objects.get_or_create(name=tags['artist'])[0]
     else:
-      tags['artist'] = Artist.objects.get_or_create(name=tags['(unknown)'])[0]
+      tags['artist'] = Artist.objects.get_or_create(name='(unknown)')[0]
     if 'album' in tags.keys():
       tags['album'] = Album.objects.get_or_create(name=tags['album'])[0]
     else: 
