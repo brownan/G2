@@ -1,23 +1,23 @@
 <html>
   <head>
     <title>{% block title %}GBS-FM{% endblock %}</title>
-    <style type="text/css">
+    <!-- <style type="text/css">
 			div.playlist {margin-left: auto; margin-right:auto; width: 640px;}
-		</style>
+		</style> -->
+    <link href="images/regstyle.css" rel="stylesheet" type="text/css">
 	</head>
 
 	<body>
+  <div class="heed"><h1>GBSFM</h1></div>
 	<div class="playlist">
-		<img src = "images/banner.png">
-	</div>
-	<div class="playlist">
+  <p class="regreg">Login:</p>
     <form enctype="multipart/form-data" action="/login" method="POST">
     <table>
       {{ form.as_p }}
-      <input type="submit" value="Submit" />
+      <input class="butan" type="submit" value="Submit" />
     </table>
     </form>
-  <p>If you haven't already, <a href="{% url playlist.views.register %}">register here.</a></p>
+  <p class="note">If you haven't already, <a href="{% url playlist.views.register %}">register here.</a></p>
 	</div>
 	</body>
 </html>

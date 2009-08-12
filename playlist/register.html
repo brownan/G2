@@ -1,20 +1,19 @@
 <html>
   <head>
     <title>{% block title %}GBS-FM{% endblock %}</title>
-    <style type="text/css">
+    <!-- <style type="text/css">
 			div.playlist {margin-left: auto; margin-right:auto; width: 640px;}
       body, th, td { font:12px/1.4em Verdana,sans-serif; }
       .error { color: red; }
-		</style>
+		</style> -->
+    <link href="images/regstyle.css" rel="stylesheet" type="text/css">
 	</head>
 
 	<body>
+  <div class="heed"><h1>GBSFM</h1></div>
 	<div class="playlist">
-		<img src = "images/banner.png">
-	</div>
-	<div class="playlist">
+    <p class="regreg">Register:</p>
     <span class="error">{{error}}</span>
-    <p>Register:</p>
     <form enctype="multipart/form-data" action="{% url playlist.views.register %}" method="POST">
     <table>
       {{ form.as_p }}
