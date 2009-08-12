@@ -7,13 +7,15 @@
     {% if message %}
     {{ message }}
     {% endif %}
-    <p>Upload music file here. Make sure the tags make sense!</p>
+    <p>Upload music files here. Make sure the tags make sense!</p>
     <form enctype="multipart/form-data" action="/upload" method="POST">
     <table>
       {{ form.as_p }}
       <input type="submit" value="Submit" />
     </table>
+
     {% if uploads %}
+    <p>(<em style="font-style: normal; font-weight: bold">FTP upload</em> now available at gbsfm.ath.cx on port 2100)</p>
     <p>Last ten uploads:</p>
     <ul>
       {% for upload in uploads %}

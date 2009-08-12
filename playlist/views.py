@@ -309,9 +309,9 @@ def upload(request):
         request.user.message_set.create(message="Uploaded file successfully!")
   else:
     form = UploadFileForm()
-  uploads = Song.objects.filter(uploader=request.user).order_by("add_date")
+  uploads = Song.objects.filter(uploader=request.user).order_by("-add_date")
   if len(uploads) > 10: 
-    recentuploads = uploads[uploads.count()-10:]
+    recentuploads = uploads[:10]
   else: 
     recentuploads = uploads
   return render_to_response('playlist/upload.html', {'form': form, 'uploads':recentuploads}, context_instance=RequestContext(request))

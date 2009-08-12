@@ -6,13 +6,14 @@ import threading
 sys.path.append('/home/jonnty/Python/pydj/pydj/playlist')
 sys.path.append('/home/jonnty/Python/pydj/')
 from pyftpdlib import ftpserver
-from upload import UploadedFile
+from upload import UploadedFile, UnsupportedFormatError, CorruptFileError
 
 from pydj import settings
 from django.core.management import setup_environ
 setup_environ(settings)
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from pydj.playlist.models import FileTooBigError
 
 
 BASE_DIR = settings.FTP_BASE_DIR
@@ -25,7 +26,10 @@ class G2FTPHandler(ftpserver.FTPHandler):
   def on_file_received(self, file):
   
     def handle():
-      User.objects.get(username=self.username).get_profile().uploadSong(UploadedFile(file))
+      try:
+        User.objects.get(username=self.username).get_profile().uploadSong(UploadedFile(file))
+      except (UnsupportedFormatError, CorruptFileError, FileTooBigError):
+        pass
       os.remove(file)
       self.sleeping = False
       
