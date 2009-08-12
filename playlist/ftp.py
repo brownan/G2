@@ -13,7 +13,7 @@ from django.core.management import setup_environ
 setup_environ(settings)
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from pydj.playlist.models import FileTooBigError
+from pydj.playlist.models import FileTooBigError, DuplicateError
 
 
 BASE_DIR = settings.FTP_BASE_DIR
@@ -28,7 +28,7 @@ class G2FTPHandler(ftpserver.FTPHandler):
     def handle():
       try:
         User.objects.get(username=self.username).get_profile().uploadSong(UploadedFile(file))
-      except (UnsupportedFormatError, CorruptFileError, FileTooBigError):
+      except (UnsupportedFormatError, CorruptFileError, FileTooBigError, DuplicateError):
         pass
       os.remove(file)
       self.sleeping = False

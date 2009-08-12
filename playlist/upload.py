@@ -65,8 +65,12 @@ class UploadedFile:
       tags['title'] = os.path.basename(self.file)
     if 'artist' in tags.keys():
       tags['artist'] = Artist.objects.get_or_create(name=tags['artist'])[0]
+    else:
+      tags['artist'] = Artist.objects.get_or_create(name=tags['(unknown)'])[0]
     if 'album' in tags.keys():
       tags['album'] = Album.objects.get_or_create(name=tags['album'])[0]
+    else: 
+      tags['album'] = Album.objects.get_or_create(name='(empty)')[0]
     
     for x in ["tracknumber", "version", "date"]:
       if x in tags.keys():
