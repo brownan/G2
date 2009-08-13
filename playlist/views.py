@@ -295,7 +295,7 @@ def listartists(request, letter='123', page='1'):
   except (EmptyPage, InvalidPage):
     #page no. out of range
     artists = p.page(p.num_pages)
-  return render_to_response('playlist/artists.html', {"artists": artists, "letter", letter}, context_instance=RequestContext(request))
+  return render_to_response('playlist/artists.html', {"artists": artists, "letter": letter}, context_instance=RequestContext(request))
 
   
 @permission_required('playlist.ban_song')
