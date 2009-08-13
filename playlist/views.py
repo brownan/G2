@@ -194,6 +194,8 @@ def ajax(request, resource=""):
     except KeyError:
       raise Http404
     if not lastid: raise Http404
+    if lastid[0] != 'h':
+      raise Http404 #avert disaster
     lastid = lastid[1:] #get rid of leading 'h'
     history = OldPlaylistEntry.objects.filter(id__gt=lastid)
     data = serialize("json", history, relations={'song':{'relations':('artist'), 'fields':('title', 'length', 'artist')}, 'adder':{'fields':('username')}})
@@ -420,8 +422,6 @@ def newregister(request):
     if form.is_valid():
       randcode = form.cleaned_data['randcode']
       try:
-        print get_authcode(form.cleaned_data['randcode'])
-        print SA_PREFIX + quote(form.cleaned_data['saname'])
         cj = cookielib.LWPCookieJar()
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
         urllib2.install_opener(opener)
