@@ -271,16 +271,24 @@ def song(request, songid=0, edit=None):
 
   
 @login_required()
-def listartists(request, page=1):
+def listartists(request, letter='123', page='1'):
+  artists = Artist.objects.all().order_by("name")
+  for artist in artists:
+    if artist.songs.count() == 0:
+      artist.delete() #prune empty artists
+      
+  if letter == '123':
+    artists = filter((lambda e: not e.name[0].isalpha()), artists)
+  elif letter == "all":
+    pass
+  elif letter.isalpha():
+    artists = filter((lambda e: e.name[0].upper() == letter.upper()), artists)
+  else:
+    raise Http404
   try:
     page = int(page)
   except:
     page = 1
-  artists = Artist.objects.all().order_by("name")
-  for artist in artists:
-    if artist.songs.count() == 0:
-      artist.delete()
-  artists = Artist.objects.all().order_by("name")
   p = Paginator(artists, 50)
   try:
     artists = p.page(page)
@@ -484,7 +492,8 @@ def orphans(request, page=0):
     page = 1
   scuttle = User.objects.get(username="Scuttle")
   songs = Song.objects.filter(uploader=scuttle).order_by("title")
-  p = Paginator(songs, 50)
+  for song in songs: 
+    p = Paginator(songs, 50)
   try:
     songs = p.page(page)
   except (EmptyPage, InvalidPage):
