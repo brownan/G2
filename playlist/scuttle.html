@@ -7,6 +7,35 @@
 {% block main %}
   <div class="artists">
   <div class="page-links">
+  <ol class="alphabetical">
+      <li><a href="{% url playlist.views.listartists "123","1" %}">#</a></li>
+      <li><a href="{% url playlist.views.listartists "A","1" %}">A</a></li>
+      <li><a href="{% url playlist.views.listartists "B","1" %}">B</a></li>
+      <li><a href="{% url playlist.views.listartists "C","1" %}">C</a></li>
+      <li><a href="{% url playlist.views.listartists "D","1" %}">D</a></li>
+      <li><a href="{% url playlist.views.listartists "E","1" %}">E</a></li>
+      <li><a href="{% url playlist.views.listartists "F","1" %}">F</a></li>
+      <li><a href="{% url playlist.views.listartists "G","1" %}">G</a></li>
+      <li><a href="{% url playlist.views.listartists "H","1" %}">H</a></li>
+      <li><a href="{% url playlist.views.listartists "I","1" %}">I</a></li>
+      <li><a href="{% url playlist.views.listartists "J","1" %}">J</a></li>
+      <li><a href="{% url playlist.views.listartists "K","1" %}">K</a></li>
+      <li><a href="{% url playlist.views.listartists "L","1" %}">L</a></li>
+      <li><a href="{% url playlist.views.listartists "M","1" %}">M</a></li>
+      <li><a href="{% url playlist.views.listartists "N","1" %}">N</a></li>
+      <li><a href="{% url playlist.views.listartists "O","1" %}">O</a></li>
+      <li><a href="{% url playlist.views.listartists "P","1" %}">P</a></li>
+      <li><a href="{% url playlist.views.listartists "Q","1" %}">Q</a></li>
+      <li><a href="{% url playlist.views.listartists "R","1" %}">R</a></li>
+      <li><a href="{% url playlist.views.listartists "S","1" %}">S</a></li>
+      <li><a href="{% url playlist.views.listartists "T","1" %}">T</a></li>
+      <li><a href="{% url playlist.views.listartists "U","1" %}">U</a></li>
+      <li><a href="{% url playlist.views.listartists "V","1" %}">V</a></li>
+      <li><a href="{% url playlist.views.listartists "W","1" %}">W</a></li>
+      <li><a href="{% url playlist.views.listartists "X","1" %}">X</a></li>
+      <li><a href="{% url playlist.views.listartists "Y","1" %}">Y</a></li>
+      <li><a href="{% url playlist.views.listartists "Z","1" %}">Z</a></li>
+    </ol>
     {% if songs.has_previous %}
       <a href="{% url playlist.views.orphans songs.previous_page_number %}">previous</a>
     {% endif %}
