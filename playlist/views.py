@@ -259,10 +259,14 @@ def song(request, songid=0, edit=None):
     vote = Rating.objects.get(user=request.user, song=song).score
   except Rating.DoesNotExist:
     vote = 0
+  if request.user.has_perm('playlist.edit_song'):
+    path = song.getPath()
+  else:
+    path = None
   return render_to_response('playlist/song.html', \
   {'song': song, 'editform':editform, 'edit':edit,'commentform':commentform, \
   'currentuser':request.user, 'comments':comments, 'can_ban':can_ban, \
-  'banform':banform, 'can_delete':can_delete, 'can_edit':can_edit, 'vote':vote}, \
+  'banform':banform, 'can_delete':can_delete, 'can_edit':can_edit, 'vote':vote, 'path':path}, \
   context_instance=RequestContext(request))
 
   

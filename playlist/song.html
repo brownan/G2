@@ -162,6 +162,11 @@ document.getElementById("link"+id).innerHTML = "Explain";
     <td>Score:</td>
     <td class="details">{{song.avgscore}} with {{song.voteno}} votes.</td>
   </tr>
+  {% if path %}<tr>
+    <td>Filepath:</td>
+    <td class="details">{{path}}</td>
+  </tr>
+  {% endif %}
   <tr>
     <td>Vote:</td>
     <td class="details">
