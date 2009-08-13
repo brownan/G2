@@ -273,18 +273,23 @@ def song(request, songid=0, edit=None):
 @login_required()
 def listartists(request, letter='123', page='1'):
   artists = Artist.objects.all().order_by("name")
+  letter = letter.lower()
   for artist in artists:
     if artist.songs.count() == 0:
       artist.delete() #prune empty artists
       
   if letter == '123':
-    artists = filter((lambda e: not e.name[0].isalpha()), artists)
+    artists = Artist.objects.all().order_by("name")
+    artists = filter(lambda e: (not e.name[0].isalpha()) or (e.name[:4].lower() == "the" and (not e.name[4].isalpha())), artists)
   elif letter == "all":
-    pass
+    artists = Artist.objects.all().order_by("name")
   elif letter.isalpha():
-    artists = filter((lambda e: e.name[0].upper() == letter.upper()), artists)
+    artists = Artist.objects.filter(name__istartswith=letter).order_by("name") | \
+    Artist.objects.filter(name__istartswith="the "+letter).order_by("name") 
   else:
     raise Http404
+  artists = list(artists)
+  artists.sort(key=(lambda x: x.name[:4].lower()=="the " and x.name[4:] or x.name)) #sort 'the's properly
   try:
     page = int(page)
   except:
