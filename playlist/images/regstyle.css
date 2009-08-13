@@ -64,3 +64,13 @@ em {
   font-style: normal;
   font-weight: bold;
 }
+span.error {
+  display:block;
+  margin-top:1.5em;
+  margin-left:50px;
+  border:1px solid red;
+  color:#A00;
+  background-color:#FEE;
+  max-width:540px;
+  word-wrap:break-word; /* CSS3. works on firefox at the time of writing */
+}
