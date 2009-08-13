@@ -13,7 +13,7 @@
   <div class="heed"><h1>GBSFM</h1></div>
 	<div class="playlist">
     <p class="regreg">Register:</p>
-    <span class="error">{{error}}</span>
+    {% if error %}<span class="error">{{error}}</span>{% endif%}
     <form enctype="multipart/form-data" action="{% url playlist.views.newregister %}" method="POST">
       {{ form.as_p }}
       <p>Now put your verification code, "<em>{{authcode}}</em>", into any field of your Something Awful profile and press the button below.</p>
