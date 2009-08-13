@@ -8,11 +8,11 @@
   <div class="artists">
   <div class="page-links">
     {% if artists.has_previous %}
-      <a href="{% url playlist.views.listartists artists.previous_page_number %}">previous</a>
+      <a href="{% url playlist.views.listartists letter,artists.previous_page_number %}">previous</a>
     {% endif %}
     Artists: page {{ artists.number }} of {{ artists.paginator.num_pages }}
     {% if artists.has_next %}
-      <a href="{% url playlist.views.listartists artists.next_page_number %}">next</a>
+      <a href="{% url playlist.views.listartists letter,artists.next_page_number %}">next</a>
     {% endif %}
   </div>
     <ul>
