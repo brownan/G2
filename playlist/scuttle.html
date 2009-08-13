@@ -1,0 +1,27 @@
+{% extends "playlist/master.html" %}
+
+{% block title %}Dong Orphanage - GBS-FM{% endblock %}
+  
+  {% load filters %}
+  
+{% block main %}
+  <div class="artists">
+  <div class="page-links">
+    {% if songs.has_previous %}
+      <a href="{% url playlist.views.orphans songs.previous_page_number %}">previous</a>
+    {% endif %}
+    Orphaned dongs: page {{ songs.number }} of {{ songs.paginator.num_pages }}
+    {% if songs.has_next %}
+      <a href="{% url orphans songs.next_page_number %}">next</a>
+    {% endif %}
+    <p>Click on a dong to become the uploader of it. Please only click on dongs you did actually upload for now.</p>
+  </div>
+    <ul>
+      {% for song in songs.object_list %}
+        <li><a href="{% url adopt song.id %}">{{song.metadataString}}</a></li>
+      {% endfor %}
+    </ul>
+
+  </div>
+ 
+{% endblock %} 
