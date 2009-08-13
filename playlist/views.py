@@ -283,13 +283,16 @@ def listartists(request, letter='123', page='1'):
     artists = filter(lambda e: (not e.name[0].isalpha()) or (e.name[:4].lower() == "the" and (not e.name[4].isalpha())), artists)
   elif letter == "all":
     artists = Artist.objects.all().order_by("name")
+  elif letter == 't':
+    artists = Artist.objects.filter(name__istartswith=letter).order_by("name").exclude(name__istartswith="the") | \
+    Artist.objects.filter(name__istartswith="the "+letter).order_by("name") 
   elif letter.isalpha():
     artists = Artist.objects.filter(name__istartswith=letter).order_by("name") | \
     Artist.objects.filter(name__istartswith="the "+letter).order_by("name") 
   else:
     raise Http404
   artists = list(artists)
-  artists.sort(key=(lambda x: x.name[:4].lower()=="the " and x.name[4:] or x.name)) #sort 'the's properly
+  artists.sort(key=(lambda x: x.name[:4].lower()=="the " and x.name[4:].lower() or x.name.lower())) #sort 'the's properly
   try:
     page = int(page)
   except:
