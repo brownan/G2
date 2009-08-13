@@ -476,3 +476,30 @@ def search(request):
 def info(request):
   song = PlaylistEntry.objects.get(playing=True)
   return HttpResponse()
+  
+def orphans(request, page=0):
+  try:
+    page = int(page)
+  except:
+    page = 1
+  scuttle = User.objects.get(username="Scuttle")
+  songs = Song.objects.filter(uploader=scuttle).order_by("title")
+  p = Paginator(songs, 50)
+  try:
+    songs = p.page(page)
+  except (EmptyPage, InvalidPage):
+    #page no. out of range
+    songs = p.page(p.num_pages)
+  return render_to_response('playlist/scuttle.html', {"songs": songs}, context_instance=RequestContext(request))
+  
+def adopt(request, songid):
+  song = Song.objects.get(id=songid)
+  scuttle = User.objects.get(username="Scuttle")
+  if not song in Song.objects.filter(uploader=scuttle):
+    request.user.message_set.create(message="You may not adopt this dong.")
+    return HttpResponseRedirect(reverse("song", args=[songid]))
+  else:
+    song.uploader = request.user
+    song.save()
+    request.user.message_set.create(message="Dong adopted successfully. Take good care of it!")
+    return HttpResponseRedirect(reverse("song", args=[songid]))    
