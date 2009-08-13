@@ -16,7 +16,7 @@
     {% if error %}<span class="error">{{error}}</span>{% endif%}
     <form enctype="multipart/form-data" action="{% url playlist.views.newregister %}" method="POST">
       {{ form.as_p }}
-      <p>Now put your verification code, "<em>{{authcode}}</em>", into any field of your Something Awful profile and press the button below.</p>
+      <p>Now put your verification code, <em>{{authcode}}</em>, anywhere in the About Me, Location, Occupation or Interest fields of your Something Awful profile and press the button below.</p>
       <input type="submit" value="Verify Account and Register" />
     </form>
 	</div>

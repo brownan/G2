@@ -273,6 +273,10 @@ def listartists(request, page=1):
   except:
     page = 1
   artists = Artist.objects.all().order_by("name")
+  for artist in artists:
+    if artist.songs.count() == 0:
+      artist.delete()
+  artists = Artist.objects.all().order_by("name")
   p = Paginator(artists, 50)
   try:
     artists = p.page(page)
