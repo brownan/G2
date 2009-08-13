@@ -6,6 +6,7 @@ import time
 
 sys.path.append('/home/jonnty/Python/pydj/pydj/playlist')
 sys.path.append('/home/jonnty/Python/pydj/')
+sys.path.append('/home/jonnty/')
 from pyftpdlib import ftpserver
 from upload import UploadedFile, UnsupportedFormatError, CorruptFileError
 
@@ -73,3 +74,4 @@ if __name__ == "__main__":
   address = ('', 2100)
   ftpd = ftpserver.FTPServer(address, ftp_handler)
   ftpd.serve_forever()
+  
