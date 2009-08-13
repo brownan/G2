@@ -60,3 +60,7 @@ div.heed {
 div.heed h1 {
   font-size:32px;
 }
+em {
+  font-style: normal;
+  font-weight: bold;
+}

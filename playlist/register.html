@@ -14,11 +14,10 @@
 	<div class="playlist">
     <p class="regreg">Register:</p>
     <span class="error">{{error}}</span>
-    <form enctype="multipart/form-data" action="{% url playlist.views.register %}" method="POST">
-    <table>
+    <form enctype="multipart/form-data" action="{% url playlist.views.newregister %}" method="POST">
       {{ form.as_p }}
-      <input type="submit" value="Submit" />
-    </table>
+      <p>Now put your verification code, "<em>{{authcode}}</em>", into any field of your Something Awful profile and press the button below.</p>
+      <input type="submit" value="Verify Account and Register" />
     </form>
 	</div>
 	</body>

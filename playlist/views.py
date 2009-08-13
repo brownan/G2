@@ -3,6 +3,12 @@ import os
 import signal
 import itertools
 import datetime
+from random import getrandbits
+from hashlib import md5
+from urllib2 import urlopen, URLError
+import urllib2
+import cookielib
+from urllib import quote, urlencode
 
 from django.http import HttpResponse,  HttpResponseRedirect, Http404
 from django.template import Context, loader
@@ -27,6 +33,7 @@ from pydj.playlist.upload import UploadedFile
 permissions = ["upload_song", "view_artist", "view_playlist", "view_song", "view_user", "queue_song"]
 
 PIDFILE = settings.LOGIC_DIR+"/pid"
+SA_PREFIX = "http://forums.somethingawful.com/member.php?action=getinfo&username="
 
 from django.contrib.auth.decorators import permission_required, login_required
 
@@ -71,6 +78,29 @@ class BanForm(forms.Form):
 class RegisterForm(UserCreationForm):
   passcode = forms.CharField(max_length=50)
 
+  
+class NewRegisterForm(forms.Form):
+
+  
+  saname = forms.CharField(max_length=30, label="SA Username:")
+  password1 = forms.CharField(max_length=30, label="Desired Password:", widget=forms.PasswordInput)
+  password2 = forms.CharField(max_length=30, label="Confirm Password:", widget=forms.PasswordInput)
+  email = forms.EmailField(label="E-mail Address:")
+  randcode = forms.CharField(max_length=32, widget=forms.HiddenInput)
+      
+  def clean_password2(self):
+    if self.cleaned_data['password1'] != self.cleaned_data['password2']:
+      raise ValidationError, "Passwords must match"
+    return self.cleaned_data['password1'] 
+  
+  def clean_saname(self):
+    try:
+      User.objects.get(username=self.cleaned_data['saname'])
+      raise forms.ValidationError, "Username already registered. If you're not happy about this, PM Jonnty."
+    except User.DoesNotExist:
+      return self.cleaned_data['saname'] 
+
+  
 @permission_required('playlist.start_stream')
 def start_stream(request):
   utils.start_stream()
@@ -377,6 +407,47 @@ def register(request):
     form = RegisterForm()
     error = "Fill in the form properly"
   return render_to_response('playlist/register.html', {'form': form}, context_instance=RequestContext(request))
+   
+
+   
+def newregister(request):
+  get_authcode = lambda randcode: md5(settings.SECRET_KEY + randcode).hexdigest()
+  get_randcode = lambda: md5(str(getrandbits(64))).hexdigest()
+  error = ""
+  if request.method == "POST":
+    
+    form = NewRegisterForm(request.POST)
+    if form.is_valid():
+      randcode = form.cleaned_data['randcode']
+      try:
+        print get_authcode(form.cleaned_data['randcode'])
+        print SA_PREFIX + quote(form.cleaned_data['saname'])
+        cj = cookielib.LWPCookieJar()
+        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+        urllib2.install_opener(opener)
+        opener.open("http://forums.somethingawful.com/account.php", \
+                    urlencode([("username", settings.SA_USERNAME), ("password", settings.SA_PASSWORD), ("action", "login")]))
+        if not get_authcode(form.cleaned_data['randcode']) in opener.open(SA_PREFIX + quote(form.cleaned_data['saname'])).read():
+          error = "Verification code not found on your profile."
+      except URLError:
+        error = "Couldn't find your profile. Check you haven't made a typo and that SA isn't down."
+      if not error:
+        username = form.cleaned_data['saname']
+        password = form.cleaned_data['password1']
+        email = form.cleaned_data['email']
+        user = User.objects.create_user(username=username, email="", password=password)
+        g = Group.objects.get(name="user")
+        user.groups.add(g)
+        user.save()
+        UserProfile(user=user).save()
+        return HttpResponseRedirect(reverse(django.contrib.auth.views.login))
+    else:
+      randcode = request.POST['randcode']
+  else:
+    randcode = get_randcode()
+    form = NewRegisterForm(initial={'randcode': randcode})
+  authcode = get_authcode(randcode)
+  return render_to_response('playlist/register.html', {'form': form, 'authcode': authcode, 'error':error}, context_instance=RequestContext(request))
   
 @login_required()
 def search(request):
