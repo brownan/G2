@@ -13,6 +13,8 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError 
 from django.conf import settings
 
+MUSIC_PATH = settings.MUSIC_DIR
+
 class DuplicateError(Exception): pass
 class ScoreOutOfRangeError(Exception): pass
 class AddError(Exception): pass
@@ -245,6 +247,9 @@ class Song(models.Model):
     p.save()
   
   def __unicode__(self): return self.artist.name + ' - ' + self.title
+  
+  def getPath(self):
+    return MUSIC_PATH+'/'+ self.sha_hash+ '.' + self.format
   
   def ban(self, reason=""):
     self.banned = True
