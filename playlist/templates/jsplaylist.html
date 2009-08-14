@@ -126,7 +126,9 @@ var pruneHandler = function(){
 }
 
 var titleHandler = function(data) {
-  $("title").html(data)
+  if $("title").html() != data {
+    $("title").html(data)
+  }
 }
 
 var checkLoop = function(){

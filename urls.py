@@ -17,8 +17,8 @@ urlpatterns = patterns('',
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-(r'^.*community/', include('sphene.community.urls'), defaultdict),
-(r'^.*board/', include('sphene.sphboard.urls'), defaultdict),
+(r'^community/', include('sphene.community.urls'), defaultdict),
+(r'^board/', include('sphene.sphboard.urls'), defaultdict),
 
 # Only for development
 (r'^.*sphene/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.ROOT_PATH + '/static/sphene' }),
@@ -35,7 +35,7 @@ url(r'^admin/(.*)', admin.site.root, {}, "admin_site"),
 (r'^.*/images/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.IMAGES_DIR}),
 (r'^media/(?P<path>.*)$', 'django.views.static.serve', 
 {'document_root': "/usr/share/python-support/python-django/django/contrib/admin/media/"}),
-(r'^login/?$', 'django.contrib.auth.views.login', {'template_name': 'playlist/login.html'}),
+(r'^.*login/?$', 'django.contrib.auth.views.login', {'template_name': 'login.html'}),
 (r'^logout/?$', 'django.contrib.auth.views.logout'),
 (r'^add/(?P<songid>\d+)$', 'pydj.playlist.views.add'), 
 (r'^next/(?P<authid>.+)$', 'pydj.playlist.views.next'), 
