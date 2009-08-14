@@ -1,0 +1,69 @@
+
+    .sphform input[type="text"],
+    .sphform input[type="password"],
+    .sphform select {
+      width: 100%;
+      border: 1px solid black;
+      padding: 3px;
+    }
+    .sphform textarea {
+      width: 100%;
+      border: 1px solid black;
+      padding: 3px;
+    }
+    .sphform .separator {
+      margin: 20px;
+      height: 30px;
+    }
+    .sphform .separator th {
+      border-top: 1px solid gray;
+    }
+    
+    .sph_object_list {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    .sph_object_list th,
+    .sph_object_list td {
+      border: 1px solid black;
+      padding: 5px;
+    }
+
+    /* Small hack to have the signature not display outside of the board. */
+    .signature {
+      display: none;
+    }
+
+
+  /* administration */
+  .sph_options a:before { content: " [ "; }
+  .sph_options a:after { content: " ] "; }
+
+  .sph_options { white-space: nowrap; }
+  .sph_rolename { white-space: nowrap; }
+
+
+
+/* wiki links - need to be here because the board also makes use of wikilinks */
+/* This should be cleaned up one day to do the same as with jsincludes        */
+    .sph_nonexistent {
+      color: #cc0000;
+    }
+    .sph_nonexistent:after {
+      vertical-align: super;
+      font-size: xx-small;
+      content: "?";
+    }
+
+.sph_community_profile {
+  float: left;
+}
+
+.sph_community_blocks {
+  float:left;
+  border-left: 1px solid gray;
+  padding-left: 2em;
+  margin-left: 2em;
+  max-width: 50%;
+}

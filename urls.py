@@ -7,6 +7,8 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
 
+defaultdict = { 'groupName': 'example' }
+
 urlpatterns = patterns('',
     # Example:
     # (r'^pydj/', include('pydj.foo.urls')),
@@ -15,9 +17,13 @@ urlpatterns = patterns('',
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-    # Uncomment the next line to enable the admin:
+(r'^.*community/', include('sphene.community.urls'), defaultdict),
+(r'^.*board/', include('sphene.sphboard.urls'), defaultdict),
+
+# Only for development
+(r'^.*sphene/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.ROOT_PATH + '/static/sphene' }),
+
 url(r'^admin/(.*)', admin.site.root, {}, "admin_site"),
-(r'^forum/', include('forum.urls')),
 (r'^$', 'pydj.playlist.views.playlist', {}, "playlist"),
 (r'^playlist(/?|(?P<js>/js))$', 'pydj.playlist.views.playlist'),
 (r'^images/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.IMAGES_DIR}),

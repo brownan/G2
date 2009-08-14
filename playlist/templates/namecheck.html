@@ -1,0 +1,23 @@
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+  <title>GBS-FM</title>
+  <link href="regstyle.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+  <div class="heed"><h1>GBS-FM</h1></div>
+  <div class="playlist">
+    <span class="error"></span>
+    <p class="regreg">Name check:</p>
+    <form enctype="multipart/form-data" action="{% url namecheck %}" method="POST">
+      <p>
+        <label for="id_saname">SA Username:</label> 
+        <input id="id_saname" name="saname" maxlength="30" type="text"> 
+      </p>
+      <p>Now, please put <em>"{{id_hash}}"</em> in any field of your Something Awful profile and then click the button below</p>
+      <input value="Verify Account" type="submit">
+    </form>
+  </div>
+</body>
+</html>

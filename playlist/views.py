@@ -113,7 +113,7 @@ def stop_stream(request):
   
 @permission_required('playlist.view_g2admin')
 def g2admin(request):
-  return render_to_response('playlist/admin.html',  {}, context_instance=RequestContext(request))
+  return render_to_response('admin.html',  {}, context_instance=RequestContext(request))
 
 @permission_required('playlist.view_playlist')
 def playlist(request, msg="", js=""):
@@ -141,10 +141,10 @@ def playlist(request, msg="", js=""):
     lastremoval = removals[removals.count()-1].id
   else:
     lastremoval = 0
-  return render_to_response('playlist/jsplaylist.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip, 'lastremoval':lastremoval, 'now_playing':now_playing}, context_instance=RequestContext(request))
+  return render_to_response('jsplaylist.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip, 'lastremoval':lastremoval, 'now_playing':now_playing}, context_instance=RequestContext(request))
 
   
- # return render_to_response('playlist/index.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))
+ # return render_to_response('index.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))
   
 @login_required()
 def ajax(request, resource=""):
@@ -235,7 +235,7 @@ def song(request, songid=0, edit=None):
   try:
     song = Song.objects.get(id=songid)
   except Song.DoesNotExist:
-    return render_to_response('playlist/song.html', {'error': 'Song not found.'})
+    return render_to_response('song.html', {'error': 'Song not found.'})
   if request.method == "POST" and (request.user.has_perm('playlist.edit_song') or (request.user == song.uploader)):
     editform = SongForm(request.POST, instance=song)
     if editform.is_valid():
@@ -263,7 +263,7 @@ def song(request, songid=0, edit=None):
     path = song.getPath()
   else:
     path = None
-  return render_to_response('playlist/song.html', \
+  return render_to_response('song.html', \
   {'song': song, 'editform':editform, 'edit':edit,'commentform':commentform, \
   'currentuser':request.user, 'comments':comments, 'can_ban':can_ban, \
   'banform':banform, 'can_delete':can_delete, 'can_edit':can_edit, 'vote':vote, 'path':path}, \
@@ -303,7 +303,7 @@ def listartists(request, letter='123', page='1'):
   except (EmptyPage, InvalidPage):
     #page no. out of range
     artists = p.page(p.num_pages)
-  return render_to_response('playlist/artists.html', {"artists": artists, "letter": letter}, context_instance=RequestContext(request))
+  return render_to_response('artists.html', {"artists": artists, "letter": letter}, context_instance=RequestContext(request))
 
   
 @permission_required('playlist.ban_song')
@@ -337,7 +337,7 @@ def deletesong(request, songid=0):
 @login_required()
 def user(request, userid):
   owner=  User.objects.get(id=userid)
-  return render_to_response("playlist/user.html", {'owner':owner}, context_instance=RequestContext(request))
+  return render_to_response("user.html", {'owner':owner}, context_instance=RequestContext(request))
 
 @login_required()
 def comment(request, songid): 
@@ -377,14 +377,14 @@ def upload(request):
     recentuploads = uploads[:10]
   else: 
     recentuploads = uploads
-  return render_to_response('playlist/upload.html', {'form': form, 'uploads':recentuploads}, context_instance=RequestContext(request))
+  return render_to_response('upload.html', {'form': form, 'uploads':recentuploads}, context_instance=RequestContext(request))
 
 
 @permission_required('playlist.view_artist')
 def artist(request, artistid=None):
   artist = Artist.objects.get(id=artistid)
   songs = Song.objects.filter(artist=artist).order_by("album")
-  return render_to_response("playlist/artist.html", {'songs': songs, 'artist': artist}, context_instance=RequestContext(request))
+  return render_to_response("artist.html", {'songs': songs, 'artist': artist}, context_instance=RequestContext(request))
     
 @permission_required('playlist.queue_song')
 def add(request, songid=0): 
@@ -415,7 +415,7 @@ def register(request):
     if form.is_valid():
       if form.cleaned_data['passcode'] != 'dongboners':
         error = "Incorrect passcode"
-        return render_to_response('playlist/register.html', {'form': form, 'error':error})
+        return render_to_response('register.html', {'form': form, 'error':error})
       username = form.cleaned_data['username']
       password = form.cleaned_data['password1']
       user = User.objects.create_user(username=username, email="", password=password)
@@ -432,7 +432,7 @@ def register(request):
   else:
     form = RegisterForm()
     error = "Fill in the form properly"
-  return render_to_response('playlist/register.html', {'form': form}, context_instance=RequestContext(request))
+  return render_to_response('register.html', {'form': form}, context_instance=RequestContext(request))
    
 
    
@@ -471,7 +471,7 @@ def newregister(request):
     randcode = get_randcode()
     form = NewRegisterForm(initial={'randcode': randcode})
   authcode = get_authcode(randcode)
-  return render_to_response('playlist/register.html', {'form': form, 'authcode': authcode, 'error':error}, context_instance=RequestContext(request))
+  return render_to_response('register.html', {'form': form, 'authcode': authcode, 'error':error}, context_instance=RequestContext(request))
   
 @login_required()
 def search(request):
@@ -482,11 +482,11 @@ def search(request):
       
       artists = Artist.objects.filter(name__icontains=query).order_by('name')
       songs = Song.objects.filter(title__icontains=query).order_by('title')
-      return render_to_response('playlist/search.html', {'form':form, 'artists':list(artists), 'songs':songs, 'query':query},\
+      return render_to_response('search.html', {'form':form, 'artists':list(artists), 'songs':songs, 'query':query},\
       context_instance=RequestContext(request))
   else:
     form = SearchForm()
-  return render_to_response('playlist/search.html', {'form':form}, context_instance=RequestContext(request))
+  return render_to_response('search.html', {'form':form}, context_instance=RequestContext(request))
 
 
 def info(request):
@@ -507,7 +507,7 @@ def orphans(request, page=0):
   except (EmptyPage, InvalidPage):
     #page no. out of range
     songs = p.page(p.num_pages)
-  return render_to_response('playlist/scuttle.html', {"songs": songs}, context_instance=RequestContext(request))
+  return render_to_response('scuttle.html', {"songs": songs}, context_instance=RequestContext(request))
   
 def adopt(request, songid):
   song = Song.objects.get(id=songid)
