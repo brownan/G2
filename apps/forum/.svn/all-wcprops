@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 22
+/svn/!svn/ver/49/trunk
+END
+admin.py
+K 25
+svn:wc:ra_dav:version-url
+V 31
+/svn/!svn/ver/38/trunk/admin.py
+END
+LICENSE.TXT
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/7/trunk/LICENSE.TXT
+END
+views.py
+K 25
+svn:wc:ra_dav:version-url
+V 31
+/svn/!svn/ver/49/trunk/views.py
+END
+managers.py
+K 25
+svn:wc:ra_dav:version-url
+V 34
+/svn/!svn/ver/41/trunk/managers.py
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/2/trunk/__init__.py
+END
+sitemap.py
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/45/trunk/sitemap.py
+END
+models.py
+K 25
+svn:wc:ra_dav:version-url
+V 32
+/svn/!svn/ver/48/trunk/models.py
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/45/trunk/README.txt
+END
+urls.py
+K 25
+svn:wc:ra_dav:version-url
+V 30
+/svn/!svn/ver/45/trunk/urls.py
+END
+feeds.py
+K 25
+svn:wc:ra_dav:version-url
+V 31
+/svn/!svn/ver/17/trunk/feeds.py
+END
+forms.py
+K 25
+svn:wc:ra_dav:version-url
+V 31
+/svn/!svn/ver/27/trunk/forms.py
+END

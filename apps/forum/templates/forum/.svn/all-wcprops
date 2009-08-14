@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/!svn/ver/48/trunk/templates/forum
+END
+updatesubs.html
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/48/trunk/templates/forum/updatesubs.html
+END
+newthread.html
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/48/trunk/templates/forum/newthread.html
+END
+thread_list.html
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/48/trunk/templates/forum/thread_list.html
+END
+forum_list.html
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/48/trunk/templates/forum/forum_list.html
+END
+notify.txt
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/20/trunk/templates/forum/notify.txt
+END
+thread.html
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/48/trunk/templates/forum/thread.html
+END
+reply.html
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/33/trunk/templates/forum/reply.html
+END
