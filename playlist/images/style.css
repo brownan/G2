@@ -56,7 +56,7 @@ div.sidebar {
   width:100px;
 }
 div.sidebarbg {
-  background-image:url('sidebarimg2.png'); /* THEME: menu base image (default; leaves) */
+  background-image:url('sidebarimg2b.png'); /* THEME: menu base image (default; leaves) */
   width:100px;
 }
 img.logo {
@@ -206,4 +206,16 @@ ol.alphabetical li.chosen {
   font-weight:bold;
   border:2px solid black;
   background-color:#E5EFDE; /* ARTISTS page ends here */
+}
+div#player {        /* Flash Player */
+	text-align:center;
+}
+div.messages p {    /* MESSAGES bar- "track added", "too many dongs" etc. */
+  padding:2px 2px 2px 20px;
+  background-color:#FF7;
+  border:1px solid #770;
+  display:block;
+  margin-left:140px;
+  margin-right:10px;
+  font-weight:bold;
 }
