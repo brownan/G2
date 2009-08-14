@@ -7,6 +7,8 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
 
+defaultdict = { 'groupName': 'example' }
+
 urlpatterns = patterns('',
     # Example:
     # (r'^pydj/', include('pydj.foo.urls')),
@@ -15,7 +17,12 @@ urlpatterns = patterns('',
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-    # Uncomment the next line to enable the admin:
+#(r'^community/', include('sphene.community.urls'), defaultdict),
+#(r'^board/', include('sphene.sphboard.urls'), defaultdict),
+
+# Only for development
+#(r'^.*sphene/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.ROOT_PATH + '/static/sphene' }),
+(r'^forum/', include('forum.urls')),
 url(r'^admin/(.*)', admin.site.root, {}, "admin_site"),
 (r'^$', 'pydj.playlist.views.playlist', {}, "playlist"),
 (r'^playlist(/?|(?P<js>/js))$', 'pydj.playlist.views.playlist'),
@@ -26,7 +33,9 @@ url(r'^admin/(.*)', admin.site.root, {}, "admin_site"),
 (r'^artist/(?P<artistid>\d+)$', 'pydj.playlist.views.artist', {}, "artist"),
 (r'^user/(?P<userid>\d+)$', 'pydj.playlist.views.user'),
 (r'^.*/images/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.IMAGES_DIR}),
-(r'^login/?$', 'django.contrib.auth.views.login', {'template_name': 'playlist/login.html'}),
+(r'^media/(?P<path>.*)$', 'django.views.static.serve', 
+{'document_root': "/usr/share/python-support/python-django/django/contrib/admin/media/"}),
+(r'^.*login/?$', 'django.contrib.auth.views.login', {'template_name': 'login.html'}),
 (r'^logout/?$', 'django.contrib.auth.views.logout'),
 (r'^add/(?P<songid>\d+)$', 'pydj.playlist.views.add'), 
 (r'^next/(?P<authid>.+)$', 'pydj.playlist.views.next'), 

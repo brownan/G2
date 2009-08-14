@@ -1,0 +1,26 @@
+.highlight {
+  font-weight: bold;
+}
+
+.sphsearch {
+  list-style:none;
+}
+
+.sphsearch li {
+  margin-bottom: 1em;
+}
+
+.sphsearch a {
+  font-size: 1.1em;
+}
+
+.sphsearch p {
+  margin-top: 0em;
+  margin-bottom: 0em;
+}
+
+.sphsearch_meta {
+  margin-top:0em;
+  font-size: smaller;
+  color: green;
+}

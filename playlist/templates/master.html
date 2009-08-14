@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<head>
+<title>{% block title %}g2{% endblock %}</title>
+<link href="images/style.css" rel="stylesheet" type="text/css">
+<!-- <style type="text/css">
+  body, th, td { font:12px/1.4em Verdana,sans-serif; }
+  div.playlist {margin-left: auto; margin-right:auto; width: 640px; }
+  div.sidebar {margin-left: 10px; float: left;}
+  div.banner {clear: both; float: center; margin-left: auto; margin-right:auto; width: 640px;}
+  div.song {margin-left: auto; margin-right:auto; width: 630px; float: center; border-style: dotted; border-width: 1px; padding: 5px;}
+  div.page-links {text-align: center; border-style: dotted; border-width: 1px; padding: 3px;}
+  div.artists {margin-left: auto; margin-right:auto; width: 640px; float: center; border-width: 1px;}
+  table.playlist {width: 640px;}
+  p.artists {border-width: 1px; border-style: dotted; padding: 5px;}
+  p.copyright {font-size: 0.7em; color: grey;}
+  ol.menu {list-style-type: lower-greek;}
+  div.messages {border-width: 1px; border-style: solid; width: auto; padding: 5px; border-color: red;}
+  div.content {width: 640px; margin-right: auto; margin-left: auto; }
+  em.bold {font-weight: bold; font-style: normal;}
+  /*table.songs {text-align: center;}*/
+  th.song {
+  font-family: "Lucida Grande","Lucida Sans",Helvetica,Geneva,Verdana,Arial;
+  color: white;
+  background-color: black;
+  font-size: 10px;
+  border-bottom: 2px solid black;
+  }
+  a img {border-width: 0px;}
+  /*tr {text-align: inherit;}
+  td {text-align: center;}*/
+  .album {font-weight: bold; text-align: center;}
+  .playing {background-color: #4466bb;}
+  .banned {text-decoration: line-through;}
+</style>-->
+{% block head %}
+{% endblock %}
+<script type="text/javascript" src="images/swfobject.js"></script>
+<script type="text/javascript" src="images/playload.js"></script>
+</head>
+
+<body>
+<!-- extra comment gitted -->
+<!--<div class="banner">
+    <img src = "images/banner.png" alt="gbs-fm banner" title="gbs-fm" />
+</div>-->
+
+<div class="leftside"> <!-- ADDED DIV: to keep playlist from sliding under the menu when window is too small -->
+  <div class="sidebar">
+  <div class="sidebarbg">
+
+    <a href="{% url playlist.views.playlist %}"><img src="images/logo.png" class="logo" alt="g2 logo" title="g2" /></a>
+    <ol class='menu'>
+      <li><a id="menuitem" href="{% url playlist.views.playlist %}"><img id="butansurface" src="images/butansurface.png" alt="playlist" title="playlist" />Playlist</a></li>
+      <li><a id="menuitem" href="{% url playlist.views.search %}"><img id="butansurface" src="images/butansurface.png" alt="search" title="search" />Search</a></li>
+      <li><a id="menuitem" href="{% url playlist.views.upload %}"><img id="butansurface" src="images/butansurface.png" alt="upload" title="upload" />Upload</a></li>
+      <li><a id="menuitem" href="{% url playlist.views.listartists "all","1" %}"><img id="butansurface" src="images/butansurface.png" alt="artists" title="Browse Artists" />Artists</a></li>
+      <li><a id="menuitem" href='{% url playlist.views.orphans "1" %}'><img id="butansurface" src="images/butansurface.png" alt="orphanage" title="Orphanage" />Orphanage</a></li>
+      <li><a id="menuitem" href="http://gbsfm.ath.cx:8001/listen.pls"><img id="butansurface" src="images/butansurface.png" alt="listen" title="Listen!" />Listen!</a></li>
+      <li><a id="menuitem" href="#" onClick="listenswf(); return false;"><img id="butansurface" src="images/butansurface.png" alt="Flash Player" title="Flash Player" />Flash Player</a></li>
+      <li><a id="menuitem" href="{% url django.contrib.auth.views.logout %}"><img id="butansurface" src="images/butansurface.png" alt="logout" title="Logout" />Logout</a></li>
+      <li><a id="menuitem" href="http://www.thegreenwood.info/irc/"><img id="butansurface" src="images/butansurface.png" alt="irc" title="IRC" />IRC</a></li>
+      {% if perms.playlist.view_g2admin %}
+      <!--<a href="{#{% url admin_site %}#}"><li>Admin</li></a>-->
+      <li><a id="menuitem" href="{% url g2admin %}"><img id="butansurface" src="images/butansurface.png" alt="admin" title="Admin" />Admin</a></li>
+      {% endif %}
+    </ol>
+
+    <div id="player"></div>
+    <p class="copyright">Icons from <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a></p>
+    <p class="copyright">Pretty bits by overdose</p>
+    <img src="images/menubottom.png" alt="" title="" />
+  </div>
+  </div>
+</div>
+
+<div class="content">
+{% if messages %}
+  <div class="messages">
+  {% for message in messages %}
+    <p>{{ message }}</p>
+  {% endfor %}
+  </div>
+{% endif %}
+{% block main %}
+{% endblock %}
+{% block content %}
+{% endblock %}
+</div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-{% extends "playlist/master.html" %}
+{% extends "master.html" %}
 
 {% block title %}{% if query %}{{query}} - {% endif %} Search - GBS-FM{% endblock %}
 {% load filters %}
@@ -38,7 +38,7 @@
       <td><a href='{% url playlist.views.song song.id %}'>{{ song.title }}</a></td>
       <td>{{ song.length|stom }}</td>
       <td>{{ song.uploader.username }}</td>
-      <td>{% include "playlist/add.html" %}</td>
+      <td>{% include "add.html" %}</td>
     </tr>
     {% endfor %}
   </table>

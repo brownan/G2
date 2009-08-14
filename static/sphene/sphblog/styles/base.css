@@ -1,0 +1,35 @@
+.sph_all_tags {
+  margin: 5px;
+  margin-top: 30px;
+}
+
+.sph_all_tags ul {
+  list-style-type: none;
+}
+
+.sph_all_tags li {
+  display: inline;
+}
+
+.sph_all_tags li:last-child:after {
+  content:'';
+}
+
+.sph_all_tags li:after {
+  content:', ';
+}
+
+.entrydetails, .entrydetails p {
+  font-size: 10px;
+  line-height: inherit;
+  font-family:Georgia,"Times New Roman",Times,serif;
+}
+
+.sphboard_post_list td.sphblog_post {
+  border: none;
+}
+.sphboard_post_list th.sphblog_comments_heading {
+  border: none;
+}
+
+
