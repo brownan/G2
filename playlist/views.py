@@ -34,6 +34,7 @@ permissions = ["upload_song", "view_artist", "view_playlist", "view_song", "view
 
 PIDFILE = settings.LOGIC_DIR+"/pid"
 SA_PREFIX = "http://forums.somethingawful.com/member.php?action=getinfo&username="
+LIVE = settings.IS_LIVE
 
 from django.contrib.auth.decorators import permission_required, login_required
 
@@ -451,7 +452,8 @@ def newregister(request):
         urllib2.install_opener(opener)
         opener.open("http://forums.somethingawful.com/account.php", \
                     urlencode([("username", settings.SA_USERNAME), ("password", settings.SA_PASSWORD), ("action", "login")]))
-        if not get_authcode(form.cleaned_data['randcode']) in opener.open(SA_PREFIX + quote(form.cleaned_data['saname'])).read():
+        if not get_authcode(form.cleaned_data['randcode']) in \
+           opener.open(SA_PREFIX + quote(form.cleaned_data['saname'])).read() and LIVE:
           error = "Verification code not found on your profile."
       except URLError:
         error = "Couldn't find your profile. Check you haven't made a typo and that SA isn't down."

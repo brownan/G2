@@ -58,12 +58,12 @@
       <li><a id="menuitem" href='{% url playlist.views.orphans "1" %}'><img id="butansurface" src="images/butansurface.png" alt="orphanage" title="Orphanage" />Orphanage</a></li>
       <li><a id="menuitem" href="http://gbsfm.ath.cx:8001"><img id="butansurface" src="images/butansurface.png" alt="listen" title="Listen!" />Listen!</a></li>
       <li><a id="menuitem" href="{% url django.contrib.auth.views.logout %}"><img id="butansurface" src="images/butansurface.png" alt="logout" title="Logout" />Logout</a></li>
+      <li><a id="menuitem" href="http://www.thegreenwood.info/irc/"><img id="butansurface" src="images/butansurface.png" alt="irc" title="IRC" />IRC</a></li>
       {% if perms.playlist.view_g2admin %}
       <!--<a href="{#{% url admin_site %}#}"><li>Admin</li></a>-->
       <li><a id="menuitem" href="{% url g2admin %}"><img id="butansurface" src="images/butansurface.png" alt="admin" title="Admin" />Admin</a></li>
       {% endif %}
     </ol>
-    
     <p class="copyright">Icons from <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a></p>
     <p class="copyright">Pretty bits by overdose</p>
     <img src="images/menubottom.png" alt="" title="" />

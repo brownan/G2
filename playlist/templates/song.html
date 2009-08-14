@@ -1,4 +1,4 @@
-{% extends "playlist/master.html" %}
+{% extends "master.html" %}
 
 {% block title %}{{song.title}} - GBS-FM{% endblock %}
 
@@ -179,7 +179,7 @@ document.getElementById("link"+id).innerHTML = "Explain";
   </tr>  
   <tr>
     <td>Add to playlist:</td>
-    <td>{% include "playlist/add.html" %}</td>
+    <td>{% include "add.html" %}</td>
   </tr>
   {% if can_ban and not song.banned %}
   <form action='{% url playlist.views.bansong song.id%}' method="post">
