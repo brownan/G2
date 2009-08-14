@@ -108,7 +108,7 @@ class UserProfile(models.Model):
       
   def addDisallowed(self):
     #check user hasn't got too many songs on the playlist
-    if len(PlaylistEntry.objects.filter(adder=self.user)) >= 6:
+    if len(PlaylistEntry.objects.filter(adder=self.user)) >= 2:
       return ("you already have too many songs on the playlist", "user is greedy")
     return None
     
@@ -219,7 +219,7 @@ class Song(models.Model):
     if len(PlaylistEntry.objects.filter(song=self)) > 0:
       return ("song already on playlist", "on playlist")
     #check song hasn't been played recently: dt is definition of 'recently'
-    dt = datetime.datetime.now()-datetime.timedelta(hours=2)
+    dt = datetime.datetime.now()-datetime.timedelta(days=2)
     if len(OldPlaylistEntry.objects.filter(song=self, playtime__gt=dt)) > 0:
       return ("song played too recently", "recently played")
     return None

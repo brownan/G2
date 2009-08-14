@@ -37,6 +37,8 @@
 </style>-->
 {% block head %}
 {% endblock %}
+<script type="text/javascript" src="images/swfobject.js"></script>
+<script type="text/javascript" src="images/playload.js"></script>
 </head>
 
 <body>
@@ -56,7 +58,8 @@
       <li><a id="menuitem" href="{% url playlist.views.upload %}"><img id="butansurface" src="images/butansurface.png" alt="upload" title="upload" />Upload</a></li>
       <li><a id="menuitem" href="{% url playlist.views.listartists "all","1" %}"><img id="butansurface" src="images/butansurface.png" alt="artists" title="Browse Artists" />Artists</a></li>
       <li><a id="menuitem" href='{% url playlist.views.orphans "1" %}'><img id="butansurface" src="images/butansurface.png" alt="orphanage" title="Orphanage" />Orphanage</a></li>
-      <li><a id="menuitem" href="http://gbsfm.ath.cx:8001"><img id="butansurface" src="images/butansurface.png" alt="listen" title="Listen!" />Listen!</a></li>
+      <li><a id="menuitem" href="http://gbsfm.ath.cx:8001/listen.pls"><img id="butansurface" src="images/butansurface.png" alt="listen" title="Listen!" />Listen!</a></li>
+      <li><a id="menuitem" href="#" onClick="listenswf(); return false;"><img id="butansurface" src="images/butansurface.png" alt="Flash Player" title="Flash Player" />Flash Player</a></li>
       <li><a id="menuitem" href="{% url django.contrib.auth.views.logout %}"><img id="butansurface" src="images/butansurface.png" alt="logout" title="Logout" />Logout</a></li>
       <li><a id="menuitem" href="http://www.thegreenwood.info/irc/"><img id="butansurface" src="images/butansurface.png" alt="irc" title="IRC" />IRC</a></li>
       {% if perms.playlist.view_g2admin %}
@@ -64,6 +67,8 @@
       <li><a id="menuitem" href="{% url g2admin %}"><img id="butansurface" src="images/butansurface.png" alt="admin" title="Admin" />Admin</a></li>
       {% endif %}
     </ol>
+
+    <div id="player"></div>
     <p class="copyright">Icons from <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a></p>
     <p class="copyright">Pretty bits by overdose</p>
     <img src="images/menubottom.png" alt="" title="" />
