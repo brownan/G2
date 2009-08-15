@@ -290,7 +290,7 @@ def listartists(request, letter='123', page='1'):
   def the_filter(e):
     if len(e.name) > 4:
       return (not e.name[0].isalpha()) or (e.name[:4].lower() == "the" and (not e.name[4].isalpha()))
-    elif len(e.name == 0):
+    elif len(e.name) == 0:
       return False
     else:
       return not e.name[0].isalpha()
