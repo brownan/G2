@@ -142,6 +142,12 @@ document.getElementById("link"+id).innerHTML = "Explain";
     <td class="details">{{song.genre}}</td>
   </tr>
   {% endif %}
+  {% if is_orphan %}
+  <tr>
+    <td>Adopt:</td>
+    <td class="details"><a href="{% url adopt song.id %}">adopt</a></td>
+  </tr>
+  {% endif %}
   <tr>
     <td>Length:</td>
     <td class="details">{{song.length|stom}}</td>

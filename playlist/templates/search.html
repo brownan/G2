@@ -8,6 +8,7 @@
     <form action='{% url playlist.views.search %}' method="POST">
     <p>
       {{ form.query }}
+      Only orphans {{ form.orphan }}
       <input type="submit" value="Search" />
     </p>
     </form>
