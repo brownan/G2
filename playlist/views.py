@@ -233,11 +233,7 @@ def removeentry(request, entryid):
   
 @permission_required('playlist.skip_song')
 def skip(request):
-  #FIXME: abstract this in a useful way
-  f = open(PIDFILE)
-  pid = int(f.read())
-  f.close()
-  os.kill(pid, signal.SIGUSR1)
+  Popen(["killall", "-SIGTERM", "ices"])
   return HttpResponseRedirect(reverse('playlist'))
 
 @permission_required('playlist.view_song')

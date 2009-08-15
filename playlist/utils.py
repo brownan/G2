@@ -41,10 +41,7 @@ def start_stream():
   os.chdir(olddir)
   
 def stop_stream():
-  f = open(settings.LOGIC_DIR+"/pid")
-  pid = int(f.read())
-  f.close()
-  os.kill(pid, signal.SIGTERM)
+  Popen(["killall", "-SIGTERM", "ices"])
   
   
 #  
