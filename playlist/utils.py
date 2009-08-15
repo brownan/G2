@@ -85,11 +85,11 @@ def stop_stream():
 #  self.uploads += 1
 #  self.save()
 #
-#def _getObj(self, name, table):
-#  #get object if it exists; otherwise create it
-#  try:
-#    return table.objects.get(name=name)
-#  except:
-#    t = table(name=name)
-#    t.save()
-#    return t
+def getObj(table, name):
+  #get object if it exists; otherwise create it
+  try:
+    return table.objects.get(name__exact=name)
+  except table.DoesNotExist:
+    t = table(name=name)
+    t.save()
+    return t
