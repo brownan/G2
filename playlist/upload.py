@@ -25,6 +25,8 @@ class UploadedFile:
     if self.type is None:
       self.type = os.path.splitext(realname)[1].strip('.')
       
+    self.type = self.type.lower()  
+    
     if self.type not in self.supported_types:
       raise UnsupportedFormatError, "%s not supported" % self.type
     
