@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 from django.contrib import admin
-from forum.models import Forum, Thread, Post, Subscription
+from forum.models import Forum, Thread, Post, Subscription, Category
 
 class ForumAdmin(admin.ModelAdmin):
     list_display = ('title', '_parents_repr')
@@ -18,3 +19,5 @@ admin.site.register(Forum, ForumAdmin)
 admin.site.register(Thread, ThreadAdmin)
 admin.site.register(Post)
 admin.site.register(Subscription, SubscriptionAdmin)
+admin.site.register(Category)
+
