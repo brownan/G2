@@ -43,6 +43,8 @@ class UploadFileForm(forms.Form):
 
 class SearchForm(forms.Form):
   query = forms.CharField(max_length=100)
+  orphan = forms.BooleanField(required=False)
+
   
 class SongForm(forms.ModelForm):
 
@@ -264,10 +266,15 @@ def song(request, songid=0, edit=None):
     path = song.getPath()
   else:
     path = None
+  
+  is_orphan = (song.uploader == User.objects.get(username="scuttle"))
+    
+    
+  
   return render_to_response('song.html', \
   {'song': song, 'editform':editform, 'edit':edit,'commentform':commentform, \
-  'currentuser':request.user, 'comments':comments, 'can_ban':can_ban, \
-  'banform':banform, 'can_delete':can_delete, 'can_edit':can_edit, 'vote':vote, 'path':path}, \
+  'currentuser':request.user, 'comments':comments, 'can_ban':can_ban, 'is_orphan':is_orphan, \
+  'banform':banform, 'can_delete':can_delete, 'can_edit':can_edit, 'vote':vote, 'path':path,}, \
   context_instance=RequestContext(request))
 
   
@@ -484,6 +491,16 @@ def search(request):
       
       artists = Artist.objects.filter(name__icontains=query).order_by('name')
       songs = Song.objects.filter(title__icontains=query).order_by('title')
+      if form.cleaned_data['orphan']:
+        scuttle = User(username="scuttle")
+        orphans = Song.objects.filter(uploader=scuttle).order_by('name')
+        temp = []
+        for artist in artists:
+          for song in artist.songs.all():
+            if song.uploader == scuttle:
+              temp.append(artist)
+        artists = temp
+        
       return render_to_response('search.html', {'form':form, 'artists':list(artists), 'songs':songs, 'query':query},\
       context_instance=RequestContext(request))
   else:
