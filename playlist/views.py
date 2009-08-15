@@ -26,7 +26,7 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.template import RequestContext
 from django.conf import settings
 
-from utils import getSong
+from pydj.playlist.utils import getSong, getObj
 from pydj.playlist.upload import UploadedFile
 
 
@@ -59,8 +59,8 @@ class SongForm(forms.ModelForm):
     #self.album = forms.CharField(max_length=300, initial=song.album.name)
   
   def save(self):
-    self.cleaned_data['artist'] = utils.getObj(Artist, self.cleaned_data['artist']) #convert strings to objects
-    self.cleaned_data['album'] = utils.getObj(Album, self.cleaned_data['album'])
+    self.cleaned_data['artist'] = getObj(Artist, self.cleaned_data['artist']) #convert strings to objects
+    self.cleaned_data['album'] = getObj(Album, self.cleaned_data['album'])
     forms.ModelForm.save(self)
   
 
