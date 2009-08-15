@@ -44,7 +44,11 @@ class UploadFileForm(forms.Form):
 class SearchForm(forms.Form):
   query = forms.CharField(max_length=100)
   orphan = forms.BooleanField(required=False)
-
+  
+  def clean_query(self):
+    if len(self.cleaned_data['query']) < 3:
+      raise forms.ValidationError, "Query should be 3 characters long or more."
+    return self.cleaned_data['query']
   
 class SongForm(forms.ModelForm):
 
@@ -91,10 +95,13 @@ class NewRegisterForm(forms.Form):
   email = forms.EmailField(label="E-mail Address:")
   randcode = forms.CharField(max_length=32, widget=forms.HiddenInput)
       
-  def clean_password2(self):
+  def clean(self):
     if self.cleaned_data['password1'] != self.cleaned_data['password2']:
-      raise ValidationError, "Passwords must match"
-    return self.cleaned_data['password1'] 
+      raise forms.ValidationError, "Passwords must match"
+    if len(self.cleaned_data['password1']) < 4:
+      raise forms.ValidationError, "Password too short: must be at least 4 characters"
+    
+    return self.cleaned_data
   
   def clean_saname(self):
     try:
@@ -280,6 +287,18 @@ def song(request, songid=0, edit=None):
   
 @login_required()
 def listartists(request, letter='123', page='1'):
+  def the_filter(e):
+    if len(e.name) > 4:
+      return (not e.name[0].isalpha()) or (e.name[:4].lower() == "the" and (not e.name[4].isalpha()))
+    else:
+      return not e.name[0].isalpha()
+      
+  def sortkey(x):
+    if len(x.name) > 4:
+      return x.name[:4].lower()=="the " and x.name[4:].lower() or x.name.lower()
+    else:
+      return x.name.lower()
+      
   artists = Artist.objects.all().order_by("name")
   letter = letter.lower()
   for artist in artists:
@@ -288,7 +307,7 @@ def listartists(request, letter='123', page='1'):
       
   if letter == '123':
     artists = Artist.objects.all().order_by("name")
-    artists = filter(lambda e: (not e.name[0].isalpha()) or (e.name[:4].lower() == "the" and (not e.name[4].isalpha())), artists)
+    artists = filter(the_filter, artists)
   elif letter == "all":
     artists = Artist.objects.all().order_by("name")
   elif letter == 't':
@@ -300,7 +319,7 @@ def listartists(request, letter='123', page='1'):
   else:
     raise Http404
   artists = list(artists)
-  artists.sort(key=(lambda x: x.name[:4].lower()=="the " and x.name[4:].lower() or x.name.lower())) #sort 'the's properly
+  artists.sort(key=sortkey) #sort 'the's properly
   try:
     page = int(page)
   except:

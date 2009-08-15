@@ -7,7 +7,7 @@
   <div class="playlist">
     <form action='{% url playlist.views.search %}' method="POST">
     <p>
-      {{ form.query }}
+      {{ form.query }} {{ form.query.errors }}
       Only orphans {{ form.orphan }}
       <input type="submit" value="Search" />
     </p>

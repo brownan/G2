@@ -162,7 +162,7 @@ document.getElementById("link"+id).innerHTML = "Explain";
   </tr>
   <tr>
     <td>Uploader:</td>
-    <td class="details"><a href="{% url playlist.views.song song.id%}">{{song.uploader}}</a></td>
+    <td class="details"><a href="{% url playlist.views.user song.uploader.id%}">{{song.uploader}}</a></td>
   </tr>
   <tr>
     <td>Score:</td>
