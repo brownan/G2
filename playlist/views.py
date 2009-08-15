@@ -48,6 +48,7 @@ class SearchForm(forms.Form):
   def clean_query(self):
     if len(self.cleaned_data['query']) > 3:
       raise ValidationError, "Query should be 3 characters long or more."
+    return self.cleaned_data['query']
   
 class SongForm(forms.ModelForm):
 
