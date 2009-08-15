@@ -444,7 +444,7 @@ def register(request):
       username = form.cleaned_data['username']
       password = form.cleaned_data['password1']
       user = User.objects.create_user(username=username, email="", password=password)
-      try: g = Group.objects.get(name="user")
+      try: g = Group.objects.get(name="Listener")
       except Group.DoesNotExist:
         g = Group(name="user")
         g.save()
