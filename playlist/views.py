@@ -97,7 +97,7 @@ class NewRegisterForm(forms.Form):
       
   def clean(self):
     if self.cleaned_data['password1'] != self.cleaned_data['password2']:
-      raise ValidationError, "Passwords must match"
+      raise forms.ValidationError, "Passwords must match"
     return self.cleaned_data
   
   def clean_saname(self):
