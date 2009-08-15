@@ -41,7 +41,7 @@ class G2FTPHandler(ftpserver.FTPHandler):
 class G2Authorizer(ftpserver.DummyAuthorizer):
   def validate_authentication(self, username, password):
     try:
-      self.add_user(username, 'password', BASE_DIR, perm='lw')
+      self.add_user(username, 'password', BASE_DIR, perm='lwe') #list, write, CWD
     except ftpserver.AuthorizerError:
       pass #already logged in
       
