@@ -489,7 +489,7 @@ def newregister(request):
         username = form.cleaned_data['saname']
         password = form.cleaned_data['password1']
         email = form.cleaned_data['email']
-        user = User.objects.create_user(username=username, email="", password=password)
+        user = User.objects.create_user(username=username, email=email, password=password)
         g = Group.objects.get(name="user")
         user.groups.add(g)
         user.save()
