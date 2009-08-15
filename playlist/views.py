@@ -347,7 +347,7 @@ def user(request, userid):
   owner=  User.objects.get(id=userid)
   return render_to_response("user.html", {'owner':owner}, context_instance=RequestContext(request))
 
-@login_required()
+@permission_required('playlist.can_comment')
 def comment(request, songid): 
   song = Song.objects.get(id=songid)
   if request.method == "POST":
@@ -358,7 +358,7 @@ def comment(request, songid):
   return HttpResponseRedirect(reverse('song', args=[songid]))
 
 
-@login_required()
+@permission_required('playlist.can_rate')
 def rate(request, songid, vote):
   song = Song.objects.get(id=songid)
   song.rate(vote, request.user)
@@ -511,7 +511,8 @@ def search(request):
 def info(request):
   song = PlaylistEntry.objects.get(playing=True)
   return HttpResponse()
-  
+
+@login_required()
 def orphans(request, page=0):
   try:
     page = int(page)
@@ -527,7 +528,8 @@ def orphans(request, page=0):
     #page no. out of range
     songs = p.page(p.num_pages)
   return render_to_response('scuttle.html', {"songs": songs}, context_instance=RequestContext(request))
-  
+
+@login_required()
 def adopt(request, songid):
   song = Song.objects.get(id=songid)
   scuttle = User.objects.get(username="Scuttle")

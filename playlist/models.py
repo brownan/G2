@@ -29,7 +29,7 @@ class Artist(models.Model):
   
   class Meta:
     permissions = (
-    ("view_artist",  "Can view artist pages."), 
+    ("view_artist",  "g2 Can view artist pages."), 
     )
 
 
@@ -47,6 +47,9 @@ class Rating(models.Model):
 
   class Meta:
     unique_together = ('user', 'song')
+    permissions = (
+    ("can_rate",  "g2 Can rate songs"), 
+    )
 
 class UserProfile(models.Model):
   user = models.OneToOneField(User,  unique=True)
@@ -167,7 +170,7 @@ class UserProfile(models.Model):
       
   class Meta:
     permissions = (
-    ("view_user",  "Can view user pages"), 
+    ("view_user",  "g2 Can view user pages"), 
     )
 
   def __unicode__(self): return self.user.name
@@ -297,13 +300,14 @@ class Song(models.Model):
 
   class Meta:
     permissions = (
-    ("view_song",  "Can view song pages"), 
-    ("upload_song",  "Can upload songs"),
-    ("ban_song",  "Can ban songs"),
-    ("edit_song", "Can edit all songs."),
-    ("start_stream", "Can start the stream."),
-    ("stop_stream", "Can stop the stream"),
-    ("view_g2admin", "Can view g2 Admin page."),
+    ("view_song",  "g2 Can view song pages"), 
+    ("upload_song",  "g2 Can upload songs"),
+    ("ban_song",  "g2 Can ban songs"),
+    ("edit_song", "g2 Can edit all songs."),
+    ("delete_song", "g2 Can delete all songs."),
+    ("start_stream", "g2 Can start the stream."),
+    ("stop_stream", "g2 Can stop the stream"),
+    ("view_g2admin", "g2 Can view g2 Admin page."),
     )
     
 
@@ -322,7 +326,9 @@ class Comment(models.Model):
     super(Comment, self).save()
   class Meta:
     ordering = ['-datetime']
-    
+    permissions = (
+    ("can_comment",  "g2 Can comment on songs"),
+    )
     
 class PlaylistEntry(models.Model):
   
@@ -372,10 +378,10 @@ class PlaylistEntry(models.Model):
   class Meta:
     ordering = ['hijack', 'id']
     permissions = (
-    ("view_playlist",  "Can view the playlist"), 
-    ("queue_song",  "Can add song to the playlist"), #golden_appel <3
-    ("remove_entry", "Can remove all playlist entries"),
-    ("skip_song", "Can skip currently playing song")
+    ("view_playlist",  "g2 Can view the playlist"), 
+    ("queue_song",  "g2 Can add song to the playlist"), #golden_appel <3
+    ("remove_entry", "g2 Can remove all playlist entries"),
+    ("skip_song", "g2 Can skip currently playing song")
     ) 
     verbose_name_plural = "Playlist"
     
@@ -435,6 +441,7 @@ class ShowRating(models.Model):
   
   class Meta:
     unique_together = ('user', 'show')
+    
 
 class ShowComment(models.Model):
   text = models.CharField(max_length=400)
