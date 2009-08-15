@@ -59,7 +59,6 @@ class SongForm(forms.ModelForm):
     #self.album = forms.CharField(max_length=300, initial=song.album.name)
   
   def save(self):
-    try:
     self.cleaned_data['artist'] = Artist.objects.get_or_create(name__exact=self.cleaned_data['artist'])[0] #convert strings to objects
     self.cleaned_data['album'] = Album.objects.get_or_create(name__exact=self.cleaned_data['album'])[0]
     forms.ModelForm.save(self)
