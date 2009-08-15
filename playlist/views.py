@@ -44,7 +44,10 @@ class UploadFileForm(forms.Form):
 class SearchForm(forms.Form):
   query = forms.CharField(max_length=100)
   orphan = forms.BooleanField(required=False)
-
+  
+  def clean_query():
+    if len(cleaned_data['query']) > 3:
+      raise ValidationError, "Query should be 3 characters long or more."
   
 class SongForm(forms.ModelForm):
 
