@@ -128,11 +128,11 @@ class UserProfile(models.Model):
     if not ("title" in d.keys()):
       d['title'] = file.name
     if 'artist' in d.keys():
-      d['artist'] = Artist.objects.get_or_create(name=d['artist'])[0]
+      d['artist'] = Artist.objects.get_or_create(name__exact=d['artist'])[0]
     else:
       d['artist'] = Artist.objects.get_or_create(name="unknown")[0]
     if 'album' in d.keys():
-      d['album'] = Album.objects.get_or_create(name=d['album'])[0]
+      d['album'] = Album.objects.get_or_create(name__exact=d['album'])[0]
     else:
       d['album'] = Album.objects.get_or_create(name="unknown")[0]
       
