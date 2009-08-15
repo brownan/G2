@@ -46,7 +46,7 @@ class SearchForm(forms.Form):
   orphan = forms.BooleanField(required=False)
   
   def clean_query(self):
-    if len(cleaned_data['query']) > 3:
+    if len(self.cleaned_data['query']) > 3:
       raise ValidationError, "Query should be 3 characters long or more."
   
 class SongForm(forms.ModelForm):
