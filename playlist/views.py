@@ -94,10 +94,10 @@ class NewRegisterForm(forms.Form):
   email = forms.EmailField(label="E-mail Address:")
   randcode = forms.CharField(max_length=32, widget=forms.HiddenInput)
       
-  def clean_password2(self):
+  def clean(self):
     if self.cleaned_data['password1'] != self.cleaned_data['password2']:
       raise ValidationError, "Passwords must match"
-    return self.cleaned_data['password1'] 
+    return self.cleaned_data
   
   def clean_saname(self):
     try:
