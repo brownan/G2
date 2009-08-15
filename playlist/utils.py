@@ -36,12 +36,12 @@ def start_stream():
   olddir = os.curdir
   os.chdir(settings.LOGIC_DIR)
   #f = open(settings.LOGIC_DIR+"/pid", 'w')
-  Popen(["ices", "-c", settings.ICES_CONF])
+  Popen(["ices", "-c", settings.ICES_CONF]).wait()
   #f.close()
   os.chdir(olddir)
   
 def stop_stream():
-  Popen(["killall", "-SIGTERM", "ices"])
+  Popen(["killall", "-SIGTERM", "ices"]).wait()
   
   
 #  

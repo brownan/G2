@@ -9,6 +9,7 @@ from urllib2 import urlopen, URLError
 import urllib2
 import cookielib
 from urllib import quote, urlencode
+from subprocess import Popen
 
 from django.http import HttpResponse,  HttpResponseRedirect, Http404
 from django.template import Context, loader

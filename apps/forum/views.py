@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 All forum logic is kept here - displaying lists of forums, threads 
 and posts, adding new threads, and adding replies.
@@ -23,9 +24,9 @@ FORUM_PAGINATION = getattr(settings, 'FORUM_PAGINATION', 10)
 LOGIN_URL = getattr(settings, 'LOGIN_URL', '/accounts/login/')
 
 def forums_list(request):
-    queryset = Forum.objects.for_groups(request.user.groups.all()).filter(parent__isnull=True)
-    return object_list( request,
-                        queryset=queryset)
+    
+  queryset = Forum.objects.for_groups(request.user.groups.all()).filter(parent__isnull=True)
+  return render_to_response('register.html', {'form': form}, context_instance=RequestContext(request))
 
 def forum(request, slug):
     """
@@ -237,4 +238,4 @@ def updatesubs(request):
         RequestContext(request, {
             'subs': subs,
         }))
-       
+      

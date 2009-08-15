@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """ 
 A basic forum model with corresponding thread/post models.
 
@@ -12,6 +13,15 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from forum.managers import ForumManager
+
+class Category(models.Model):
+  
+  name = models.CharField(max_length=100, editable=True)
+  sort_order = models.IntegerField(default=0, editable=True)
+  
+  def __unicode__(self):
+    return self.name
+
 
 class Forum(models.Model):
     """
@@ -29,6 +39,8 @@ class Forum(models.Model):
     description = models.TextField(_("Description"))
     threads = models.IntegerField(_("Threads"), default=0, editable=False)
     posts = models.IntegerField(_("Posts"), default=0, editable=False)
+    category = models.ForeignKey(Category)
+    sort_order = models.IntegerField(default=0)
 
     objects = ForumManager()
 

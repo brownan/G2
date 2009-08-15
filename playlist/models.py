@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from pydj.playlist import utils
+from subprocess import Popen
 import datetime
 import shutil
 import os
