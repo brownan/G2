@@ -98,6 +98,9 @@ class NewRegisterForm(forms.Form):
   def clean(self):
     if self.cleaned_data['password1'] != self.cleaned_data['password2']:
       raise forms.ValidationError, "Passwords must match"
+    if len(self.cleaned_data['password1']) < 4:
+      raise forms.ValidationError, "Password too short: must be at least 4 characters"
+    
     return self.cleaned_data
   
   def clean_saname(self):
