@@ -181,7 +181,7 @@ $(document).ready(function(){
         
         <td><a href='{% url playlist.views.artist entry.object.song.artist.id %}'>{{ entry.object.song.artist }}</a></td>
         <td><a href='{% url song entry.object.song.id %}'>{{ entry.object.song.title }}</a></td>
-        <td>{{ entry.object.song.length|stom }}</td>
+        <td class="time">{{ entry.object.song.length|stom }}</td>
         <td><a href='{% url playlist.views.user entry.object.adder.id %}'>{{ entry.object.adder.username }}</a></td>
         {% if entry.can_remove %}
         <td>
