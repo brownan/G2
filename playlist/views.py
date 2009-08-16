@@ -487,7 +487,12 @@ def newregister(request):
         password = form.cleaned_data['password1']
         email = form.cleaned_data['email']
         user = User.objects.create_user(username=username, email=email, password=password)
-        g = Group.objects.get(name="user")
+        try: g = Group.objects.get(name="Listener")
+        except Group.DoesNotExist:
+          g = Group(name="Listener")
+          g.save()
+          [g.permissions.add(Permission.objects.get(codename=s)) for s in permissions]
+          g.save()
         user.groups.add(g)
         user.save()
         UserProfile(user=user).save()
