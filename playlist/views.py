@@ -220,7 +220,7 @@ def ajax(request, resource=""):
 @login_required()
 def removeentry(request, entryid):
   entry = PlaylistEntry.objects.get(id=entryid)
-  if ((entry.adder == request.user) or request.user.has_perm("remove_entry")) and not entry.playing:
+  if ((entry.adder == request.user) or request.user.has_perm("playlist.remove_entry")) and not entry.playing:
     entry.delete()
     request.user.message_set.create(message="Entry deleted successfully.")
     success = 1
@@ -234,7 +234,7 @@ def removeentry(request, entryid):
   
 @permission_required('playlist.skip_song')
 def skip(request):
-  Popen(["killall", "-SIGTERM", "ices"])
+  Popen(["killall", "-SIGUSR1", "ices"])
   return HttpResponseRedirect(reverse('playlist'))
 
 @permission_required('playlist.view_song')

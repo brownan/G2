@@ -41,7 +41,7 @@ def start_stream():
   os.chdir(olddir)
   
 def stop_stream():
-  Popen(["killall", "-SIGTERM", "ices"]).wait()
+  Popen(["killall", "-KILL", "ices"]).wait()
   
   
 #  
@@ -86,9 +86,12 @@ def stop_stream():
 #  self.save()
 #
 def getObj(table, name):
-  #get object if it exists; otherwise create it
+  #get album/artist object if it exists; otherwise create it
   try:
-    return table.objects.get(name__exact=name)
+    entry = table.objects.get(name__exact=name)
+    entry.name = name
+    entry.save()
+    return entry
   except table.DoesNotExist:
     t = table(name=name)
     t.save()
