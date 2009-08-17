@@ -271,7 +271,7 @@ def song(request, songid=0, edit=None):
   else:
     path = None
   
-  is_orphan = (song.uploader == User.objects.get(username="scuttle"))
+  is_orphan = (song.uploader == User.objects.get(username="Fagin"))
     
     
   
@@ -511,7 +511,7 @@ def search(request):
       artists = Artist.objects.filter(name__icontains=query).order_by('name')
       songs = Song.objects.filter(title__icontains=query).order_by('title')
       if form.cleaned_data['orphan']:
-        scuttle = User(username="scuttle")
+        scuttle = User(username="Fagin")
         orphans = Song.objects.filter(uploader=scuttle).order_by('name')
         temp = []
         for artist in artists:
@@ -537,7 +537,7 @@ def orphans(request, page=0):
     page = int(page)
   except:
     page = 1
-  scuttle = User.objects.get(username="Scuttle")
+  scuttle = User.objects.get(username="Fagin")
   songs = Song.objects.filter(uploader=scuttle).order_by("title")
   for song in songs: 
     p = Paginator(songs, 50)
@@ -551,7 +551,7 @@ def orphans(request, page=0):
 @login_required()
 def adopt(request, songid):
   song = Song.objects.get(id=songid)
-  scuttle = User.objects.get(username="Scuttle")
+  scuttle = User.objects.get(username="Fagin")
   if not song in Song.objects.filter(uploader=scuttle):
     request.user.message_set.create(message="You may not adopt this dong.")
     return HttpResponseRedirect(reverse("song", args=[songid]))
