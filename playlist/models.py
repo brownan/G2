@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 #import pydj.dbsettings as dbsettings
 from django.db import IntegrityError 
 from django.conf import settings
+from django.db.models.signals import pre_save 
 
 MUSIC_PATH = settings.MUSIC_DIR
 
@@ -22,8 +23,13 @@ class AddError(Exception): pass
 class FileTooBigError(Exception): pass
 
 
+
+
+
+
 class Artist(models.Model):
   name = models.CharField(max_length=300)
+  sort_name = models.CharField(max_length=300)
   
   def __unicode__(self): return self.name
   #maybe url, statistics?
@@ -32,7 +38,30 @@ class Artist(models.Model):
     permissions = (
     ("view_artist",  "g2 Can view artist pages."), 
     )
+  #def save(self):
+    ##clean up name and change sort_name
+    #self.name = self.name.strip()
+    #if len(self.name) > 4:
+      #self.sort_name = self.name[:4].lower()=="the " and self.name[4:] or self.name
+    #else:
+      #self.sort_name = self.name
+    #self.sort_name = self.sort_name.lstrip("'\"")
+    
+    #super(Artist, self).save()
+    
+def artist_handler(sender, **kwargs):
+  instance = kwargs['instance']
+  #clean up name and change sort_name
+  instance.name = instance.name.strip()
+  instance.sort_name = instance.name.lstrip("'\"")
+  if len(instance.name) > 4:
+    instance.sort_name = instance.sort_name[:4].lower()=="the " and instance.sort_name[4:] or instance.sort_name
+  else:
+    instance.sort_name = instance.sort_name
+  
 
+
+pre_save.connect(artist_handler, sender=Artist)
 
 class Album(models.Model):
   name = models.CharField(max_length=300)

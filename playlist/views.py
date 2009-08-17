@@ -64,7 +64,7 @@ class SongForm(forms.ModelForm):
     #self.album = forms.CharField(max_length=300, initial=song.album.name)
   
   def save(self):
-    self.cleaned_data['artist'] = getObj(Artist, self.cleaned_data['artist']) #convert strings to objects
+    self.cleaned_data['artist'] = getObj(Artist, self.cleaned_data['artist'], self.initial['artist']) #convert strings to objects
     self.cleaned_data['album'] = getObj(Album, self.cleaned_data['album'])
     forms.ModelForm.save(self)
   
@@ -305,20 +305,16 @@ def listartists(request, letter='123', page='1'):
       #artist.delete() #prune empty artists
       
   if letter == '123':
-    artists = Artist.objects.all().order_by("name")
+    artists = Artist.objects.all().order_by("sort_name")
     artists = filter(the_filter, artists)
   elif letter == "all":
-    artists = Artist.objects.all().order_by("name")
-  elif letter == 't':
-    artists = Artist.objects.filter(name__istartswith=letter).order_by("name").exclude(name__istartswith="the") | \
-    Artist.objects.filter(name__istartswith="the "+letter).order_by("name") 
+    artists = Artist.objects.all().order_by("sort_name")
   elif letter.isalpha():
-    artists = Artist.objects.filter(name__istartswith=letter).order_by("name") | \
-    Artist.objects.filter(name__istartswith="the "+letter).order_by("name") 
+    artists = Artist.objects.filter(sort_name__istartswith=letter).order_by("sort_name")
   else:
     raise Http404
-  artists = list(artists)
-  artists.sort(key=sortkey) #sort 'the's properly
+  #artists = list(artists)
+  #artists.sort(key=sortkey) #sort 'the's properly
   try:
     page = int(page)
   except:
