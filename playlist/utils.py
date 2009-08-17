@@ -110,7 +110,7 @@ def listenerCount():
     return "?"
   try:
     return listeners.search(s).group(1)
-  except IndexError, AttributeError:
+  except (IndexError, AttributeError):
     return "?"
   
   
