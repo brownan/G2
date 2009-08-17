@@ -297,12 +297,12 @@ def listartists(request, letter='123', page='1'):
       return x.name[:4].lower()=="the " and x.name[4:].lower() or x.name.lower()
     else:
       return x.name.lower()
-      
-  artists = Artist.objects.all().order_by("name")
   letter = letter.lower()
-  for artist in artists:
-    if artist.songs.count() == 0:
-      artist.delete() #prune empty artists
+  #artists = Artist.objects.all().order_by("name")
+  
+  #for artist in artists:
+    #if artist.songs.count() == 0:
+      #artist.delete() #prune empty artists
       
   if letter == '123':
     artists = Artist.objects.all().order_by("name")
