@@ -298,6 +298,12 @@ class Song(models.Model):
     if not self.id:
         self.add_date = datetime.datetime.today()
     super(Song, self).save()
+    
+  def delete(self):
+    #prune artist if now empty
+    if self.artist.songs.count() <= 1:
+        self.artist.delete()
+    super(Song, self).delete()
 
   class Meta:
     permissions = (

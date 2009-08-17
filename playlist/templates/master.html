@@ -58,10 +58,11 @@
       <li><a id="menuitem" href="{% url playlist.views.upload %}"><img id="butansurface" src="images/butansurface.png" alt="upload" title="upload" />Upload</a></li>
       <li><a id="menuitem" href="{% url playlist.views.listartists "all","1" %}"><img id="butansurface" src="images/butansurface.png" alt="artists" title="Browse Artists" />Artists</a></li>
       <li><a id="menuitem" href='{% url playlist.views.orphans "1" %}'><img id="butansurface" src="images/butansurface.png" alt="orphanage" title="Orphanage" />Orphanage</a></li>
+      <li><a id="menuitem" href="{% url forum_index %}"><img id="butansurface" src="images/butansurface.png" alt="forums" title="Forums" />Forums</a></li>
+      <li><a id="menuitem" href="http://www.thegreenwood.info/irc/"><img id="butansurface" src="images/butansurface.png" alt="irc" title="IRC" />IRC</a></li>
       <li><a id="menuitem" href="http://gbsfm.ath.cx:8001/listen.pls"><img id="butansurface" src="images/butansurface.png" alt="listen" title="Listen!" />Listen!</a></li>
       <li><a id="menuitem" href="#" onClick="listenswf(); return false;"><img id="butansurface" src="images/butansurface.png" alt="Flash Player" title="Flash Player" />Flash Player</a></li>
       <li><a id="menuitem" href="{% url django.contrib.auth.views.logout %}"><img id="butansurface" src="images/butansurface.png" alt="logout" title="Logout" />Logout</a></li>
-      <li><a id="menuitem" href="http://www.thegreenwood.info/irc/"><img id="butansurface" src="images/butansurface.png" alt="irc" title="IRC" />IRC</a></li>
       {% if perms.playlist.view_g2admin %}
       <!--<a href="{#{% url admin_site %}#}"><li>Admin</li></a>-->
       <li><a id="menuitem" href="{% url g2admin %}"><img id="butansurface" src="images/butansurface.png" alt="admin" title="Admin" />Admin</a></li>

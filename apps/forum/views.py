@@ -17,7 +17,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.views.generic.list_detail import object_list
 
-from forum.models import Forum,Thread,Post,Subscription
+from forum.models import Forum,Thread,Post,Subscription,Category
 from forum.forms import CreateThreadForm, ReplyForm
 
 FORUM_PAGINATION = getattr(settings, 'FORUM_PAGINATION', 10)
@@ -25,8 +25,12 @@ LOGIN_URL = getattr(settings, 'LOGIN_URL', '/accounts/login/')
 
 def forums_list(request):
     
-  queryset = Forum.objects.for_groups(request.user.groups.all()).filter(parent__isnull=True)
-  return render_to_response('register.html', {'form': form}, context_instance=RequestContext(request))
+  forums = Forum.objects.for_groups(request.user.groups.all()).filter(parent__isnull=True).order_by('sort_order')
+  categories = []
+  for category in Category.objects.all().order_by('sort_order'):
+    categories.append({'name': category.name, 'object':category.forums.all().order_by('sort_order')})
+    
+  return render_to_response('forum/forum_list.html', {'categories': categories}, context_instance=RequestContext(request))
 
 def forum(request, slug):
     """
