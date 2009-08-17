@@ -85,8 +85,12 @@ def stop_stream():
 #  self.uploads += 1
 #  self.save()
 #
-def getObj(table, name):
+def getObj(table, name, oldid=None):
   #get album/artist object if it exists; otherwise create it
+  if oldid:
+    obj = table.objects.get(id=oldid)
+    if obj.songs.count() <= 1:
+      obj.delete()
   try:
     entry = table.objects.get(name__exact=name)
     entry.name = name
