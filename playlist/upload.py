@@ -61,8 +61,12 @@ class UploadedFile:
     tags.update(song)
     
     for value in tags.keys():
-      tags[value] = tags[value][0] #list to string (first element)
-  
+      try:
+        tags[value] = tags[value][0] #list to string (first element)
+      except IndexError:
+        #no tag 
+        pass
+      
     tags['length'] = round(song.info.length)
     tags['bitrate'] = song.info.bitrate/1000 #b/s -> kb/s
     if not ("title" in tags.keys()):
