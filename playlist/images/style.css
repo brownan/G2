@@ -14,7 +14,7 @@ body {
   background-image:url('bodystripes3.png'); /* THEME: background */
 }
 #playlist {
-  background-color:#EFE; /* THEME: playlist background */
+  background-color:#F5FFEE; /* THEME: playlist background */
 }
 tr.odd, #columns tr {
   background-color:#F5FFEE; /* THEME: playlist alternating color 1 */
@@ -139,7 +139,7 @@ p.artists {
   border-style: dotted;
   padding: 5px;
 }
-p.copyright {
+p.copyright, p.listenersthing {
   font-size: 0.7em;
   color: grey;
   max-width:99px;
@@ -222,4 +222,64 @@ div.messages p {    /* MESSAGES bar- "track added", "too many dongs" etc. */
   margin-left:140px;
   margin-right:10px;
   font-weight:bold;
+}
+div.progtube {
+  width:320px;
+  border:1px solid black;
+  background-color:#FFF;
+  height:8px;
+}
+div.progbar {
+  height:8px;
+  background-color:#050;
+}
+div.clutterbar, div.notices {
+  font-size:smaller;
+  border:1px solid black;
+  padding:10px;
+  background-color:#F5FFEE;
+  margin:5px 0px;
+}
+div.notices {
+  margin-left:140px;
+  margin-right:10px;
+}
+div.clutterbar {
+  min-height:55px;
+  /* background-position:top right;   No need for this.. yet
+  background-repeat:no-repeat; */ 
+}
+div.voteboxbar {
+  float:right;
+  padding-left:5px;
+}
+div.voteboxbar p {
+  font-size:larger;
+}
+div.clutterbar p a {
+  border:1px solid black;
+  padding:1px;
+  margin:1px;
+  text-decoration:none;
+  color:black;
+  background-color:#F5FFEE;
+}
+div.clutterbar p a.selectedvote, div.clutterbar p a.selectedvote:hover {
+  color:white;
+  background-color:black;
+  font-weight:bold;
+}
+div.clutterbar p a:hover {
+  background-color:#9C9;
+}
+div.voteboxsong {
+  display:block;
+  margin-right:330px;
+}
+p.listenersthing {
+  font-size:10px;
+  color:black;
+  font-weight:bold;
+  max-width:99px;
+  text-align:center;
 }

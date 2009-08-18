@@ -72,13 +72,22 @@
     <div id="player"></div>
     <p class="copyright">Icons from <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a></p>
     <p class="copyright">Pretty bits by overdose</p>
-    <p class="copyright">Listeners: {{listeners}}</p>
+    <p class="listenersthing">Listeners: {{listeners}}</p>
     <img src="images/menubottom.png" alt="" title="" />
   </div>
   </div>
 </div>
 
 <div class="content">
+<div class="notices"> <!-- Change information in this box into something more relevant -->
+    Hello, you are staring at gbsfm2, yes welcome. munch munch munch munch munch munch munch munch munch munch<br />
+    Currently implementing:
+    <ul>
+      <li>Forum</li>
+      <li>Stuff</li>
+      <li>Other things</li>
+    </ul>
+  </div>
 {% if messages %}
   <div class="messages">
   {% for message in messages %}
@@ -90,6 +99,19 @@
 {% endblock %}
 {% block content %}
 {% endblock %}
+    <div class="clutterbar"> <!-- this whole clutterbar should probably work and be positionable top or bottom -->
+      <div class="voteboxbar"><div class="progtube"><div style="width:40%;" class="progbar"></div></div>4:56/7:23
+      <p>Vote: <a class="selectedvote" href="#">1</a><!-- the width here^^ in percent is the progress of the song -->
+      <a href="#">2</a>
+      <a href="#">3</a>
+      <a href="#">4</a>
+      <a href="#">5</a>
+      </p>
+      </div>
+      <div class="voteboxsong"><!-- Song title, comments... I dunno... -->
+      An Implausably Longyst Name - The First Figen Caca Caca Poooooop Or Maybe Something Other Than Artist and Title Here I Dunno
+      </div>
+    </div>
 </div>
 </body>
 </html>
