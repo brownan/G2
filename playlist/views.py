@@ -132,9 +132,9 @@ def playlist(request, msg="", js=""):
   #historylength = 10
   oldentries = OldPlaylistEntry.objects.all()
   if historylength <= oldentries.count():
-    playlist = list(oldentries[oldentries.count()-historylength:]) + list(PlaylistEntry.objects.all().order_by('addtime'))
+    playlist = itertools.chain(oldentries[oldentries.count()-historylength:], PlaylistEntry.objects.all().order_by('addtime'))
   else:
-    playlist = list(oldentries) + list(PlaylistEntry.objects.all().order_by('addtime'))
+    playlist = itertools.chain(oldentries, PlaylistEntry.objects.all().order_by('addtime'))
   aug_playlist= []
   for entry in playlist:
     if isinstance(entry, PlaylistEntry) and not entry.playing and (request.user.has_perm('remove_entry') or request.user == entry.adder):
@@ -157,7 +157,6 @@ def playlist(request, msg="", js=""):
   
  # return render_to_response('index.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))
   
-@login_required()
 def ajax(request, resource=""):
   if resource == "nowplaying":
     entryid = PlaylistEntry.objects.get(playing=True).id
