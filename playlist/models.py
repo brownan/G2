@@ -59,9 +59,16 @@ def artist_handler(sender, **kwargs):
   else:
     instance.sort_name = instance.sort_name
   
+def dupe_handler(sender, **kwargs):
+  instance = kwargs['instance']
+  for dupe in sender.objects.filter(name=instance.name):
+    for song in dupe.songs.all():
+      instance.songs.add(song)
+    dupe.delete()
 
 
 pre_save.connect(artist_handler, sender=Artist)
+pre_save.connect(dupe_handler, sender=Artist)
 
 class Album(models.Model):
   name = models.CharField(max_length=300)
@@ -302,7 +309,7 @@ class Song(models.Model):
     
   def rate(self, score, user):
     score = int(score)
-    if not (0 <= score and score <= 5):
+    if not (1 <= score and score <= 5):
       raise ScoreOutOfRangeError
     
     try:
