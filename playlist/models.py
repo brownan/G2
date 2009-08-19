@@ -309,7 +309,7 @@ class Song(models.Model):
     
   def rate(self, score, user):
     score = int(score)
-    if not (0 <= score and score <= 5):
+    if not (1 <= score and score <= 5):
       raise ScoreOutOfRangeError
     
     try:
