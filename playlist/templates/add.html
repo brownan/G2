@@ -1,5 +1,5 @@
 {#{% if song.addDisallowed %}#}
-  ({#{{song.addDisallowed.1}}#})
+  <!--({#{{song.addDisallowed.1}}#})-->
 {#{% else %}#}
   <a href="{% url playlist.views.add song.id %}">Add!</a>
 {#{% endif %}#}
