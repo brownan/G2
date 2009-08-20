@@ -262,11 +262,11 @@ class Song(models.Model):
       oldentries = OldPlaylistEntry.objects.all()
     if self.banned:
       return ("song banned", "banned")
-    if entries.filter(song=self).count() > 0:
+    if len(PlaylistEntry.objects.filter(song=self)) > 0:
       return ("song already on playlist", "on playlist")
     #check song hasn't been played recently: dt is definition of 'recently'
     dt = datetime.datetime.now()-datetime.timedelta(hours=int(settings.REPLAY_INTERVAL))
-    if oldentries.filter(song=self, playtime__gt=dt) > 0:
+    if len(OldPlaylistEntry.objects.filter(song=self, playtime__gt=dt)) > 0:
       return ("song played too recently", "recently played")
     return None
     
