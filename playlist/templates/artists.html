@@ -46,7 +46,7 @@
   </div>
     <ul>
       {% for artist in artists.object_list %}
-        <li><a href="{% url artist artist.id %}"> {{ artist.name }}</a> ({{artist.songs.count}} dong{{artist.songs.count|pluralize}})</li>
+        <li><a href="{% url artist artist.id %}"> {{ artist.name }}</a> ({{artist.song_count}} dong{{artist.song_count|pluralize}})</li>
       {% endfor %}
     </ul>
 

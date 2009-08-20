@@ -2,6 +2,7 @@
 import os.path
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
+from mutagen.mp3 import HeaderNotFoundError
 import hashlib
 from django.core.management import setup_environ
 from pydj import settings
@@ -55,7 +56,7 @@ class UploadedFile:
     
     try:
       song = MP3(self.file, ID3=EasyID3)
-    except mutagen.mp3.HeaderNotFoundError:
+    except HeaderNotFoundError:
       raise CorruptFileError
     
     tags.update(song)

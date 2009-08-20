@@ -26,6 +26,9 @@ from django.forms.models import modelformset_factory
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.template import RequestContext
 from django.conf import settings
+from django.db import connection, transaction
+from django.db.models import Avg, Max, Min, Count
+
 
 from pydj.playlist.utils import getSong, getObj
 from pydj.playlist.upload import UploadedFile
@@ -131,10 +134,8 @@ def playlist(request, msg="", js=""):
   historylength = request.user.get_profile().s_playlistHistory
   #historylength = 10
   oldentries = OldPlaylistEntry.objects.all()
-  if historylength <= oldentries.count():
-    playlist = itertools.chain(oldentries[oldentries.count()-historylength:], PlaylistEntry.objects.all().order_by('addtime'))
-  else:
-    playlist = itertools.chain(oldentries, PlaylistEntry.objects.all().order_by('addtime'))
+  playlist = itertools.chain(oldentries.extra(where=['playlist_oldplaylistentry.id > \
+  (select max(id) from playlist_oldplaylistentry)-%s'], params=[historylength]).select_related(), PlaylistEntry.objects.select_related().all().order_by('addtime'))
   aug_playlist= []
   for entry in playlist:
     if isinstance(entry, PlaylistEntry) and not entry.playing and (request.user.has_perm('remove_entry') or request.user == entry.adder):
@@ -146,12 +147,8 @@ def playlist(request, msg="", js=""):
     
   can_skip = request.user.has_perm('playlist.skip_song')
   now_playing = PlaylistEntry.objects.get(playing=True).song.metadataString()
-
-  removals = RemovedEntry.objects.all()
-  if removals.count():
-    lastremoval = removals[removals.count()-1].id
-  else:
-    lastremoval = 0
+  lastremoval = RemovedEntry.objects.aggregate(Min('id'))
+  
   return render_to_response('jsplaylist.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip, 'lastremoval':lastremoval, 'now_playing':now_playing}, context_instance=RequestContext(request))
 
   
@@ -304,12 +301,12 @@ def listartists(request, letter='123', page='1'):
       #artist.delete() #prune empty artists
       
   if letter == '123':
-    artists = Artist.objects.all().order_by("sort_name")
+    artists = Artist.objects.all().order_by("sort_name").annotate(song_count=Count('songs'))
     artists = filter(the_filter, artists)
   elif letter == "all":
-    artists = Artist.objects.all().order_by("sort_name")
+    artists = Artist.objects.all().order_by("sort_name").annotate(song_count=Count('songs'))
   elif letter.isalpha():
-    artists = Artist.objects.filter(sort_name__istartswith=letter).order_by("sort_name")
+    artists = Artist.objects.filter(sort_name__istartswith=letter).order_by("sort_name").annotate(song_count=Count('songs'))
   else:
     raise Http404
   #artists = list(artists)
@@ -393,7 +390,7 @@ def upload(request):
         request.user.message_set.create(message="Uploaded file successfully!")
   else:
     form = UploadFileForm()
-  uploads = Song.objects.filter(uploader=request.user).order_by("-add_date")
+  uploads = Song.objects.select_related().filter(uploader=request.user).order_by("-add_date")
   if len(uploads) > 10: 
     recentuploads = uploads[:10]
   else: 
@@ -404,7 +401,7 @@ def upload(request):
 @permission_required('playlist.view_artist')
 def artist(request, artistid=None):
   artist = Artist.objects.get(id=artistid)
-  songs = Song.objects.filter(artist=artist).order_by("album")
+  songs = Song.objects.select_related().filter(artist=artist).order_by("album")
   return render_to_response("artist.html", {'songs': songs, 'artist': artist}, context_instance=RequestContext(request))
     
 @permission_required('playlist.queue_song')
@@ -507,17 +504,18 @@ def search(request):
     if form.is_valid(): # All validation rules pass
       query = form.cleaned_data['query']
       
-      artists = Artist.objects.filter(name__icontains=query).order_by('name')
-      songs = Song.objects.filter(title__icontains=query).order_by('title')
+      artists = Artist.objects.select_related().filter(name__icontains=query).order_by('name')
+      songs = Song.objects.select_related().filter(title__icontains=query).order_by('title')
       if form.cleaned_data['orphan']:
         scuttle = User(username="Fagin")
-        orphans = Song.objects.filter(uploader=scuttle).order_by('name')
+        orphans = Song.objects.select_related().filter(uploader=scuttle).order_by('name')
         temp = []
         for artist in artists:
           for song in artist.songs.all():
             if song.uploader == scuttle:
               temp.append(artist)
         artists = temp
+        songs = orphans
         
       return render_to_response('search.html', {'form':form, 'artists':list(artists), 'songs':songs, 'query':query},\
       context_instance=RequestContext(request))
@@ -537,7 +535,7 @@ def orphans(request, page=0):
   except:
     page = 1
   scuttle = User.objects.get(username="Fagin")
-  songs = Song.objects.filter(uploader=scuttle).order_by("title")
+  songs = Song.objects.select_related().filter(uploader=scuttle).order_by("title")
   for song in songs: 
     p = Paginator(songs, 50)
   try:

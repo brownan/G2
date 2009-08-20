@@ -93,16 +93,23 @@
 {% endblock %}
 {% block content %}
 {% endblock %}
-    <!--<div class="clutterbar"> <!-- this whole clutterbar should probably work and be positionable top or bottom -->
-      <!--<div class="voteboxbar"><div class="progtube"><div style="width:40%;" class="progbar"></div></div>4:56/7:23
-      <p>Vote: <a class="selectedvote" href="#">1</a>--><!-- the width here^^ in percent is the progress of the song -->
-      <!--<a href="#">2</a>
+<!--    <div class="clutterbar">  this whole clutterbar should probably work and be positionable top or bottom 
+      <div class="voteboxbar"><div class="progtube"><div style="width:40%;" class="progbar"></div></div>4:56/7:23
+      <p>Vote: <a class="selectedvote" href="#">1</a> the width here^^ in percent is the progress of the song 
+      <a href="#">2</a>
       <a href="#">3</a>
       <a href="#">4</a>
       <a href="#">5</a>
       </p>
       </div>
-      <div class="voteboxsong">--><!-- Song title, comments... I dunno... -->
+      <div class="voteboxsong"> Song title, comments... I dunno... -->
+      <p><em>Total query count:</em> {{ sqllog|length }}<br/>
+      <em>Total execution time:</em> {{ sqltime }}</p>
+      <!--<ul class="sqllog">
+          {% for sql in sqllog %}
+              <li>{{ sql.time }}: {{ sql.sql }}</li>
+          {% endfor %}
+      </ul>-->
       
       </div>
     </div>
