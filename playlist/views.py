@@ -67,8 +67,9 @@ class SongForm(forms.ModelForm):
     #self.album = forms.CharField(max_length=300, initial=song.album.name)
   
   def save(self):
-    self.cleaned_data['artist'] = getObj(Artist, self.cleaned_data['artist'], self.initial['artist']) #convert strings to objects
-    self.cleaned_data['album'] = getObj(Album, self.cleaned_data['album'])
+    self.cleaned_data['artist'] = Artist.objects.get_or_create(name=self.cleaned_data['artist'])[0]#getObj(Artist, self.cleaned_data['artist'], self.initial['artist']) #convert strings to objects
+    print self.cleaned_data['artist']
+    self.cleaned_data['album'] = Album.objects.get_or_create(name=self.cleaned_data['album'])[0]#getObj(Album, self.cleaned_data['album'])
     forms.ModelForm.save(self)
   
 
@@ -407,12 +408,18 @@ def artist(request, artistid=None):
 @permission_required('playlist.queue_song')
 def add(request, songid=0): 
   try:
-    Song.objects.get(id=songid).playlistAdd(request.user)
+    song = Song.objects.get(id=songid)
+    song.playlistAdd(request.user)
   except AddError, e:
     msg = "Error: %s" % (e.args[0])
     request.user.message_set.create(message=msg)
     return HttpResponseRedirect(reverse("playlist"))      
   else:
+    scuttle = User.objects.get(username="Fagin")
+    if song in Song.objects.filter(uploader=scuttle):
+      song.uploader = request.user
+      song.save()
+      request.user.message_set.create(message="This dong was an orphan, so you have automatically adopted it. Take good care of it!")
     request.user.message_set.create(message="Track added successfully!")
     return HttpResponseRedirect(reverse("playlist"))
   
@@ -535,7 +542,7 @@ def orphans(request, page=0):
   except:
     page = 1
   scuttle = User.objects.get(username="Fagin")
-  songs = Song.objects.select_related().filter(uploader=scuttle).order_by("title")
+  songs = Song.objects.filter(uploader=scuttle).order_by("title")
   for song in songs: 
     p = Paginator(songs, 50)
   try:

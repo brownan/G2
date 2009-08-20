@@ -52,7 +52,7 @@ url(r'^admin/(.*)', admin.site.root, {}, "admin_site"),
 (r'^g2admin$', 'pydj.playlist.views.g2admin', {}, 'g2admin'), 
 (r'^stop_stream$', 'pydj.playlist.views.stop_stream', {}, 'stop_stream'), 
 (r'^start_stream$', 'pydj.playlist.views.start_stream', {}, 'start_stream'), 
-(r'^orphanage/(\d+)$', 'pydj.playlist.views.orphans', {}, 'orphans'),
+#(r'^orphanage/(\d+)$', 'pydj.playlist.views.orphans', {}, 'orphans'),
 (r'^adopt/(\d+)$', 'pydj.playlist.views.adopt', {}, 'adopt'),
 
 #javascript stuff

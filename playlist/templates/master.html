@@ -57,7 +57,6 @@
       <li><a id="menuitem" href="{% url playlist.views.search %}"><img id="butansurface" src="images/butansurface.png" alt="search" title="search" />Search</a></li>
       <li><a id="menuitem" href="{% url playlist.views.upload %}"><img id="butansurface" src="images/butansurface.png" alt="upload" title="upload" />Upload</a></li>
       <li><a id="menuitem" href="{% url playlist.views.listartists "all","1" %}"><img id="butansurface" src="images/butansurface.png" alt="artists" title="Browse Artists" />Artists</a></li>
-      <li><a id="menuitem" href='{% url playlist.views.orphans "1" %}'><img id="butansurface" src="images/butansurface.png" alt="orphanage" title="Orphanage" />Orphanage</a></li>
       <li><a id="menuitem" href="{% url forum_index %}"><img id="butansurface" src="images/butansurface.png" alt="forums" title="Forums" />Forums</a></li>
       <li><a id="menuitem" href="http://www.thegreenwood.info/irc/"><img id="butansurface" src="images/butansurface.png" alt="irc" title="IRC" />IRC</a></li>
       <li><a id="menuitem" href="http://gbsfm.ath.cx:8001/listen.pls"><img id="butansurface" src="images/butansurface.png" alt="listen" title="Listen!" />Listen!</a></li>
@@ -105,11 +104,11 @@
       <div class="voteboxsong"> Song title, comments... I dunno... -->
       <p><em>Total query count:</em> {{ sqllog|length }}<br/>
       <em>Total execution time:</em> {{ sqltime }}</p>
-      <!--<ul class="sqllog">
+      <ul class="sqllog">
           {% for sql in sqllog %}
               <li>{{ sql.time }}: {{ sql.sql }}</li>
           {% endfor %}
-      </ul>-->
+      </ul>
       
       </div>
     </div>
