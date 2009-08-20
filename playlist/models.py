@@ -146,9 +146,11 @@ class UserProfile(models.Model):
     self.user.get_profile().uploads += 1
     self.user.save()
       
-  def addDisallowed(self):
+  def addDisallowed(self, entries=None):
     #check user hasn't got too many songs on the playlist
-    if len(PlaylistEntry.objects.filter(adder=self.user)) >= int(settings.PLAYLIST_MAX):
+    if not entries:
+      entries = PlaylistEntry.objects.all()
+    if len(entries.filter(adder=self.user)) >= int(settings.PLAYLIST_MAX):
       return ("you already have too many songs on the playlist", "user is greedy")
     return None
     
@@ -249,18 +251,22 @@ class Song(models.Model):
   
   #stream_options = StreamOptions()
   
-  def addDisallowed(self):
+  def addDisallowed(self, entries=None, oldentries=None):
     """Returns (reason, shortreason) tuple. 
     Reason for user, shortreason for add button.
     Otherwise returns None."""
     
+    if not entries:
+      entries = PlaylistEntry.objects.all()
+    if not oldentries:
+      oldentries = OldPlaylistEntry.objects.all()
     if self.banned:
       return ("song banned", "banned")
-    if len(PlaylistEntry.objects.filter(song=self)) > 0:
+    if entries.filter(song=self).count() > 0:
       return ("song already on playlist", "on playlist")
     #check song hasn't been played recently: dt is definition of 'recently'
     dt = datetime.datetime.now()-datetime.timedelta(hours=int(settings.REPLAY_INTERVAL))
-    if len(OldPlaylistEntry.objects.filter(song=self, playtime__gt=dt)) > 0:
+    if oldentries.filter(song=self, playtime__gt=dt) > 0:
       return ("song played too recently", "recently played")
     return None
     
