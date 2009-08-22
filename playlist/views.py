@@ -148,7 +148,7 @@ def playlist(request, msg="", js=""):
     
   can_skip = request.user.has_perm('playlist.skip_song')
   now_playing = PlaylistEntry.objects.get(playing=True).song.metadataString()
-  lastremoval = RemovedEntry.objects.aggregate(Min('id'))
+  lastremoval = RemovedEntry.objects.aggregate(Min('id'))['id__min']
   
   return render_to_response('jsplaylist.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip, 'lastremoval':lastremoval, 'now_playing':now_playing}, context_instance=RequestContext(request))
 
