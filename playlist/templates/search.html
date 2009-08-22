@@ -38,7 +38,7 @@
       <td><a href='{% url playlist.views.artist song.artist.id %}'>{{ song.artist }}</a></td>
       <td><a href='{% url playlist.views.song song.id %}'>{{ song.title }}</a></td>
       <td>{{ song.length|stom }}</td>
-      <td>{{ song.uploader.username }}</td>
+      <td><a href='{% url playlist.views.user song.uploader.id %}'>{{ song.uploader.username }}</a></td>
       <td>{% include "add.html" %}</td>
     </tr>
     {% endfor %}

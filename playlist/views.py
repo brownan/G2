@@ -513,13 +513,14 @@ def search(request):
       artists = Artist.objects.select_related().filter(name__icontains=query).order_by('name')
       songs = Song.objects.select_related().filter(title__icontains=query).order_by('title')
       if form.cleaned_data['orphan']:
-        scuttle = User(username="Fagin")
-        orphans = Song.objects.select_related().filter(uploader=scuttle).order_by('name')
+        scuttle = User.objects.get(username="Fagin")
+        orphans = songs.filter(uploader=scuttle).order_by('title')
         temp = []
         for artist in artists:
           for song in artist.songs.all():
             if song.uploader == scuttle:
               temp.append(artist)
+              break
         artists = temp
         songs = orphans
         
