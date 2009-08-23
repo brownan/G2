@@ -10,6 +10,7 @@ import urllib2
 import cookielib
 from urllib import quote, urlencode
 from subprocess import Popen
+import logging
 
 from django.http import HttpResponse,  HttpResponseRedirect, Http404
 from django.template import Context, loader
@@ -41,6 +42,9 @@ SA_PREFIX = "http://forums.somethingawful.com/member.php?action=getinfo&username
 LIVE = settings.IS_LIVE
 
 from django.contrib.auth.decorators import permission_required, login_required
+
+def now():
+  return " ".join(datetime.datetime.now().isoformat().split("T"))
 
 class UploadFileForm(forms.Form):
   file  = forms.FileField()
@@ -215,14 +219,13 @@ def ajax(request, resource=""):
 
 @login_required()
 def removeentry(request, entryid):
-  entry = PlaylistEntry.objects.get(id=entryid)
+  entry = PlaylistEntry.objects.select_related().get(id=entryid)
   if ((entry.adder == request.user) or request.user.has_perm("playlist.remove_entry")) and not entry.playing:
+    logging.info("User %s (uid %d) removed songid %d from playlist at %s" % (request.user.username, request.user.id, entry.song.id, now()))
     entry.delete()
     request.user.message_set.create(message="Entry deleted successfully.")
-    success = 1
   else:
     request.user.message_set.create(message="Error: insufficient permissions to remove entry")
-    success = 0
   if request.is_ajax():
     return HttpResponse(str(success))
   else:
@@ -230,6 +233,7 @@ def removeentry(request, entryid):
   
 @permission_required('playlist.skip_song')
 def skip(request):
+  logging.info("Mod %s (uid %d) skipped song at %s" % (request.user.username, request.user.id, now()))
   Popen(["killall", "-SIGUSR1", "ices"])
   return HttpResponseRedirect(reverse('playlist'))
 
@@ -333,12 +337,15 @@ def bansong(request, songid=0):
       reason = form.cleaned_data['reason']
       song.ban(reason)
       song.save()
+      logging.info("Mod %s (uid %d) banned songid %d with reason '%s' at %s" % (request.user.username, request.user.id, song.id, reason, now()))
+      
   return HttpResponseRedirect(reverse('song', args=[songid]))
 
 @permission_required('playlist.ban_song')
 def unbansong(request, songid=0, plays=0):
   song = Song.objects.get(id=songid)
   song.unban(plays)
+  logging.info("Mod %s (uid %d) unbanned songid %d for %d plays at %s" % (request.user.username, request.user.id, song.id, int(plays), now()))
   return HttpResponseRedirect(reverse('song', args=[songid]))
 
 @login_required()
@@ -346,6 +353,8 @@ def deletesong(request, songid=0):
   """Deletes song with songid from db. Does not yet delete file."""
   song = Song.objects.get(id=songid)
   if request.user.get_profile().canDelete(song):
+    logging.info("User %s (uid %d) deleted song '%s' with hash %s at %s" % (request.user.username, request.user.id, 
+                                                                        song.metadataString(), song.sha_hash, now()))
     song.delete()
     return HttpResponseRedirect(reverse(playlist))
   else:
