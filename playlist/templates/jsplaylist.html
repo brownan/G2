@@ -83,15 +83,16 @@ var addHandler = function(data){
     } else {
       removebutton = "";
     }
-    newentry = playlist.append("\
+    lastentry = $('#playlist > :last-child')
+    newentry = lastentry.after("\
     <tr id='" + entry.pk + "'>\
         <td><a href='{% url artist_js %}"+ entry.fields.song.fields.artist.pk+"'>"+ entry.fields.song.fields.artist.fields.name +"</a></td>\
         <td><a href='{% url song_js %}"+ entry.fields.song.pk +"'>"+ entry.fields.song.fields.title +"</a></td>\
-        <td>"+ stom(entry.fields.song.fields.length) + "</td>\
+        <td class='time'>"+ stom(entry.fields.song.fields.length) + "</td>\
         <td><a href='{% url user_js %}"+ entry.fields.adder.pk +"'>"+ entry.fields.adder.fields.username +"</a></td>\
         "+ removebutton +"\
-    </tr>").is(":last-child")
-    if (newentry.prev().hasClass('odd')) {
+    </tr>").next()
+    if (lastentry.hasClass('odd')) {
       newentry.addClass('even')
     } else {
       newentry.addClass('odd')
@@ -107,7 +108,7 @@ var oldEntryHandler = function(data){
     <tr id='h" + entry.pk + "'>\
         <td><a href='{% url artist_js %}"+ entry.fields.song.fields.artist.pk +"'>"+ entry.fields.song.fields.artist.fields.name +"</a></td>\
         <td><a href='{% url song_js %}"+ entry.fields.song.pk +"'>"+ entry.fields.song.fields.title +"</a></td>\
-        <td>"+ stom(entry.fields.song.fields.length) + "</td>\
+        <td class='time'>"+ stom(entry.fields.song.fields.length) + "</td>\
         <td><a href='{% url user_js %}"+ entry.fields.adder.pk +"'>"+ entry.fields.adder.fields.username +"</a></td>\
     </tr>").next()
     if (lastentry.hasClass('odd')) {
