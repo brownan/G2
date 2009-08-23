@@ -9,7 +9,7 @@ def init_logging():
     if settings.LOG_LEVEL == "DEBUG":
       logging.basicConfig(filename=settings.LOG_FILE,level=logging.DEBUG)
     else:
-      logging.basicConfig(filename=settings.LOG_FILE,level=logging.INFO
+      logging.basicConfig(filename=settings.LOG_FILE,level=logging.INFO)
   
     #handler = logging.handlers.TimedRotatingFileHandler(settings.LOG_FILENAME, when = 'midnight')  
     #formatter = logging.Formatter(LOG_MSG_FORMAT)  
