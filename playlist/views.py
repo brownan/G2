@@ -29,7 +29,7 @@ from django.template import RequestContext
 from django.conf import settings
 from django.db import connection, transaction
 from django.db.models import Avg, Max, Min, Count
-
+from django.contrib.auth import authenticate
 
 from pydj.playlist.utils import getSong, getObj
 from pydj.playlist.upload import UploadedFile
@@ -132,10 +132,26 @@ def stop_stream(request):
 @permission_required('playlist.view_g2admin')
 def g2admin(request):
   return render_to_response('admin.html',  {}, context_instance=RequestContext(request))
-
+  
+def splaylist(request):
+  #for scuttle loadtesting
+  try:
+    if authenticate(username=request.REQUEST['username'], password=request.REQUEST['password']):
+      return jsplaylist(request)
+  except KeyError: pass
+  return HttpResponseRedirect(reverse('login'))
+    
 @permission_required('playlist.view_playlist')
-def playlist(request, msg="", js=""):
-  historylength = request.user.get_profile().s_playlistHistory
+def playlist(request):
+  #normal entry route
+  return jsplaylist(request)
+  
+  
+def jsplaylist(request):
+  try:
+    historylength = request.user.get_profile().s_playlistHistory
+  except AttributeError:
+    historylength = 10
   #historylength = 10
   oldentries = OldPlaylistEntry.objects.all()
   playlist = itertools.chain(oldentries.extra(where=['playlist_oldplaylistentry.id > \
@@ -153,7 +169,7 @@ def playlist(request, msg="", js=""):
   now_playing = PlaylistEntry.objects.get(playing=True).song.metadataString()
   lastremoval = RemovedEntry.objects.aggregate(Max('id'))['id__max']
   
-  return render_to_response('jsplaylist.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip, 'lastremoval':lastremoval, 'now_playing':now_playing}, context_instance=RequestContext(request))
+  return render_to_response('jsplaylist.html',  {'aug_playlist': aug_playlist, 'can_skip':can_skip, 'lastremoval':lastremoval, 'now_playing':now_playing}, context_instance=RequestContext(request))
 
   
  # return render_to_response('index.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))
