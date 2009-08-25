@@ -193,7 +193,7 @@ class UserProfile(models.Model):
       return False #on playlist
     td = datetime.timedelta(days=1)
     now = datetime.datetime.now()
-    if (now > song.add_date-td) and (self.user == song.uploader):
+    if (now < song.add_date+td) and (self.user == song.uploader):
       return True
     return False
   
