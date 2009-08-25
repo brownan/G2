@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
+import os.path
 import threading
 import time
 
@@ -40,12 +41,20 @@ class G2FTPHandler(ftpserver.FTPHandler):
 
 class G2Authorizer(ftpserver.DummyAuthorizer):
   def validate_authentication(self, username, password):
+    if not bool(authenticate(username=username, password=password)):
+      return False
     try:
-      self.add_user(username, 'password', BASE_DIR, perm='lwe') #list, write, CWD
+      homedir = os.path.join(BASE_DIR, username)
+      os.mkdir(homedir)
+    except OSError:
+      pass #already exists..probably
+      
+    try:
+      self.add_user(username, 'password', homedir, perm='lweadf') #list, write, CWD
     except ftpserver.AuthorizerError:
       pass #already logged in
       
-    return bool(authenticate(username=username, password=password))
+    return True
   
 now = lambda: time.strftime("[%Y-%b-%d %H:%M:%S]")
    
