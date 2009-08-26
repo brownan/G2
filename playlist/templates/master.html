@@ -56,7 +56,8 @@
     <ol class='menu'>
       <li><a id="menuitem" href="{% url playlist.views.playlist %}"><img id="butansurface" src="images/butansurface.png" alt="playlist" title="playlist" />Playlist</a></li>
       <li><a id="menuitem" href="{% url playlist.views.search %}"><img id="butansurface" src="images/butansurface.png" alt="search" title="search" />Search</a></li>
-      <li><a id="menuitem" href="{% url playlist.views.upload %}"><img id="butansurface" src="images/butansurface.png" alt="upload" title="upload" />Upload</a></li>
+      <li><form action="/search" method="post"><input id="id_query" name="query" maxlength="100" type="text"><input name="orphan" id="id_orphan" type="hidden" value="false"></form></li> <!-- search for orphans? No. -->
+      <li><a id="menuitem" href="{% url playlist.views.upload %}"><img id="butansurface" src="images/butansurface.png" alt="upload" title="upload" />Upload</a></li> <!-- Indented as an example -->
       <li><a id="menuitem" href="{% url playlist.views.listartists "all","1" %}"><img id="butansurface" src="images/butansurface.png" alt="artists" title="Browse Artists" />Artists</a></li>
       <li><a id="menuitem" href="{% url playlist.views.user user.id %}"><img id="butansurface" src="images/butansurface.png" alt="user page" title="User Page" />User Page</a></li>
       <li><a id="menuitem" href="{% url forum_index %}"><img id="butansurface" src="images/butansurface.png" alt="forums" title="Forums" />Forums</a></li>
@@ -107,11 +108,13 @@
       {% if debug %}
       <p><em>Total query count:</em> {{ sqllog|length }}<br/>
       <em>Total execution time:</em> {{ sqltime }}</p>
+      {% if show_queries %}
       <ul class="sqllog">
           {% for sql in sqllog %}
               <li>{{ sql.time }}: {{ sql.sql }}</li>
           {% endfor %}
       </ul>
+      {% endif %}
       {% endif %}
       
       </div>

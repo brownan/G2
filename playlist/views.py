@@ -30,6 +30,7 @@ from django.conf import settings
 from django.db import connection, transaction
 from django.db.models import Avg, Max, Min, Count
 from django.contrib.auth import authenticate
+from django.db import connection
 
 from pydj.playlist.utils import getSong, getObj
 from pydj.playlist.upload import UploadedFile
@@ -445,6 +446,12 @@ def add(request, songid=0):
       song.save()
       request.user.message_set.create(message="This dong was an orphan, so you have automatically adopted it. Take good care of it!")
     request.user.message_set.create(message="Track added successfully!")
+    if settings.DEBUG:
+      f = open("sql.log", "a")
+      f.write("---\n")
+      for q in connection.queries:
+        f.write(q['time'] + " : " + q['sql'] + '\n')
+      f.close()
     return HttpResponseRedirect(reverse("playlist"))
   
 def next(request, authid):
