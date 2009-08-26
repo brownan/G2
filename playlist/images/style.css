@@ -80,6 +80,12 @@ ol.menu li {
   width:85px;
   height:16px;
 }
+ol.menu li.sub {
+  background-image:url('container6sub.png');
+  background-repeat:no-repeat;
+  margin:2px 0px 2px -30px;
+  width:75px;
+}
 ol.menu  a {
   text-decoration:none;
   color:black;
@@ -91,6 +97,9 @@ ol.menu li:hover {
 #butansurface {
   position:absolute;
   margin-left:-10px;
+}
+ol.menu li.sub #butansurface {
+  width:75px;
 }
 div.banner {
   clear: both;
@@ -282,4 +291,12 @@ p.listenersthing {
   font-weight:bold;
   max-width:99px;
   text-align:center;
+}
+#id_query {
+  width:79px;
+  height:14px;
+  font-size:11px;
+  border:0px;
+  margin:1px 3px 1px 3px;
+  padding:0px;
 }
