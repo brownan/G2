@@ -68,7 +68,7 @@ def dupe_handler(sender, **kwargs):
 
 
 pre_save.connect(artist_handler, sender=Artist)
-pre_save.connect(dupe_handler, sender=Artist)
+#pre_save.connect(dupe_handler, sender=Artist)
 
 class Album(models.Model):
   name = models.CharField(max_length=300)
@@ -227,7 +227,7 @@ class ChatboxPost(models.Model):
 class Song(models.Model):
   #TODO: sort out artist/composer/lyricist/remixer stuff as per note
   title = models.CharField(max_length=300)
-  artist = models.ForeignKey(Artist, blank=True, related_name='songs')
+  artist = models.ForeignKey(Artist, blank=True, null=True, related_name='songs')
   album = models.ForeignKey(Album, blank=True, related_name='songs')
   composer = models.CharField(max_length=300, blank=True) #balthcat <3
   lyricist = models.CharField(max_length=300, blank=True)

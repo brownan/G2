@@ -87,6 +87,11 @@ def stop_stream():
 #
 def getObj(table, name, oldid=None):
   #get album/artist object if it exists; otherwise create it
+  if oldid:
+    obj = table.objects.get(id=oldid)
+    if obj.songs.count() <= 1:
+      obj.songs.clear()
+      obj.delete()
   try:
     entry = table.objects.get(name__exact=name)
     entry.name = name
@@ -96,10 +101,7 @@ def getObj(table, name, oldid=None):
     t = table(name=name)
     t.save()
     return t
-  #if oldid:
-    #obj = table.objects.get(id=oldid)
-    #if obj.songs.count() == 0:
-      #obj.delete()
+
 
 def listenerCount():
   try:
