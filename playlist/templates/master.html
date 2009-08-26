@@ -57,7 +57,7 @@
       <li><a id="menuitem" href="{% url playlist.views.playlist %}"><img id="butansurface" src="images/butansurface.png" alt="playlist" title="playlist" />Playlist</a></li>
       <li><a id="menuitem" href="{% url playlist.views.search %}"><img id="butansurface" src="images/butansurface.png" alt="search" title="search" />Search</a></li>
       <li><form action="/search" method="post"><input id="id_query" name="query" maxlength="100" type="text"><input name="orphan" id="id_orphan" type="hidden" value="false"></form></li> <!-- search for orphans? No. -->
-      <li class="sub"><a id="menuitem" href="{% url playlist.views.upload %}"><img id="butansurface" src="images/butansurface.png" alt="upload" title="upload" />Upload</a></li> <!-- Indented as an example -->
+      <li><a id="menuitem" href="{% url playlist.views.upload %}"><img id="butansurface" src="images/butansurface.png" alt="upload" title="upload" />Upload</a></li> <!-- Indented as an example -->
       <li><a id="menuitem" href="{% url playlist.views.listartists "all","1" %}"><img id="butansurface" src="images/butansurface.png" alt="artists" title="Browse Artists" />Artists</a></li>
       <li><a id="menuitem" href="{% url playlist.views.user user.id %}"><img id="butansurface" src="images/butansurface.png" alt="user page" title="User Page" />User Page</a></li>
       <li><a id="menuitem" href="{% url forum_index %}"><img id="butansurface" src="images/butansurface.png" alt="forums" title="Forums" />Forums</a></li>
