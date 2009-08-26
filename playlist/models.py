@@ -238,7 +238,7 @@ class Song(models.Model):
   sha_hash = models.CharField(max_length=40, unique=True, editable=False)
   add_date = models.DateTimeField(editable=False)
   format = models.CharField(max_length=3, editable=False)
-  uploader = models.ForeignKey(User, editable=False)
+  uploader = models.ForeignKey(User, editable=False, related_name="uploads")
   category = models.CharField(max_length=20, default="regular", editable=False)
   
   banned = models.BooleanField(default=False, editable=False)
