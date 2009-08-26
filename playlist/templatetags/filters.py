@@ -53,4 +53,4 @@ def strip_bbcode(value):
         return force_unicode(value)
     else:
         return mark_safe(strip_bbcode(value))
-bbcode.is_save = True
+strip_bbcode.is_save = True
