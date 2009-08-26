@@ -104,13 +104,15 @@
       </p>
       </div>
       <div class="voteboxsong"> Song title, comments... I dunno... -->
+      {% if debug %}
       <p><em>Total query count:</em> {{ sqllog|length }}<br/>
       <em>Total execution time:</em> {{ sqltime }}</p>
-      <!--<ul class="sqllog">
+      <ul class="sqllog">
           {% for sql in sqllog %}
               <li>{{ sql.time }}: {{ sql.sql }}</li>
           {% endfor %}
-      </ul>-->
+      </ul>
+      {% endif %}
       
       </div>
     </div>
