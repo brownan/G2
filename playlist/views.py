@@ -52,7 +52,7 @@ class UploadFileForm(forms.Form):
 
 class SearchForm(forms.Form):
   query = forms.CharField(max_length=100)
-  orphan = forms.BooleanField(required=False)
+  orphan = forms.BooleanField(required=False, initial=False)
   
   def clean_query(self):
     if len(self.cleaned_data['query']) < 3:

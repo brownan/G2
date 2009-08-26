@@ -292,7 +292,7 @@ p.listenersthing {
   max-width:99px;
   text-align:center;
 }
-#id_query {
+li #id_query {
   width:79px;
   height:14px;
   font-size:11px;
