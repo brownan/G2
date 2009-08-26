@@ -1,5 +1,5 @@
 {% extends "forum_base.html" %}
-{% load i18n markup %}
+{% load i18n filters %}
 {% block title %}{{ thread.title|escape }} ({{ forum.title }}){% endblock %}
 
 {% block pagetitle %}{{ forum.title }} &raquo; {{ thread.title|escape }}{% endblock %}
@@ -15,7 +15,7 @@
 <tr>
 <th class='djangoForumThreadPostDetail' id='post{{ post.id }}'>{% blocktrans with post.time|timesince as time %}{{ time }} ago{% endblocktrans %}<br />
 {% ifnotequal thread.forum.id 3 %}{% trans "by" %} <strong>{{ post.author }}</strong></th>{% endifnotequal %}
-<td>{{ post.body|force_escape|markdown|safe }}</td>
+<td>{{ post.body|force_escape|bbcode|safe }}</td>
 </tr>{% endfor %}
 
 </table>
