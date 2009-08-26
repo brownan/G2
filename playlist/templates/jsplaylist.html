@@ -165,10 +165,10 @@ $(document).ready(function(){
 
 {% block main %}  
 
-  <div class="playlist">
+  <div class="playlist" id ="playlistdiv">
     {% if msg %}<p class="message">{{msg}}</p>{% endif %}
     {% if aug_playlist %}
-    <table class="playlist">
+    <table class="playlist" id="playlisttable">
     <tbody id='playlist'>
       <tr id='columns'>
         <th>Artist</th>
