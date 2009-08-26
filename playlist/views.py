@@ -447,7 +447,7 @@ def add(request, songid=0):
       request.user.message_set.create(message="This dong was an orphan, so you have automatically adopted it. Take good care of it!")
     request.user.message_set.create(message="Track added successfully!")
     if settings.DEBUG:
-      f = open("sql.log", "a")
+      f = open("/home/jonnty/sql.log", "a")
       f.write("---\n")
       for q in connection.queries:
         f.write(q['time'] + " : " + q['sql'] + '\n')
