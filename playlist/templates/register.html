@@ -13,11 +13,14 @@
   <div class="heed"><h1>GBSFM</h1></div>
 	<div class="playlist">
     <p class="regreg">Register:</p>
+    {% if error %}
     <span class="error">{{error}}</span>
+    {% endif %}
     <form enctype="multipart/form-data" action="{% url playlist.views.newregister %}" method="POST">
       {{ form.as_p }}
       <p>Now put your verification code, <em>{{authcode}}</em>, anywhere in the About Me, Location, Occupation or Interest fields of your Something Awful profile and press the button below.</p>
       <input type="submit" value="Verify Account and Register" />
+      <p>If you don't have an SA account or encounter any other problem, please email <a href="mailto:jonnty@gbs.fm">jonnty@gbs.fm</a>.</p>
     </form>
 	</div>
 	</body>

@@ -34,6 +34,9 @@ form, .note {
 form input {
   border:1px solid #999F99;
 }
+#id_randcode {
+  border:0px;
+}
 div.playlist p.regreg {
   border:1px solid black;
   padding: 3px;
