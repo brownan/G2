@@ -4,8 +4,13 @@
   
 {% block main %}
   <div class="playlist">
-    <a href="{% url start_stream %}" class="button">Start Stream</a>
-    <a href="{% url stop_stream %}" class="button">Stop Stream</a>    
+    <p><a href="{% url start_stream %}" class="button">Start Stream</a></p>
+    <p><a href="{% url stop_stream %}" class="button">Stop Stream</a></p>    
+    <form action='{% url playlist.views.g2admin %}' method="POST">
+    <table class="playlist">
+    {{msgform.as_table}}
+    </table>
+    <input type="submit" value="Update" />
   </div>
  
 {% endblock %} 

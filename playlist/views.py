@@ -96,8 +96,6 @@ class RegisterForm(UserCreationForm):
 
   
 class NewRegisterForm(forms.Form):
-
-  
   saname = forms.CharField(max_length=30, label="SA Username:")
   password1 = forms.CharField(max_length=30, label="Desired Password:", widget=forms.PasswordInput)
   password2 = forms.CharField(max_length=30, label="Confirm Password:", widget=forms.PasswordInput)
@@ -118,6 +116,10 @@ class NewRegisterForm(forms.Form):
       raise forms.ValidationError, "Username already registered. If you're not happy about this, PM Jonnty."
     except User.DoesNotExist:
       return self.cleaned_data['saname'] 
+      
+  
+class WelcomeMsgForm(forms.Form):
+  message = forms.CharField(max_length=2000, widget=forms.Textarea)
 
   
 @permission_required('playlist.start_stream')
@@ -132,7 +134,15 @@ def stop_stream(request):
   
 @permission_required('playlist.view_g2admin')
 def g2admin(request):
-  return render_to_response('admin.html',  {}, context_instance=RequestContext(request))
+  if request.method == "POST":
+    msgform = WelcomeMsgForm(request.POST)
+    if msgform.is_valid():
+      msg = Settings.objects.get(key="welcome_message")
+      msg.value = msgform.cleaned_data['message']
+      msg.save()  
+  else:
+    msgform = WelcomeMsgForm(initial={'message':Settings.objects.get(key="welcome_message").value})
+  return render_to_response('admin.html',  {"msgform":msgform}, context_instance=RequestContext(request))
   
 def splaylist(request):
   #for scuttle loadtesting
