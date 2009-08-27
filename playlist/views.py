@@ -190,6 +190,7 @@ def jsplaylist(request):
   
  # return render_to_response('index.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))
   
+@login_required()
 def ajax(request, resource=""):
   if resource == "nowplaying":
     entryid = PlaylistEntry.objects.get(playing=True).id
