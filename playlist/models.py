@@ -28,8 +28,8 @@ class FileTooBigError(Exception): pass
 
 
 class Artist(models.Model):
-  name = models.CharField(max_length=300, unique=True)
-  sort_name = models.CharField(max_length=255)
+  name = models.CharField(max_length=255, unique=True)
+  sort_name = models.CharField(max_length=300)
   
   def __unicode__(self): return self.name
   #maybe url, statistics?
