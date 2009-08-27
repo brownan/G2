@@ -56,7 +56,7 @@
     <ol class='menu'>
       <li><a id="menuitem" href="{% url playlist.views.playlist %}"><img id="butansurface" src="images/butansurface.png" alt="playlist" title="playlist" />Playlist</a></li>
       <li><a id="menuitem" href="{% url playlist.views.search %}"><img id="butansurface" src="images/butansurface.png" alt="search" title="search" />Search:</a></li>
-      <li><form action="/search" method="post"><input id="id_query" name="query" maxlength="100" type="text"></form></li>
+      <li><form action="/search" method="post"><input id="id_query" name="query" maxlength="100" onfocus="if(this.value=='Quick search')this.value='';" type="text" value="Quick search"></form></li>
       <li><a id="menuitem" href="{% url playlist.views.upload %}"><img id="butansurface" src="images/butansurface.png" alt="upload" title="upload" />Upload</a></li> 
       <li><a id="menuitem" href="{% url playlist.views.listartists "all","1" %}"><img id="butansurface" src="images/butansurface.png" alt="artists" title="Browse Artists" />Artists</a></li>
       <li><a id="menuitem" href="{% url playlist.views.user user.id %}"><img id="butansurface" src="images/butansurface.png" alt="user page" title="User Page" />User Page</a></li>
