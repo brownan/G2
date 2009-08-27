@@ -29,7 +29,7 @@ class FileTooBigError(Exception): pass
 
 class Artist(models.Model):
   name = models.CharField(max_length=300, unique=True)
-  sort_name = models.CharField(max_length=300)
+  sort_name = models.CharField(max_length=255)
   
   def __unicode__(self): return self.name
   #maybe url, statistics?
@@ -71,7 +71,7 @@ pre_save.connect(artist_handler, sender=Artist)
 #pre_save.connect(dupe_handler, sender=Artist)
 
 class Album(models.Model):
-  name = models.CharField(max_length=300, unique=True)
+  name = models.CharField(max_length=255, unique=True)
   
   def __unicode__(self): return self.name
 
