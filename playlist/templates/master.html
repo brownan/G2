@@ -43,15 +43,16 @@
 <script type="text/javascript">
 $(document).ready(function(){
   //quick search handler
-  searchbox = $('#id_query')
-  searchbox.css('color', 'grey')
+  searchbox = $('#id_query');
+  searchbox.css('color', 'grey');
+  searchbox.attr('value', "Quick search"); //override browser modifications
   searchbox.focus(function () {
     if (searchbox.attr('value') == "Quick search") {
-      searchbox.attr('value', '')
-      searchbox.css('color', 'black')
+      searchbox.attr('value', '');
+      searchbox.css('color', 'black');
     }
-  })
-})
+  });
+});
 </script>
 
 </head>
