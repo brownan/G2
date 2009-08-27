@@ -85,7 +85,7 @@
 {% block main %}
 <div class="playlist">
 <div id='djangoForumBody'>
-<div id='djangoForumBreadcrumbs'>{% block breadcrumbs %}{% endblock %}</div>
+<div id='djangoForumBreadcrumbs'><a href='{% url forum_index %}'>{% trans "Forums" %}</a>{% block breadcrumbs %}{% endblock %}</div>
 {% block content %}{% endblock %}
 </div>
 </div>
