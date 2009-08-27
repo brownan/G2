@@ -169,8 +169,13 @@ def jsplaylist(request):
   can_skip = request.user.has_perm('playlist.skip_song')
   now_playing = PlaylistEntry.objects.get(playing=True).song.metadataString()
   lastremoval = RemovedEntry.objects.aggregate(Max('id'))['id__max']
+  try:
+    welcome_message = Settings.objects.get(key="welcome_message").value
+  except:
+    welcome_message = None
   
-  return render_to_response('jsplaylist.html',  {'aug_playlist': aug_playlist, 'can_skip':can_skip, 'lastremoval':lastremoval, 'now_playing':now_playing}, context_instance=RequestContext(request))
+  
+  return render_to_response('jsplaylist.html',  {'aug_playlist': aug_playlist, 'can_skip':can_skip, 'lastremoval':lastremoval, 'now_playing':now_playing, 'welcome_message':welcome_message}, context_instance=RequestContext(request))
 
   
  # return render_to_response('index.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))

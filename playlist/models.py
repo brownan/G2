@@ -453,6 +453,15 @@ class OldPlaylistEntry(models.Model):
   class Meta:
     ordering = ['id']
 
+class Settings(models.Model):
+  key = value = models.CharField(max_length=200)
+  value = models.CharField(max_length=3000)
+  
+  def __unicode__(self): return self.key
+  
+  class Meta:
+    ordering = ['key']
+
 ## DJ Shows ##
 
 class Series(models.Model):
