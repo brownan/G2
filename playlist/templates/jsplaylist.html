@@ -143,6 +143,7 @@ var checkLoop = function(){
 }
 
 $(document).ready(function(){
+  for 
   checkLoop();
 //   nowPlaying();
 //   $('tbody').append("\
@@ -177,6 +178,7 @@ $(document).ready(function(){
         <th>Title</th>
         <th>Time</th>
         <th>Added by</th>
+        <th>Vote</th>
         <th>Actions</th>
       </tr>
       {% for entry in aug_playlist %}
@@ -186,6 +188,13 @@ $(document).ready(function(){
         <td><a href='{% url song entry.object.song.id %}'>{{ entry.object.song.title }}</a></td>
         <td class="time">{{ entry.object.song.length|stom }}</td>
         <td><a href='{% url playlist.views.user entry.object.adder.id %}'>{{ entry.object.adder.username }}</a></td>
+        <td class="votes details">
+          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{song.id}}" class="vote1">1</a>
+          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{song.id}}" class="vote2">2</a>
+          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{song.id}}" class="vote3">3</a>
+          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{song.id}}" class="vote4">4</a>
+          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{song.id}}" class="vote5">5</a>
+        </td>
         {% if entry.can_remove %}
         <td>
           <a href='{% url playlist.views.removeentry entry.object.id %}' class="removebutton">

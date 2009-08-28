@@ -248,6 +248,17 @@ def ajax(request, resource=""):
   if resource == "pltitle":
     return HttpResponse(PlaylistEntry.objects.get(playing=True).song.metadataString() + " - GBS-FM")
   
+  if resource == "vote":
+    try:
+      vote = int(request.REQUEST['vote'])
+      songid = int(request.REQUEST['songid'])
+    except KeyError:
+      raise Http404
+    song = Song.objects.get(id=songid)
+    song.rate(vote, request.user)
+    
+    return HttpResponse()
+  
   raise Http404
 
 @login_required()
