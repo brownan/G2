@@ -189,11 +189,11 @@ $(document).ready(function(){
         <td class="time">{{ entry.object.song.length|stom }}</td>
         <td><a href='{% url playlist.views.user entry.object.adder.id %}'>{{ entry.object.adder.username }}</a></td>
         <td class="votes details">
-          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{song.id}}" class="vote1">1</a>
-          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{song.id}}" class="vote2">2</a>
-          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{song.id}}" class="vote3">3</a>
-          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{song.id}}" class="vote4">4</a>
-          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{song.id}}" class="vote5">5</a>
+          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{entry.object.song.id}}" class="vote1">1</a>
+          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{entry.object.song.id}}" class="vote2">2</a>
+          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{entry.object.song.id}}" class="vote3">3</a>
+          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{entry.object.song.id}}" class="vote4">4</a>
+          <a href="{% url playlist.views.ajax "vote" %}?vote=1&songid={{entry.object.song.id}}" class="vote5">5</a>
         </td>
         {% if entry.can_remove %}
         <td>
