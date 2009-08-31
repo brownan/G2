@@ -10,7 +10,7 @@
     #                                                                     #
     # g2 is distributed in the hope that it will be useful,               #
     # but WITHOUT ANY WARRANTY; without even the implied warranty of      #
-    # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       #
+    # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the        #
     # Affero General Public License for more details.                     #
     #                                                                     #
     # You can find a copy of the Affero General Public License, Version 1 #
@@ -461,7 +461,7 @@ def upload(request):
 @permission_required('playlist.view_artist')
 def artist(request, artistid=None):
   artist = Artist.objects.get(id=artistid)
-  songs = Song.objects.select_related().filter(artist=artist).order_by("album")
+  songs = Song.objects.select_related().filter(artist=artist).order_by("album__name")
   return render_to_response("artist.html", {'songs': songs, 'artist': artist}, context_instance=RequestContext(request))
     
 @permission_required('playlist.queue_song')
