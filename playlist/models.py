@@ -322,6 +322,7 @@ class Song(models.Model):
     
     try:
       r = Rating.objects.get(user=user, song=self)
+      prevscore = r.score
       if score == 0: #0 is delete
         r.delete()
       else:  
@@ -330,6 +331,7 @@ class Song(models.Model):
     except Rating.DoesNotExist:
       #not yet created (yes I know this is what get_or_create is for but it's stupid
       #(it can't do required fields properly))
+      prevscore = 0
       if score != 0: #0 is delete, don't create instead
         r = Rating(user=user, song=self, score=score)
         r.save()
@@ -342,6 +344,7 @@ class Song(models.Model):
       #ratings = [rating['score'] for rating in Rating.objects.filter(song=self).values()]
       self.avgscore = stats['avg_score'] #sum(ratings) / self.voteno
     self.save()
+    return prevscore
     
   def comment(self, user, comment):
     c = Comment(text=comment, user=user, song=self)

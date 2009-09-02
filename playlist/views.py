@@ -308,9 +308,9 @@ def ajax(request, resource=""):
       elif songid == "prev":
         song = OldPlaylistEntry.objects.select_related("song").extra(where=['playlist_oldplaylistentry.id =\
         (select max(playlist_oldplaylistentry.id) from playlist_oldplaylistentry)'])[0].song
-    song.rate(vote, user)
+    prevscore = song.rate(vote, user)
     
-    return HttpResponse()
+    return HttpResponse(str(prevscore) + " " +song.metadataString())
   
   if resource == "listeners":
     return HttpResponse(listenerCount())
