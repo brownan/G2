@@ -13,7 +13,9 @@ from django.contrib.auth.models import User
 #import pydj.dbsettings as dbsettings
 from django.db import IntegrityError 
 from django.conf import settings
-from django.db.models.signals import pre_save 
+from django.db.models.signals import pre_save
+from django.db.models import Avg, Count
+
 
 MUSIC_PATH = settings.MUSIC_DIR
 
@@ -314,7 +316,7 @@ class Song(models.Model):
       return u"%s (%s) - %s" % (self.artist, self.album, self.title)
     
   def rate(self, score, user):
-    score = int(score)
+    score = float(score)
     if not (1 <= score and score <= 5):
       raise ScoreOutOfRangeError
     
@@ -326,9 +328,10 @@ class Song(models.Model):
       #(it can't do required fields properly))
       r = Rating(user=user, song=self, score=score)
     r.save()
-    self.voteno = Rating.objects.filter(song=self).count()
-    ratings = [rating['score'] for rating in Rating.objects.filter(song=self).values()]
-    self.avgscore = sum(ratings) / self.voteno
+    ratings = Rating.objects.filter(song=self).aggregate(id_count=Count('id'), avg_score=Avg('score'))
+    self.voteno = ratings['id_count'] #Rating.objects.filter(song=self).count()
+    #ratings = [rating['score'] for rating in Rating.objects.filter(song=self).values()]
+    self.avgscore = ratings['avg_score'] #sum(ratings) / self.voteno
     self.save()
     
   def comment(self, user, comment):
