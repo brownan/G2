@@ -111,7 +111,15 @@ var addHandler = function(data){
 var oldEntryHandler = function(data){
   for (var i=0; i < data.length; i++) {
     entry = data[i];
-    lastentry = $(document.getElementById(getLastOldEntry()))
+    lastentry = $(document.getElementById(getLastOldEntry()));
+    votes = "";
+    for (i=1; i<=5. i++) {
+      if (entry.user_vote == i) {
+        vote_class = " voted";
+      } else vote_class = "";
+      
+      votes += "<a href='{% url playlist.views.ajax 'vote' %}?vote="+i+"&songid="+ entry.fields.song.pk +"\
+      ' class='vote"+i+vote_class+"'>"+i+"</a>";
     newentry = lastentry.after("\
     <tr id='h" + entry.pk + "'>\
         <td><a href='{% url artist_js %}"+ entry.fields.song.fields.artist.pk +"'>"+ entry.fields.song.fields.artist.fields.name +"</a></td>\

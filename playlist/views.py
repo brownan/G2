@@ -271,7 +271,7 @@ def ajax(request, resource=""):
     except KeyError:
       lastid = 0
     if not lastid: lastid = 0
-    deletions = PlaylistEntry.objects.filter(id__gt=lastid)
+    deletions = PlaylistEntry.objects.select_related().filter(id__gt=lastid)
     data = serialize("json", deletions, relations={'song':{'relations':('artist'), 'fields':('title', 'length', 'artist')}, 'adder':{'fields':('username')}})
     return HttpResponse(data)
     
@@ -284,7 +284,7 @@ def ajax(request, resource=""):
     if lastid[0] != 'h':
       raise Http404 #avert disaster
     lastid = lastid[1:] #get rid of leading 'h'
-    history = OldPlaylistEntry.objects.filter(id__gt=lastid)
+    history = OldPlaylistEntry.objects.select_related().filter(id__gt=lastid)
     data = serialize("json", history, relations={'song':{'relations':('artist'), 'fields':('title', 'length', 'artist')}, 'adder':{'fields':('username')}})
     return HttpResponse(data)
   
@@ -294,10 +294,20 @@ def ajax(request, resource=""):
   if resource == "vote":
     try:
       vote = int(request.REQUEST['vote'])
-      songid = int(request.REQUEST['songid'])
     except KeyError:
       raise Http404
-    song = Song.objects.get(id=songid)
+    try:
+      songid = request.REQUEST['songid']
+      songid = int(songid)
+      song = Song.objects.get(id=songid)
+    except KeyError:
+      song = PlaylistEntry.objects.get(playing=True).song
+    except ValueError:
+      if songid == "curr":
+        song = PlaylistEntry.objects.select_related("song").get(playing=True).song
+      elif songid == "prev":
+        song = OldPlaylistEntry.objects.select_related("song").extra(where=['playlist_oldplaylistentry.id =\
+        (select max(playlist_oldplaylistentry.id) from playlist_oldplaylistentry)'])[0].song
     song.rate(vote, user)
     
     return HttpResponse()
