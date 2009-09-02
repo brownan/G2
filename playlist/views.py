@@ -166,7 +166,12 @@ def jsplaylist(request):
   #historylength = 10
   oldentries = OldPlaylistEntry.objects.all()
   playlist = itertools.chain(oldentries.extra(where=['playlist_oldplaylistentry.id > \
-  (select max(id) from playlist_oldplaylistentry)-%s'], params=[historylength]).select_related(), PlaylistEntry.objects.select_related().all().order_by('addtime'))
+  (select max(id) from playlist_oldplaylistentry)-%s'], params=[historylength], 
+  select={"user_vote": "SELECT score FROM playlist_rating WHERE playlist_rating.user_id = %s AND playlist_rating.song_id = playlist_oldplaylistentry.song_id"},
+  select_params=[request.user.id]).select_related(), 
+  PlaylistEntry.objects.extra(select={"user_vote": "SELECT score FROM playlist_rating WHERE playlist_rating.user_id = \
+  %s AND playlist_rating.song_id = playlist_playlistentry.song_id"},
+  select_params=[request.user.id]).select_related().all().order_by('addtime'))
   aug_playlist= []
   for entry in playlist:
     if isinstance(entry, PlaylistEntry) and not entry.playing and (request.user.has_perm('remove_entry') or request.user == entry.adder):
