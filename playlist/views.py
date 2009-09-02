@@ -219,22 +219,32 @@ def ajax(request, resource=""):
   #authentication
   if request.user.is_authenticated():
     user = request.user
+    
+    
   else: #non-persistent authentication for things like bots and clients
     try:
-      username = User.objects.get(id=request.REQUEST['userid']).username
-    except User.DoesNotExist:
-      raise Http404
-    except KeyError: 
-      try:
-        username = request.REQUEST['username']
-        password = request.REQUEST['password']
-      except KeyError:
-        raise Http404
-    user = authenticate(username=username, password=password)
-    if user is None:
-      #incorrect login details
-      return HttpResponseForbidden()
-    
+      username = request.REQUEST['username']
+    except KeyError:
+      try: #is there a userid arg?
+        username = User.objects.get(id=request.REQUEST['userid']).username
+      except (User.DoesNotExist, KeyError):
+        return HttpResponseForbidden()
+        
+    try: #try using password
+      password = request.REQUEST['password']
+      user = authenticate(username=username, password=password)
+      if user is None:
+        return HttpResponseForbidden()
+    except KeyError:
+      try: #try api_key
+        api_key = request.REQUEST['key']
+        userprofile = UserProfile.objects.get(user__username=username, api_key=api_key)
+        user = userprofile.user
+        if not userprofile.api_key: #api key not yet set
+          return HttpResponseForbidden()
+      except (KeyError, User.DoesNotExist):
+        return HttpResponseForbidden()
+        
   if resource == "nowplaying":
     entryid = PlaylistEntry.objects.get(playing=True).id
     return HttpResponse(str(entryid))
@@ -316,6 +326,24 @@ def ajax(request, resource=""):
     return HttpResponse(listenerCount())
     
   raise Http404
+  
+@login_required()
+def user_settings(request):
+  profile = request.user.get_profile()
+  if not profile.api_key:
+    keygen(request)
+  api_key = profile.api_key
+  return render_to_response('user_settings.html', {'api_key': api_key}, context_instance=RequestContext(request))
+  
+@login_required()
+def keygen(request):
+  """Generates an API key which can be used instead of a password for API calls but not for important things like deletes."""
+  newquay = lambda: md5(settings.SECRET_KEY + str(getrandbits(64)) + request.user.username).hexdigest()
+  key = newquay()
+  profile = request.user.get_profile()
+  profile.api_key = key
+  profile.save()
+  return HttpResponseRedirect(reverse('user_settings')) 
 
 @login_required()
 def removeentry(request, entryid):
