@@ -184,7 +184,12 @@ def jsplaylist(request):
   #historylength = 10
   oldentries = OldPlaylistEntry.objects.all()
   playlist = itertools.chain(oldentries.extra(where=['playlist_oldplaylistentry.id > \
-  (select max(id) from playlist_oldplaylistentry)-%s'], params=[historylength]).select_related(), PlaylistEntry.objects.all().order_by('addtime').select_related("song__artist", "song__album", "song__uploader", "adder"))
+  (select max(id) from playlist_oldplaylistentry)-%s'], params=[historylength], 
+  select={"user_vote": "SELECT score FROM playlist_rating WHERE playlist_rating.user_id = %s AND playlist_rating.song_id = playlist_oldplaylistentry.song_id"},
+  select_params=[request.user.id]).select_related(), 
+  PlaylistEntry.objects.extra(select={"user_vote": "SELECT score FROM playlist_rating WHERE playlist_rating.user_id = \
+  %s AND playlist_rating.song_id = playlist_playlistentry.song_id"},
+  select_params=[request.user.id]).select_related("song__artist", "song__album", "song__uploader", "adder").all().order_by('addtime'))
   aug_playlist= []
   for entry in playlist:
     if isinstance(entry, PlaylistEntry) and not entry.playing and (request.user.has_perm('remove_entry') or request.user == entry.adder):
@@ -265,6 +270,17 @@ def ajax(request, resource=""):
   
   if resource == "pltitle":
     return HttpResponse(PlaylistEntry.objects.get(playing=True).song.metadataString() + " - GBS-FM")
+  
+  if resource == "vote":
+    try:
+      vote = int(request.REQUEST['vote'])
+      songid = int(request.REQUEST['songid'])
+    except KeyError:
+      raise Http404
+    song = Song.objects.get(id=songid)
+    song.rate(vote, request.user)
+    
+    return HttpResponse()
   
   raise Http404
 
