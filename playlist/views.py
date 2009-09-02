@@ -173,6 +173,8 @@ def splaylist(request):
 @permission_required('playlist.view_playlist')
 def playlist(request):
   #normal entry route
+  if "gbsfm.ath.cx" in request.get_host():
+    return HttpResponseRedirect("/images/moved.html")
   return jsplaylist(request)
   
   
