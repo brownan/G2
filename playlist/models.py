@@ -13,7 +13,9 @@ from django.contrib.auth.models import User
 #import pydj.dbsettings as dbsettings
 from django.db import IntegrityError 
 from django.conf import settings
-from django.db.models.signals import pre_save 
+from django.db.models.signals import pre_save
+from django.db.models import Avg, Count
+
 
 MUSIC_PATH = settings.MUSIC_DIR
 
@@ -314,21 +316,31 @@ class Song(models.Model):
       return u"%s (%s) - %s" % (self.artist, self.album, self.title)
     
   def rate(self, score, user):
-    score = int(score)
-    if not (1 <= score and score <= 5):
+    score = float(score)
+    if not ((1 <= score and score <= 5) or (score==0)):
       raise ScoreOutOfRangeError
     
     try:
       r = Rating.objects.get(user=user, song=self)
-      r.score = score
+      if score == 0: #0 is delete
+        r.delete()
+      else:  
+        r.score = score
+        r.save()
     except Rating.DoesNotExist:
       #not yet created (yes I know this is what get_or_create is for but it's stupid
       #(it can't do required fields properly))
-      r = Rating(user=user, song=self, score=score)
-    r.save()
-    self.voteno = Rating.objects.filter(song=self).count()
-    ratings = [rating['score'] for rating in Rating.objects.filter(song=self).values()]
-    self.avgscore = sum(ratings) / self.voteno
+      if score != 0: #0 is delete, don't create instead
+        r = Rating(user=user, song=self, score=score)
+        r.save()
+    #sort out statistics
+    stats = Rating.objects.filter(song=self).aggregate(id_count=Count('id'), avg_score=Avg('score'))
+    if (not stats['id_count']) or (not stats['avg_score']):
+      self.voteno = self.avgscore = 0
+    else:
+      self.voteno = stats['id_count'] #Rating.objects.filter(song=self).count()
+      #ratings = [rating['score'] for rating in Rating.objects.filter(song=self).values()]
+      self.avgscore = stats['avg_score'] #sum(ratings) / self.voteno
     self.save()
     
   def comment(self, user, comment):
