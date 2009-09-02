@@ -221,7 +221,7 @@ def ajax(request, resource=""):
     user = request.user
   else: #non-persistent authentication for things like bots and clients
     try:
-      username = User.objects.get(id=request.REQUEST['userid'])
+      username = User.objects.get(id=request.REQUEST['userid']).username
     except User.DoesNotExist:
       raise Http404
     except KeyError: 
