@@ -30,9 +30,10 @@ tr.even, #columns tr {
 #playlist a {
   text-decoration:none; /* THEME: playlist item text decoration */
   color:black; /* THEME: playlist item color */
+}
+#playlist td {
   padding:0px 5px;
 }
-
 #playlist td.time {
   text-align: right;
 }
@@ -265,7 +266,7 @@ div.voteboxbar {
 div.voteboxbar p {
   font-size:larger;
 }
-div.clutterbar p a {
+div.clutterbar p a, td.votes a {
   border:1px solid black;
   padding:1px;
   margin:1px;
@@ -273,13 +274,18 @@ div.clutterbar p a {
   color:black;
   background-color:#F5FFEE;
 }
-div.clutterbar p a.selectedvote, div.clutterbar p a.selectedvote:hover {
+td.votes a {
+  padding:1px 2px;
+  margin:0px -1px;
+}
+div.clutterbar p a.selectedvote, div.clutterbar p a.selectedvote:hover, #playlist td.votes a.voted, #playlist td.votes a.voted:hover {
   color:white;
   background-color:black;
   font-weight:bold;
 }
-div.clutterbar p a:hover {
+div.clutterbar p a:hover, #playlist td.votes a:hover {
   background-color:#9C9;
+  text-decoration:none;
 }
 div.voteboxsong {
   display:block;
