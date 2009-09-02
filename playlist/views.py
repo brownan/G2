@@ -30,11 +30,10 @@ from urllib import quote, urlencode
 from subprocess import Popen
 import logging
 
-from django.http import HttpResponse,  HttpResponseRedirect, Http404
+from django.http import HttpResponse,  HttpResponseRedirect, HttpResponseForbidden, Http404
 from django.template import Context, loader
 from django.core.urlresolvers import reverse
 from django.core.serializers import serialize
-from pydj.playlist.models import *
 from django.contrib.auth.models import User,  UserManager, Group, Permission
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
@@ -50,7 +49,8 @@ from django.db.models import Avg, Max, Min, Count
 from django.contrib.auth import authenticate
 from django.db import connection
 
-from pydj.playlist.utils import getSong, getObj
+from pydj.playlist.models import *
+from pydj.playlist.utils import getSong, getObj, listenerCount
 from pydj.playlist.upload import UploadedFile
 
 
@@ -213,8 +213,28 @@ def jsplaylist(request):
   
  # return render_to_response('index.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))
   
-@login_required()
+  
 def ajax(request, resource=""):
+  
+  #authentication
+  if request.user.is_authenticated():
+    user = request.user
+  else: #non-persistent authentication for things like bots and clients
+    try:
+      username = User.objects.get(id=request.REQUEST['userid'])
+    except User.DoesNotExist:
+      raise Http404
+    except KeyError: 
+      try:
+        username = request.REQUEST['username']
+        password = request.REQUEST['password']
+      except KeyError:
+        raise Http404
+    user = authenticate(username=username, password=password)
+    if user is None:
+      #incorrect login details
+      return HttpResponseForbidden()
+    
   if resource == "nowplaying":
     entryid = PlaylistEntry.objects.get(playing=True).id
     return HttpResponse(str(entryid))
@@ -278,10 +298,13 @@ def ajax(request, resource=""):
     except KeyError:
       raise Http404
     song = Song.objects.get(id=songid)
-    song.rate(vote, request.user)
+    song.rate(vote, user)
     
     return HttpResponse()
   
+  if resource == "listeners":
+    return HttpResponse(listenerCount())
+    
   raise Http404
 
 @login_required()
