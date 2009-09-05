@@ -275,8 +275,16 @@ div.clutterbar p a, td.votes a {
   background-color:#F5FFEE;
 }
 td.votes a {
-  padding:1px 2px;
+  display:inline-block;    /* FIXED SIZE VOTE BUTTONS */
+  width:10px;
+  height:15px;
   margin:0px -1px;
+  text-align:center;
+  font-weight:normal;
+}
+td.votes {
+  white-space:nowrap;    /* THE VOTE ROW SHALT NOT BREAK! */
+  width:75px;           /* also that pesky unnecessary space at the end needs to go */
 }
 div.clutterbar p a.selectedvote, div.clutterbar p a.selectedvote:hover, #playlist td.votes a.voted, #playlist td.votes a.voted:hover {
   color:white;
