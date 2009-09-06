@@ -102,7 +102,7 @@ def listenerCount():
   try:
     opener = urllib2.build_opener()
     opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-    s = opener.open(settings.STREAMINFO_URL, timeout=1).read()
+    s = opener.open(settings.STREAMINFO_URL).read()
   except urllib2.URLError:
     return "?"
   try:
