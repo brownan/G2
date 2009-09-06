@@ -1,0 +1,35 @@
+{% load filters %}
+{% for entry in aug_playlist %}
+        <tr {% if entry.pl %} id="{{ entry.object.id }}" {% else %} id="h{{ entry.object.id }}" {% endif %} class="{% if entry.object.playing %}playing {% endif %}{% if forloop.counter|divisibleby:"2" %}even{% else %}odd{% endif %}{% if not entry.pl %} history{% endif %}">
+        
+        <td><a href='{% url playlist.views.artist entry.object.song.artist.id %}'>{{ entry.object.song.artist }}</a></td>
+        <td><a href='{% url song entry.object.song.id %}'>{{ entry.object.song.title }}</a></td>
+        <td class="time">{{ entry.object.song.length|stom }}</td>
+        <td><a href='{% url playlist.views.user entry.object.adder.id %}'>{{ entry.object.adder.username }}</a></td>
+        <td class="votes details">
+        {% num_range 1 6 as vote_range %}
+        {% for vote in vote_range %}
+          <a href="{% url playlist.views.ajax "vote" %}?vote={{vote}}&songid={{entry.object.song.id}}" class="vote{{vote}} {% ifequal entry.object.user_vote vote %}voted{% endifequal %}">{{vote}}</a>
+        {% endfor %}
+        </td>
+        <td class="score">
+          {% if entry.object.avg_score %}
+          {{entry.object.avg_score}} with {{entry.object.vote_count}} vote{{entry.object.vote_count|pluralize}}
+          {% else %}
+          no votes
+          {% endif %}
+        </td>
+        <td class="actions">
+          {% if entry.can_remove %}
+          <a href='{% url playlist.views.removeentry entry.object.id %}' class="removebutton">
+          <img src = "images/cross.png" title="Remove song from playlist" alt="cross" >
+          </a>
+          {% endif %}
+          {% if can_skip and entry.object.playing %}
+          <a href='{% url playlist.views.skip %}'>
+          <img src = "images/skip.png" title="Skip currently playing song" alt="skip" >
+          </a>
+          {% endif %}
+        </td>
+        </tr>
+      {% endfor %}
