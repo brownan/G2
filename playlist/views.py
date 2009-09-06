@@ -185,22 +185,28 @@ def jsplaylist(request):
     historylength = 10
   #historylength = 10
   oldentries = OldPlaylistEntry.objects.all()
+  
+
   playlist = itertools.chain(oldentries.extra(where=['playlist_oldplaylistentry.id > \
   (select max(id) from playlist_oldplaylistentry)-%s'], params=[historylength], 
   select={"user_vote": "SELECT ROUND(score, 0) FROM playlist_rating WHERE playlist_rating.user_id = %s AND playlist_rating.song_id = playlist_oldplaylistentry.song_id"},
   select_params=[request.user.id]).select_related(), 
   PlaylistEntry.objects.extra(select={"user_vote": "SELECT ROUND(score, 0) FROM playlist_rating WHERE playlist_rating.user_id = \
-  %s AND playlist_rating.song_id = playlist_playlistentry.song_id"},
+  %s AND playlist_rating.song_id = playlist_playlistentry.song_id", "avg_score": "SELECT AVG(playlist_rating.score) FROM playlist_rating WHERE playlist_rating.song_id = playlist_playlistentry.song_id", "vote_count": "SELECT COUNT(*) FROM playlist_rating WHERE playlist_rating.song_id = playlist_playlistentry.song_id"},
   select_params=[request.user.id]).select_related("song__artist", "song__album", "song__uploader", "adder").all().order_by('addtime'))
+
+  
   aug_playlist= []
-  for entry in playlist:
-    if isinstance(entry, PlaylistEntry) and not entry.playing and (request.user.has_perm('remove_entry') or request.user == entry.adder):
-      aug_playlist.append({'can_remove':True, 'object':entry, 'pl':True})
-    elif isinstance(entry, PlaylistEntry):
-      aug_playlist.append({'can_remove':False, 'object':entry, 'pl':True})
-    else:
-      aug_playlist.append({'can_remove':False, 'object':entry, 'pl':False})
-    
+  try:
+    for entry in playlist:
+      if isinstance(entry, PlaylistEntry) and not entry.playing and (request.user.has_perm('remove_entry') or request.user == entry.adder):
+        aug_playlist.append({'can_remove':True, 'object':entry, 'pl':True})
+      elif isinstance(entry, PlaylistEntry):
+        aug_playlist.append({'can_remove':False, 'object':entry, 'pl':True})
+      else:
+        aug_playlist.append({'can_remove':False, 'object':entry, 'pl':False})
+  except:
+    print connection.queries
   can_skip = request.user.has_perm('playlist.skip_song')
   now_playing = PlaylistEntry.objects.get(playing=True).song.metadataString()
   lastremoval = RemovedEntry.objects.aggregate(Max('id'))['id__max']

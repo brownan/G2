@@ -43,7 +43,11 @@ var nowPlayingHandler = function(data){
   currplaying = $(".playing");
   if (currplaying.attr('id') != data) {
     currplaying.removeClass('playing');
-    $(document.getElementById(data)).addClass('playing');
+    currplaying.addClass('history');
+    currplaying.children(".actions").html(""); //remove actions buttons
+    nextplaying = $(document.getElementById(data));
+    nextplaying.addClass('playing');
+    nextplaying.children(".actions").html(""); //remove actions buttons
   }
 }
 
@@ -51,7 +55,7 @@ var delHandler = function(data){
   for (var i=0; i < data.length; i++) {
     deleted = $(document.getElementById(data[i].fields.oldid));
     if (deleted.hasClass("playing")) {
-      deleted.remove();
+
     } else {
       deleted.fadeOut("slow", removeCallback);
     }
@@ -75,11 +79,11 @@ var addHandler = function(data){
   for (var i=0; i < data.length; i++) {
     entry = data[i];
     if (entry.fields.adder.pk == userid) {
-      removebutton = "<td>\
+      removebutton = "\
           <a href='{% url removeentry_js %}"+ entry.pk +"'>\
           <img src = 'images/cross.png' title='Remove song from playlist' alt='cross' >\
           </a>\
-        </td>";
+        ";
     } else {
       removebutton = "";
     }
@@ -97,8 +101,9 @@ var addHandler = function(data){
           <a href='{% url playlist.views.ajax 'vote' %}?vote=4&songid="+ entry.fields.song.pk +"' class='vote4'>4</a> \
           <a href='{% url playlist.views.ajax 'vote' %}?vote=5&songid="+ entry.fields.song.pk +"' class='vote5'>5</a> \
         </td> \
-        <td> \
+        <td class='actions'> \
         "+ removebutton +"\
+        </td>\
     </tr>").next()
     if (lastentry.hasClass('odd')) {
       newentry.addClass('even')
@@ -108,7 +113,7 @@ var addHandler = function(data){
   }
 }
 
-var oldEntryHandler = function(data){
+/*var oldEntryHandler = function(data){
   for (var i=0; i < data.length; i++) {
     entry = data[i];
     lastentry = $(document.getElementById(getLastOldEntry()));
@@ -141,11 +146,11 @@ var oldEntryHandler = function(data){
       newentry.addClass('odd')
     }
   }
-}
+}*/
 
 var pruneHandler = function(){
-  oldplaylist = $("#playlist > tr[id^='h']");
-  for (var i=0; i<(oldplaylist.length - 10); i++) {
+  oldplaylist = $(".history");
+  for (var i=0; i<(oldplaylist.length - 10); i++) { //TODO 10 should be a user setting so need to fix somehow
     $(oldplaylist[i]).fadeOut('slow', removeCallback);
   }
 }
@@ -169,7 +174,7 @@ var checkLoop = function(){
   $.getJSON("{% url playlist.views.ajax resource="deletions" %}", {'lastid': lastremoval}, delHandler);
   $.getJSON("{% url playlist.views.ajax resource="adds" %}", {'lastid': getLastEntry()}, addHandler);
   $.getJSON("{% url playlist.views.ajax resource="nowplaying" %}", nowPlayingHandler);
-  $.getJSON("{% url playlist.views.ajax resource="history" %}", {'lastid': getLastOldEntry()}, oldEntryHandler);
+  //$.getJSON("{% url playlist.views.ajax resource="history" %}", {'lastid': getLastOldEntry()}, oldEntryHandler);
   $.get("{% url playlist.views.ajax resource="pltitle" %}", {}, titleHandler);
   addVoteHandler();
   pruneHandler();
@@ -221,10 +226,11 @@ $(document).ready(function(){
         <th>Time</th>
         <th>Added by</th>
         <th>Vote</th>
+        <th>Score</th>
         <th>Actions</th>
       </tr>
       {% for entry in aug_playlist %}
-        <tr {% if entry.pl %} id="{{ entry.object.id }}" {% else %} id="h{{ entry.object.id }}" {% endif %} class="{% if entry.object.playing %}playing {% endif %}{% if forloop.counter|divisibleby:"2" %}even{% else %}odd{% endif %}">
+        <tr {% if entry.pl %} id="{{ entry.object.id }}" {% else %} id="h{{ entry.object.id }}" {% endif %} class="{% if entry.object.playing %}playing {% endif %}{% if forloop.counter|divisibleby:"2" %}even{% else %}odd{% endif %}{% if not entry.pl %} history{% endif %}">
         
         <td><a href='{% url playlist.views.artist entry.object.song.artist.id %}'>{{ entry.object.song.artist }}</a></td>
         <td><a href='{% url song entry.object.song.id %}'>{{ entry.object.song.title }}</a></td>
@@ -236,20 +242,25 @@ $(document).ready(function(){
           <a href="{% url playlist.views.ajax "vote" %}?vote={{vote}}&songid={{entry.object.song.id}}" class="vote{{vote}} {% ifequal entry.object.user_vote vote %}voted{% endifequal %}">{{vote}}</a>
         {% endfor %}
         </td>
-        {% if entry.can_remove %}
         <td>
+          {% if entry.object.avg_score %}
+          {{entry.object.avg_score}} with {{entry.object.vote_count}} vote{{entry.object.vote_count|pluralize}}
+          {% else %}
+          no votes
+          {% endif %}
+        </td>
+        <td class="actions">
+          {% if entry.can_remove %}
           <a href='{% url playlist.views.removeentry entry.object.id %}' class="removebutton">
           <img src = "images/cross.png" title="Remove song from playlist" alt="cross" >
           </a>
-        </td>
-        {% endif %}
-        {% if can_skip and entry.object.playing %}
-        <td>
+          {% endif %}
+          {% if can_skip and entry.object.playing %}
           <a href='{% url playlist.views.skip %}'>
           <img src = "images/skip.png" title="Skip currently playing song" alt="skip" >
           </a>
+          {% endif %}
         </td>
-        {% endif %}
         </tr>
       {% endfor %}
     </tbody>
