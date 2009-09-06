@@ -20,20 +20,20 @@ var olHandler = function(data){
 }
   
 var lastremoval = {{ lastremoval|default:"0" }};
-var userid = {{user.id}}; //you're wasting your time, I'm not that stupid
+//var userid = {{user.id}}; //you're wasting your time, I'm not that stupid
 
 
 var getLastEntry = function(){
   return $('#playlist > :last-child').attr('id');
 }
-var getLastOldEntry = function(){
+/*var getLastOldEntry = function(){
   playlist = $('#playlist > tr')
   for (i=0; i<playlist.length; i++) {
     if ($(playlist[i]).is('.playing')) {
       return $(playlist[i-1]).attr('id')
     }
   }
-}
+}*/
 
 var removeCallback = function() {
   $(this).remove();
@@ -74,7 +74,7 @@ var stom = function(time){
   return minutes.toString() + ':' + seconds;
 }
 
-var addHandler = function(data){
+/*var addHandler = function(data){
   playlist = $('#playlist')
   for (var i=0; i < data.length; i++) {
     entry = data[i];
@@ -87,6 +87,22 @@ var addHandler = function(data){
     } else {
       removebutton = "";
     }
+    
+    if (data.fields.vote_count) {
+      score = data.fields.avg_score + " with " + data.fields.vote_count + " vote";
+      if (data.fields.vote_count > 1) score += "s"; //pluralise
+    } else score = "no votes"; 
+    
+    votes = "";
+    
+    for (i=1; i<=5; i++) {
+      if (Math.round(data.fields.user_vote) == i) {
+        voted = " voted";
+      }
+      votes += "<a href='{% url playlist.views.ajax 'vote' %}?vote="+i+"&songid="+ entry.fields.song.pk +"' class='vote"+i+voted+"'>"+i+"</a>"
+    }
+    
+    
     lastentry = $('#playlist > :last-child')
     newentry = lastentry.after("\
     <tr id='" + entry.pk + "'>\
@@ -95,12 +111,11 @@ var addHandler = function(data){
         <td class='time'>"+ stom(entry.fields.song.fields.length) + "</td>\
         <td><a href='{% url user_js %}"+ entry.fields.adder.pk +"'>"+ entry.fields.adder.fields.username +"</a></td>\
         <td class='votes details'> \
-          <a href='{% url playlist.views.ajax 'vote' %}?vote=1&songid="+ entry.fields.song.pk +"' class='vote1'>1</a> \
-          <a href='{% url playlist.views.ajax 'vote' %}?vote=2&songid="+ entry.fields.song.pk +"' class='vote2'>2</a> \
-          <a href='{% url playlist.views.ajax 'vote' %}?vote=3&songid="+ entry.fields.song.pk +"' class='vote3'>3</a> \
-          <a href='{% url playlist.views.ajax 'vote' %}?vote=4&songid="+ entry.fields.song.pk +"' class='vote4'>4</a> \
-          <a href='{% url playlist.views.ajax 'vote' %}?vote=5&songid="+ entry.fields.song.pk +"' class='vote5'>5</a> \
+        "+votes+"\
         </td> \
+        <td class='score'>\
+        "+ score +"\
+        </td>\
         <td class='actions'> \
         "+ removebutton +"\
         </td>\
@@ -111,8 +126,17 @@ var addHandler = function(data){
       newentry.addClass('odd')
     }
   }
+}*/
+
+var addHandler = function(data){
+  lastentry = $('#playlist > :last-child');
+  newentry = lastentry.after(data);
 }
 
+var stripe = function(data) {
+  $('#playlist tr:nth-child(odd)').removeClass('even').addClass('odd');
+  $('#playlist tr:nth-child(even)').removeClass('odd').addClass('even');
+}
 /*var oldEntryHandler = function(data){
   for (var i=0; i < data.length; i++) {
     entry = data[i];
@@ -172,12 +196,14 @@ var addVoteHandler = function(data) {
 
 var checkLoop = function(){
   $.getJSON("{% url playlist.views.ajax resource="deletions" %}", {'lastid': lastremoval}, delHandler);
-  $.getJSON("{% url playlist.views.ajax resource="adds" %}", {'lastid': getLastEntry()}, addHandler);
+  //$.getJSON("{% url playlist.views.ajax resource="adds" %}", {'lastid': getLastEntry()}, addHandler);
+  $.get("/playlist/"+getLastEntry(), addHandler);
   $.getJSON("{% url playlist.views.ajax resource="nowplaying" %}", nowPlayingHandler);
   //$.getJSON("{% url playlist.views.ajax resource="history" %}", {'lastid': getLastOldEntry()}, oldEntryHandler);
   $.get("{% url playlist.views.ajax resource="pltitle" %}", {}, titleHandler);
   addVoteHandler();
   pruneHandler();
+  stripe();
 
   setTimeout('checkLoop()', DELAY);
 }
@@ -229,40 +255,7 @@ $(document).ready(function(){
         <th>Score</th>
         <th>Actions</th>
       </tr>
-      {% for entry in aug_playlist %}
-        <tr {% if entry.pl %} id="{{ entry.object.id }}" {% else %} id="h{{ entry.object.id }}" {% endif %} class="{% if entry.object.playing %}playing {% endif %}{% if forloop.counter|divisibleby:"2" %}even{% else %}odd{% endif %}{% if not entry.pl %} history{% endif %}">
-        
-        <td><a href='{% url playlist.views.artist entry.object.song.artist.id %}'>{{ entry.object.song.artist }}</a></td>
-        <td><a href='{% url song entry.object.song.id %}'>{{ entry.object.song.title }}</a></td>
-        <td class="time">{{ entry.object.song.length|stom }}</td>
-        <td><a href='{% url playlist.views.user entry.object.adder.id %}'>{{ entry.object.adder.username }}</a></td>
-        <td class="votes details">
-        {% num_range 1 6 as vote_range %}
-        {% for vote in vote_range %}
-          <a href="{% url playlist.views.ajax "vote" %}?vote={{vote}}&songid={{entry.object.song.id}}" class="vote{{vote}} {% ifequal entry.object.user_vote vote %}voted{% endifequal %}">{{vote}}</a>
-        {% endfor %}
-        </td>
-        <td>
-          {% if entry.object.avg_score %}
-          {{entry.object.avg_score}} with {{entry.object.vote_count}} vote{{entry.object.vote_count|pluralize}}
-          {% else %}
-          no votes
-          {% endif %}
-        </td>
-        <td class="actions">
-          {% if entry.can_remove %}
-          <a href='{% url playlist.views.removeentry entry.object.id %}' class="removebutton">
-          <img src = "images/cross.png" title="Remove song from playlist" alt="cross" >
-          </a>
-          {% endif %}
-          {% if can_skip and entry.object.playing %}
-          <a href='{% url playlist.views.skip %}'>
-          <img src = "images/skip.png" title="Skip currently playing song" alt="skip" >
-          </a>
-          {% endif %}
-        </td>
-        </tr>
-      {% endfor %}
+      {% include "playlist_table.html" %}
     </tbody>
     </table>
     {% else %}

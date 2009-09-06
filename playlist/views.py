@@ -171,42 +171,52 @@ def splaylist(request):
   return HttpResponseRedirect(reverse('login'))
     
 @permission_required('playlist.view_playlist')
-def playlist(request):
+def playlist(request, lastid=None):
   #normal entry route
   if "gbsfm.ath.cx" in request.get_host():
     return HttpResponseRedirect("/images/moved.html")
-  return jsplaylist(request)
+  return jsplaylist(request, lastid)
   
   
-def jsplaylist(request):
-  try:
-    historylength = request.user.get_profile().s_playlistHistory
-  except AttributeError:
-    historylength = 10
-  #historylength = 10
-  oldentries = OldPlaylistEntry.objects.all()
+def jsplaylist(request, lastid=None):
   
-
-  playlist = itertools.chain(oldentries.extra(where=['playlist_oldplaylistentry.id > \
-  (select max(id) from playlist_oldplaylistentry)-%s'], params=[historylength], 
-  select={"user_vote": "SELECT ROUND(score, 0) FROM playlist_rating WHERE playlist_rating.user_id = %s AND playlist_rating.song_id = playlist_oldplaylistentry.song_id"},
-  select_params=[request.user.id]).select_related(), 
-  PlaylistEntry.objects.extra(select={"user_vote": "SELECT ROUND(score, 0) FROM playlist_rating WHERE playlist_rating.user_id = \
+  if lastid is None:
+    try:
+      historylength = request.user.get_profile().s_playlistHistory
+    except AttributeError:
+      historylength = 10
+    #historylength = 10
+    oldentries = OldPlaylistEntry.objects.all()
+    oldentries = oldentries.extra(where=['playlist_oldplaylistentry.id > \
+    (select max(id) from playlist_oldplaylistentry)-%s'], params=[historylength], 
+    select={"user_vote": "SELECT ROUND(score, 0) FROM playlist_rating WHERE playlist_rating.user_id = %s AND playlist_rating.song_id = playlist_oldplaylistentry.song_id", "avg_score": "SELECT AVG(playlist_rating.score) FROM playlist_rating WHERE playlist_rating.song_id = playlist_oldplaylistentry.song_id", "vote_count": "SELECT COUNT(*) FROM playlist_rating WHERE playlist_rating.song_id = playlist_oldplaylistentry.song_id"},
+    select_params=[request.user.id]).select_related()
+  else:
+    oldentries = []
+  
+  newentries = PlaylistEntry.objects.extra(select={"user_vote": "SELECT ROUND(score, 0) FROM playlist_rating WHERE playlist_rating.user_id = \
   %s AND playlist_rating.song_id = playlist_playlistentry.song_id", "avg_score": "SELECT AVG(playlist_rating.score) FROM playlist_rating WHERE playlist_rating.song_id = playlist_playlistentry.song_id", "vote_count": "SELECT COUNT(*) FROM playlist_rating WHERE playlist_rating.song_id = playlist_playlistentry.song_id"},
-  select_params=[request.user.id]).select_related("song__artist", "song__album", "song__uploader", "adder").all().order_by('addtime'))
+  select_params=[request.user.id]).select_related("song__artist", "song__album", "song__uploader", "adder").all().order_by('addtime')
+
+  if lastid is not None:
+    newentries = newentries.filter(id__gt=lastid)
+  playlist = itertools.chain(oldentries, newentries)
 
   
   aug_playlist= []
-  try:
-    for entry in playlist:
-      if isinstance(entry, PlaylistEntry) and not entry.playing and (request.user.has_perm('remove_entry') or request.user == entry.adder):
-        aug_playlist.append({'can_remove':True, 'object':entry, 'pl':True})
-      elif isinstance(entry, PlaylistEntry):
-        aug_playlist.append({'can_remove':False, 'object':entry, 'pl':True})
-      else:
-        aug_playlist.append({'can_remove':False, 'object':entry, 'pl':False})
-  except:
-    print connection.queries
+
+  for entry in playlist:
+    if isinstance(entry, PlaylistEntry) and not entry.playing and (request.user.has_perm('remove_entry') or request.user == entry.adder):
+      aug_playlist.append({'can_remove':True, 'object':entry, 'pl':True})
+    elif isinstance(entry, PlaylistEntry):
+      aug_playlist.append({'can_remove':False, 'object':entry, 'pl':True})
+    else:
+      aug_playlist.append({'can_remove':False, 'object':entry, 'pl':False})
+
+    
+  if lastid is not None:
+    return render_to_response('playlist_table.html',  {'aug_playlist': aug_playlist}, context_instance=RequestContext(request))
+    
   can_skip = request.user.has_perm('playlist.skip_song')
   now_playing = PlaylistEntry.objects.get(playing=True).song.metadataString()
   lastremoval = RemovedEntry.objects.aggregate(Max('id'))['id__max']
@@ -214,6 +224,7 @@ def jsplaylist(request):
     welcome_message = Settings.objects.get(key="welcome_message").value
   except:
     welcome_message = None
+  
   
   
   return render_to_response('jsplaylist.html',  {'aug_playlist': aug_playlist, 'can_skip':can_skip, 'lastremoval':lastremoval, 'now_playing':now_playing, 'welcome_message':welcome_message}, context_instance=RequestContext(request))
@@ -289,8 +300,10 @@ def ajax(request, resource=""):
     except KeyError:
       lastid = 0
     if not lastid: lastid = 0
-    deletions = PlaylistEntry.objects.select_related().filter(id__gt=lastid)
-    data = serialize("json", deletions, relations={'song':{'relations':('artist'), 'fields':('title', 'length', 'artist')}, 'adder':{'fields':('username')}})
+    adds = PlaylistEntry.objects.extra(select={"user_vote": "SELECT ROUND(score, 0) FROM playlist_rating WHERE playlist_rating.user_id = \
+    %s AND playlist_rating.song_id = playlist_playlistentry.song_id", "avg_score": "SELECT AVG(playlist_rating.score) FROM playlist_rating WHERE playlist_rating.song_id = playlist_playlistentry.song_id", "vote_count": "SELECT COUNT(*) FROM playlist_rating WHERE playlist_rating.song_id = playlist_playlistentry.song_id"},
+    select_params=[request.user.id]).select_related("song__artist", "song__album", "song__uploader", "adder").order_by('addtime').filter(id__gt=lastid)
+    data = serialize("json", adds, relations={'song':{'relations':('artist'), 'fields':('title', 'length', 'artist')}, 'adder':{'fields':('username')}})
     return HttpResponse(data)
     
   if resource == "history":
