@@ -322,11 +322,8 @@ def ajax(request, resource=""):
   if resource == "pltitle":
     return HttpResponse(PlaylistEntry.objects.get(playing=True).song.metadataString() + " - GBS-FM")
   
-  if resource == "vote":
-    try:
-      vote = float(request.REQUEST['vote'])
-    except KeyError:
-      raise Http404
+  def getSong(request):
+    """Returns a song object given a request object"""
     try:
       songid = request.REQUEST['songid']
       songid = int(songid)
@@ -339,10 +336,28 @@ def ajax(request, resource=""):
       elif songid == "prev":
         song = OldPlaylistEntry.objects.select_related("song").extra(where=['playlist_oldplaylistentry.id =\
         (select max(playlist_oldplaylistentry.id) from playlist_oldplaylistentry)'])[0].song
+    return song
+    
+  if resource == "vote":
+    try:
+      vote = float(request.REQUEST['vote'])
+    except KeyError:
+      raise Http404
+    song = getSong(request)
     prevscore = song.rate(vote, user)
     
     return HttpResponse(str(prevscore) + " " +song.metadataString())
   
+  if resource == "comment":
+    try:
+      comment = request.REQUEST['comment']
+    except KeyError:
+      raise Http404
+    song = getSong(request)
+    song.comment(user, comment)
+    
+    return HttpResponse()
+      
   if resource == "listeners":
     return HttpResponse(listenerCount())
     
