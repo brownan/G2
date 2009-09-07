@@ -427,7 +427,7 @@ def removeentry(request, entryid):
   entry = PlaylistEntry.objects.select_related().get(id=entryid)
   if ((entry.adder == request.user) or request.user.has_perm("playlist.remove_entry")) and not entry.playing:
     logging.info("User %s (uid %d) removed songid %d from playlist at %s" % (request.user.username, request.user.id, entry.song.id, now()))
-    entry.delete()
+    entry.remove()
     request.user.message_set.create(message="Entry deleted successfully.")
   else:
     request.user.message_set.create(message="Error: insufficient permissions to remove entry")
