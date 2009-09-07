@@ -14,7 +14,7 @@
         </td>
         <td class="score">
           {% if entry.object.avg_score %}
-          {{entry.object.avg_score}} ({{entry.object.vote_count}} vote{{entry.object.vote_count|pluralize}})
+          {{entry.object.avg_score|floatformat:accuracy}} ({{entry.object.vote_count}} vote{{entry.object.vote_count|pluralize}})
           {% else %}
           no votes
           {% endif %}
