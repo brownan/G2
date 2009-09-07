@@ -427,7 +427,7 @@ def skip(request):
 @permission_required('playlist.view_song')
 def song(request, songid=0, edit=None):
   try:
-    song = Song.objects.get(id=songid)
+    song = Song.objects.select_related().get(id=songid)
   except Song.DoesNotExist:
     return render_to_response('song.html', {'error': 'Song not found.'})
   if request.method == "POST" and (request.user.has_perm('playlist.edit_song') or (request.user == song.uploader)):
@@ -437,7 +437,7 @@ def song(request, songid=0, edit=None):
   else:
     editform = SongForm(instance=song)
   commentform = CommentForm()
-  comments = Comment.objects.filter(song=song)
+  comments = Comment.objects.select_related().filter(song=song)
   banform = BanForm()
   can_ban = request.user.has_perm('playlist.ban_song')
   if request.user.get_profile().canDelete(song):
