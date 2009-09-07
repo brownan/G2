@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError 
 from django.conf import settings
 from django.db.models.signals import pre_save
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Sum
 
 
 MUSIC_PATH = settings.MUSIC_DIR
@@ -395,6 +395,12 @@ class Comment(models.Model):
     ("can_comment",  "g2 Can comment on songs"),
     )
     
+class PlaylistManager(models.Manager):
+  
+  def length(self):
+    """Returns dictionary of playlist length in seconds and song count."""
+    return super(PlaylistManager, self).select_related('song').filter(playing=False).aggregate(seconds=Sum('song__length'), song_count=Count('song'))
+    
 class PlaylistEntry(models.Model):
   
   song = models.ForeignKey(Song, related_name="entries")
@@ -439,6 +445,8 @@ class PlaylistEntry(models.Model):
   def delSong(self, songid):
     self.entries.objects.get(id=songid).delete()
     self.save()
+    
+  objects = PlaylistManager()
       
   class Meta:
     ordering = ['hijack', 'id']
