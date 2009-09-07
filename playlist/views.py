@@ -306,21 +306,22 @@ def ajax(request, resource=""):
     data = serialize("json", adds, relations={'song':{'relations':('artist'), 'fields':('title', 'length', 'artist')}, 'adder':{'fields':('username')}})
     return HttpResponse(data)
     
-  if resource == "history":
-    try:
-      lastid = request.REQUEST['lastid']
-    except KeyError:
-      raise Http404
-    if not lastid: raise Http404
-    if lastid[0] != 'h':
-      raise Http404 #avert disaster
-    lastid = lastid[1:] #get rid of leading 'h'
-    history = OldPlaylistEntry.objects.select_related().filter(id__gt=lastid)
-    data = serialize("json", history, relations={'song':{'relations':('artist'), 'fields':('title', 'length', 'artist')}, 'adder':{'fields':('username')}})
-    return HttpResponse(data)
+  #if resource == "history":
+    #try:
+      #lastid = request.REQUEST['lastid']
+    #except KeyError:
+      #raise Http404
+    #if not lastid: raise Http404
+    #if lastid[0] != 'h':
+      #raise Http404 #avert disaster
+    #lastid = lastid[1:] #get rid of leading 'h'
+    #history = OldPlaylistEntry.objects.select_related().filter(id__gt=lastid)
+    #data = serialize("json", history, relations={'song':{'relations':('artist'), 'fields':('title', 'length', 'artist')}, 'adder':{'fields':('username')}})
+    #return HttpResponse(data)
   
   if resource == "pltitle":
     return HttpResponse(PlaylistEntry.objects.get(playing=True).song.metadataString() + " - GBS-FM")
+    
   
   def getSong(request):
     """Returns a song object given a request object"""
@@ -329,7 +330,7 @@ def ajax(request, resource=""):
       songid = int(songid)
       song = Song.objects.get(id=songid)
     except KeyError:
-      song = PlaylistEntry.objects.get(playing=True).song
+      song = PlaylistEntry.objects.select_related().get(playing=True).song
     except ValueError:
       if songid == "curr":
         song = PlaylistEntry.objects.select_related("song").get(playing=True).song
@@ -379,7 +380,10 @@ def ajax(request, resource=""):
       raise Http404
     
     return HttpResponse(comment.song.metadataString())
-      
+  
+  if resource == "metadata":
+    song = getSong(request)
+    return HttpResponse(song.artist.name + "\n" + song.album.name + "\n" + song.title)
       
   if resource == "listeners":
     return HttpResponse(listenerCount())
