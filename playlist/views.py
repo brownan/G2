@@ -359,6 +359,14 @@ def ajax(request, resource=""):
     
     return HttpResponse()
     
+  if resource == "pllength":
+    length = PlaylistEntry.objects.length()
+    try:
+      comment = request.REQUEST['formatted']
+      return render_to_response('pl_length.html', {'length':length})
+    except KeyError:
+      return HttpResponse(str(length['seconds']) + '\n' + str(length['song_count']))
+  
   if resource == "add":
     try:
       song = Song.objects.select_related().get(id=request.REQUEST['songid'])

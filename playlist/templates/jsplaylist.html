@@ -203,6 +203,13 @@ var addVoteHandler = function(data) {
   }).addClass('handled');
 }
 
+var lenHandler = function(data) {
+  length = $("#length")
+  if (length.html() != data) {
+      length.html(data);
+  }
+}
+
 var checkLoop = function(){
   $.getJSON("{% url playlist.views.ajax resource="deletions" %}", {'lastid': lastremoval}, delHandler);
   //$.getJSON("{% url playlist.views.ajax resource="adds" %}", {'lastid': getLastEntry()}, addHandler);
@@ -210,6 +217,7 @@ var checkLoop = function(){
   $.getJSON("{% url playlist.views.ajax resource="nowplaying" %}", nowPlayingHandler);
   //$.getJSON("{% url playlist.views.ajax resource="history" %}", {'lastid': getLastOldEntry()}, oldEntryHandler);
   $.get("{% url playlist.views.ajax resource="pltitle" %}", {}, titleHandler);
+  $.get("{% url playlist.views.ajax resource="pllength" %}?formatted", {}, lenHandler);
   addVoteHandler();
   pruneHandler();
   stripe();
@@ -250,7 +258,7 @@ $(document).ready(function(){
   {% if welcome_message %}
   <div class="notices">{{welcome_message|safe}}</div>
   {% endif %}
-  {% include "pl_length.html" %}
+  <div class="notices" id="length">{% include "pl_length.html" %}</div>
   <div class="playlist" id ="playlistdiv">
     {% if msg %}<p class="message">{{msg}}</p>{% endif %}
     {% if aug_playlist %}
