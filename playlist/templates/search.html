@@ -24,6 +24,16 @@
     {% endfor %}
   </p>
   {% endif %}
+  {% if albums %}
+  <p class="artists">Album{{ albums|length|pluralize }}:
+    {% for album in albums|slice:":-1" %}
+      <a href="{% url playlist.views.album album.id %}">{{album.name}}</a>,
+    {% endfor %}
+    {% for album in albums|slice:"-1:" %}
+      <a href="{% url playlist.views.album album.id %}">{{album.name}}</a>.
+    {% endfor %}
+  </p>
+  {% endif %}
   {% if songs %}
   <table width="620" class="songs">
     <tr id="columns">
