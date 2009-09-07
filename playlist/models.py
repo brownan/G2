@@ -431,9 +431,10 @@ class PlaylistEntry(models.Model):
     new.save()
     return new
 
-  def delete(self):
+  def remove(self):
+    """removes from playlist and lets ajax playlist handler know"""
     RemovedEntry(oldid=self.id).save()
-    super(PlaylistEntry, self).delete()
+    self.delete()
   
   def save(self):
     if not self.id:
