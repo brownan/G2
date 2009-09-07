@@ -215,8 +215,11 @@ def jsplaylist(request, lastid=None):
 
     
   if lastid is not None:
-    return render_to_response('playlist_table.html',  {'aug_playlist': aug_playlist}, context_instance=RequestContext(request))
-    
+    return render_to_response('playlist_table.html',  {'aug_playlist': aug_playlist, 'accuracy':accuracy},
+    context_instance=RequestContext(request))
+  
+  accuracy = 1
+  
   can_skip = request.user.has_perm('playlist.skip_song')
   now_playing = PlaylistEntry.objects.get(playing=True).song.metadataString()
   lastremoval = RemovedEntry.objects.aggregate(Max('id'))['id__max']
@@ -227,7 +230,9 @@ def jsplaylist(request, lastid=None):
   
   length = PlaylistEntry.objects.length()
   
-  return render_to_response('jsplaylist.html',  {'aug_playlist': aug_playlist, 'can_skip':can_skip, 'lastremoval':lastremoval, 'now_playing':now_playing, 'welcome_message':welcome_message, 'length':length }, context_instance=RequestContext(request))
+  return render_to_response('jsplaylist.html',  {'aug_playlist': aug_playlist, 'can_skip':can_skip, 
+  'lastremoval':lastremoval, 'now_playing':now_playing, 'welcome_message':welcome_message, 
+  'length':length, 'accuracy':accuracy}, context_instance=RequestContext(request))
 
   
  # return render_to_response('index.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))
