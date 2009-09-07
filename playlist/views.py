@@ -30,7 +30,7 @@ from urllib import quote, urlencode
 from subprocess import Popen
 import logging
 
-from django.http import HttpResponse,  HttpResponseRedirect, HttpResponseForbidden, Http404
+from django.http import *
 from django.template import Context, loader
 from django.core.urlresolvers import reverse
 from django.core.serializers import serialize
@@ -357,6 +357,29 @@ def ajax(request, resource=""):
     song.comment(user, comment)
     
     return HttpResponse()
+    
+  if resource == "add":
+    try:
+      song = Song.objects.select_related().get(id=request.REQUEST['songid'])
+    except (KeyError, Song.DoesNotExist):
+      raise Http404
+    
+    try: 
+      song.playlistAdd(user)
+    except AddError, e:
+      return HttpResponseBadRequest(e.args[0])
+    
+    return HttpResponse(song.metadataString())
+    
+  if resource == "uncomment":
+    try:
+      comment = Comment.objects.select_related().filter(user=user)[0]
+      comment.delete()
+    except IndexError:
+      raise Http404
+    
+    return HttpResponse(comment.song.metadataString())
+      
       
   if resource == "listeners":
     return HttpResponse(listenerCount())
