@@ -225,9 +225,9 @@ def jsplaylist(request, lastid=None):
   except:
     welcome_message = None
   
+  length = PlaylistEntry.objects.length()
   
-  
-  return render_to_response('jsplaylist.html',  {'aug_playlist': aug_playlist, 'can_skip':can_skip, 'lastremoval':lastremoval, 'now_playing':now_playing, 'welcome_message':welcome_message}, context_instance=RequestContext(request))
+  return render_to_response('jsplaylist.html',  {'aug_playlist': aug_playlist, 'can_skip':can_skip, 'lastremoval':lastremoval, 'now_playing':now_playing, 'welcome_message':welcome_message, 'length':length }, context_instance=RequestContext(request))
 
   
  # return render_to_response('index.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))
@@ -359,6 +359,14 @@ def ajax(request, resource=""):
     
     return HttpResponse()
     
+  if resource == "pllength":
+    length = PlaylistEntry.objects.length()
+    try:
+      comment = request.REQUEST['formatted']
+      return render_to_response('pl_length.html', {'length':length})
+    except KeyError:
+      return HttpResponse(str(length['seconds']) + '\n' + str(length['song_count']))
+  
   if resource == "add":
     try:
       song = Song.objects.select_related().get(id=request.REQUEST['songid'])
@@ -400,9 +408,15 @@ def user_settings(request):
   
 @login_required()
 def keygen(request):
-  """Generates an API key which can be used instead of a password for API calls but not for important things like deletes."""
-  newquay = lambda: md5(settings.SECRET_KEY + str(getrandbits(64)) + request.user.username).hexdigest()
-  key = newquay()
+  """Generates an API key which can be used instead of a password for API calls but not for important things like deletes. Checks for dupes."""
+  while True:
+    #keep generating keys until we get a unique one
+    newquay = lambda: md5(settings.SECRET_KEY + str(getrandbits(64)) + request.user.username).hexdigest()
+    key = newquay()
+    try:
+      UserProfile.objects.get(api_key=key)
+    except UserProfile.DoesNotExist:
+     break
   profile = request.user.get_profile()
   profile.api_key = key
   profile.save()
