@@ -45,7 +45,7 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.template import RequestContext
 from django.conf import settings
 from django.db import connection, transaction
-from django.db.models import Avg, Max, Min, Count
+from django.db.models import Avg, Max, Min, Count, Q
 from django.contrib.auth import authenticate
 from django.db import connection
 
@@ -486,6 +486,11 @@ def song(request, songid=0, edit=None):
   'banform':banform, 'can_delete':can_delete, 'can_edit':can_edit, 'vote':vote, 'path':path,}, \
   context_instance=RequestContext(request))
 
+@login_required()
+def album(request, albumid=None):
+  album = Album.objects.select_related().get(id=albumid)
+  songs = album.songs.all().select_related()
+  return render_to_response('album.html', {'album': album, 'songs': songs}, context_instance=RequestContext(request))
   
 @login_required()
 def listartists(request, letter='123', page='1'):
@@ -732,6 +737,7 @@ def search(request):
       
       artists = Artist.objects.select_related().filter(name__icontains=query).order_by('name')
       songs = Song.objects.select_related().filter(title__icontains=query).order_by('title')
+      albums = Album.objects.select_related().filter(name__icontains=query).order_by('name')
       if form.cleaned_data['orphan']:
         scuttle = User.objects.get(username="Fagin")
         orphans = songs.filter(uploader=scuttle).order_by('title')
@@ -744,7 +750,7 @@ def search(request):
         artists = temp
         songs = orphans
         
-      return render_to_response('search.html', {'form':form, 'artists':list(artists), 'songs':songs, 'query':query},\
+      return render_to_response('search.html', {'form':form, 'artists':list(artists), 'albums':list(albums), 'songs':songs, 'query':query},\
       context_instance=RequestContext(request))
   else:
     form = SearchForm()
