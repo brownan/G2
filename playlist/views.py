@@ -213,12 +213,12 @@ def jsplaylist(request, lastid=None):
     else:
       aug_playlist.append({'can_remove':False, 'object':entry, 'pl':False})
 
-    
+  accuracy = 1
   if lastid is not None:
     return render_to_response('playlist_table.html',  {'aug_playlist': aug_playlist, 'accuracy':accuracy},
     context_instance=RequestContext(request))
   
-  accuracy = 1
+
   
   can_skip = request.user.has_perm('playlist.skip_song')
   now_playing = PlaylistEntry.objects.get(playing=True).song.metadataString()

@@ -14,7 +14,8 @@
 
 <tr>
 <th class='djangoForumThreadPostDetail' id='post{{ post.id }}'>{% blocktrans with post.time|timesince as time %}{{ time }} ago{% endblocktrans %}<br />
-{% ifnotequal thread.forum.id 3 %}{% trans "by" %} <strong>{{ post.author }}</strong></th>{% endifnotequal %}
+{% ifnotequal thread.forum.id 3 %}{% trans "by" %} <strong>{{ post.author }}</strong></th><br />{% endifnotequal %}
+{% if post.can_edit %}<a href="">(edit)</a>
 <td>{{ post.body|bbcode }}</td>
 </tr>{% endfor %}
 
