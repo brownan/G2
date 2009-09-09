@@ -10,6 +10,8 @@ register = template.Library()
 
 @register.filter
 def stom(seconds):
+  if not seconds:
+    seconds = 0 #combat NoneType error bug
   t = divmod(int(seconds),  60) #get minutes and seconds
   
   if t[1] < 10:
