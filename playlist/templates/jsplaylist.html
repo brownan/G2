@@ -258,12 +258,12 @@ $(document).ready(function(){
   {% if welcome_message %}
   <div class="notices">{{welcome_message|safe}}</div>
   {% endif %}
-  <div class="notices" id="length">{% include "pl_length.html" %}</div>
   <div class="playlist" id ="playlistdiv">
     {% if msg %}<p class="message">{{msg}}</p>{% endif %}
     {% if aug_playlist %}
     <table class="playlist" id="playlisttable">
     <tbody id='playlist'>
+      <th colspan="7" id="length">{% include "pl_length.html" %}</th>
       <tr id='columns'>
         <th>Artist</th>
         <th>Title</th>
