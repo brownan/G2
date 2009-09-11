@@ -13,7 +13,7 @@
     </p>
     </form>
   
-  {% if artists or songs %}
+  {% if artists or songs or albums%}
   {% if artists %}
   <p class="artists">Artist{{ artists|length|pluralize }}:
     {% for artist in artists|slice:":-1" %}
