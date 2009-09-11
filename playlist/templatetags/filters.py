@@ -12,13 +12,23 @@ register = template.Library()
 def stom(seconds):
   if not seconds:
     seconds = 0 #combat NoneType error bug
-  t = divmod(int(seconds),  60) #get minutes and seconds
   
-  if t[1] < 10:
-    s = '0' + str(t[1]) #add zero to single digit numbers
+  t = divmod(int(seconds),  60) #get minutes and seconds
+  minutes = t[0]
+  seconds = t[1]
+  
+  hours = int(minutes/60)
+  minutes -= hours * 60
+  
+  if hours > 0:
+    return "%d:%02d:%02d" % (hours, minutes, seconds)
   else:
-    s = t[1]
-  return str(t[0]) + ':' + str(s)
+    return "%d:%02d" % (minutes, seconds)
+  #if t[1] < 10:
+    #s = '0' + str(t[1]) #add zero to single digit numbers
+  #else:
+    #s = t[1]
+  #return str(t[0]) + ':' + str(s)
 
 
 @register.filter
