@@ -261,7 +261,7 @@ class LinkTag(TagBase):
 
         scheme, uri = url.split(':', 1)
 
-        if scheme not in ['http', 'https']:
+        if scheme not in ['http', 'https', 'ftp', 'irc', 'spotify']:
             return u''
 
         try:
