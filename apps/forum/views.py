@@ -17,8 +17,8 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.views.generic.list_detail import object_list
 
-from forum.models import Forum,Thread,Post,Subscription,Category
-from forum.forms import CreateThreadForm, ReplyForm, EditForm
+from forum.models import *
+from forum.forms import *
 
 FORUM_PAGINATION = getattr(settings, 'FORUM_PAGINATION', 10)
 LOGIN_URL = getattr(settings, 'LOGIN_URL', '/accounts/login/')
@@ -56,25 +56,42 @@ def forum(request, slug):
                             'form': form,
                         })
 
-def thread(request, thread, editid=None):
+def thread(request, thread, editid=None, lastread=None):
     """
     Increments the viewed count on a thread then displays the 
     posts for that thread, in chronological order.
     """
+
     try:
         t = Thread.objects.select_related().get(pk=thread)
         if not Forum.objects.has_access(t.forum, request.user.groups.all()):
             raise Http404, "insufficient permissions"
     except Thread.DoesNotExist:
         raise Http404, "thread does not exist"
+      
+    if lastread:
+      try:
+        return HttpResponseRedirect(LastRead.objects.get(user=request.user, thread=t).post.get_absolute_url())
+      except LastRead.DoesNotExist:
+        pass
     
     perm = request.user.has_perm("forum.edit_post")
     
     p = t.post_set.extra(select={'can_edit': 'author_id = %s OR %s'}, 
     select_params=[request.user.id, int(perm)]).select_related('author').all().order_by('time')
     s = None
+    page = request.REQUEST.get("page", 1)
     if request.user.is_authenticated():
         s = t.subscription_set.select_related().filter(author=request.user)
+        #last read post system
+        last_post = min((page*FORUM_PAGINATION, p.count()))-1
+        try:
+          lastread = LastRead.objects.get(user=request.user, thread=t)
+          lastread.post = p[last_post]
+          lastread.save()
+        except LastRead.DoesNotExist:
+          LastRead(user=request.user, thread=t, post=p[last_post]).save()
+          
 
     t.views += 1
     t.save()
@@ -96,7 +113,6 @@ def thread(request, thread, editid=None):
     else:
       edit_form = None
     
-    page = request.REQUEST.get("page", 1)
     can_lock = can_sticky = True
     
     return object_list( request,

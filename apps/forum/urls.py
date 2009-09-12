@@ -33,7 +33,7 @@ urlpatterns = patterns('',
 
     url(r'edit/(?P<postid>[0-9]+)/$', 'forum.views.edit_post', name='post_edit'),
 
-    url(r'^thread/(?P<thread>[0-9]+)/$', 'forum.views.thread', name='forum_view_thread'),
+    url(r'^thread/(?P<thread>[0-9]+)/(?P<lastread>lastread)?$', 'forum.views.thread', name='forum_view_thread'),
     url(r'^thread/(?P<thread>[0-9]+)/editing/(?P<editid>[0-9]+)$', 'forum.views.thread', name='thread_post_edit'),
     url(r'^thread/(?P<thread>[0-9]+)/reply/$', 'forum.views.reply', name='forum_reply_thread'),
     url(r'^thread/(?P<threadid>[0-9]+)/action/(?P<action>[a-z]+)$', 'forum.views.mod_action', name='mod_action'),
