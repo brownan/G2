@@ -41,6 +41,7 @@
 <th>{% trans "Thread" %}</th>
 <th style='width: 50px;'>{% trans "Posts" %}</th>
 <th style='width: 50px;'>{% trans "Views" %}</th>
+<th style='width: 9em;'>Last Read Post</th>
 <th style='width: 220px;'>{% trans "Last Post" %}</th>
 </tr>
 
@@ -49,6 +50,7 @@
 <td>{% if t.sticky %}Sticky: {% endif %}<a href='{{ t.get_absolute_url }}'>{{ t.title|escape }}</a>{% if t.closed %} (locked){% endif %}</td>
 <td style='width: 50px;'>{{ t.posts }}</td>
 <td style='width: 50px;'>{{ t.views }}</td>
+<td style='width: 9em;'><a href="{% url forum_view_thread thread=t.id,lastread="lastread" %}">(last read post)</a></td>
 {% with t.thread_latest_post as latest_post %}
 <td style='width: 220px;' class='djangoForumThreadLastPost'>{% blocktrans with latest_post.time|timesince as time and latest_post.author as author %}{{ time }} ago by {{ author }}{% endblocktrans %} (<a href='{{ latest_post.get_absolute_url }}'>{% trans "view" %}</a>)</td>
 {% endwith %}

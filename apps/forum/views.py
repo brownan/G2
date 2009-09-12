@@ -56,17 +56,24 @@ def forum(request, slug):
                             'form': form,
                         })
 
-def thread(request, thread, editid=None):
+def thread(request, thread, editid=None, lastread=None):
     """
     Increments the viewed count on a thread then displays the 
     posts for that thread, in chronological order.
     """
+
     try:
         t = Thread.objects.select_related().get(pk=thread)
         if not Forum.objects.has_access(t.forum, request.user.groups.all()):
             raise Http404, "insufficient permissions"
     except Thread.DoesNotExist:
         raise Http404, "thread does not exist"
+      
+    if lastread:
+      try:
+        return HttpResponseRedirect(LastRead.objects.get(user=request.user, thread=t).post.get_absolute_url())
+      except LastRead.DoesNotExist:
+        pass
     
     perm = request.user.has_perm("forum.edit_post")
     
