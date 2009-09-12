@@ -226,7 +226,7 @@ class LinkTag(TagBase):
     _safe_chars = frozenset('ABCDEFGHIJKLMNOPQRSTUVWXYZ'
                'abcdefghijklmnopqrstuvwxyz'
                '0123456789'
-               '_.-=/&?:%&')
+               '_.-=/&?:%&#')
 
     _re_domain = re.compile(r"//([a-z0-9-\.]*)", re.UNICODE)
 
@@ -303,7 +303,7 @@ class LinkTag(TagBase):
             return u''
 
         if self.domain:
-            return u'</a>'+self.annotate_link(self.domain)
+            return u'</a>'#+self.annotate_link(self.domain)
         else:
             return u''
 
