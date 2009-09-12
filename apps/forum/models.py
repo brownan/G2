@@ -293,3 +293,18 @@ class Subscription(models.Model):
 
     def __unicode__(self):
         return u"%s to %s" % (self.author, self.thread)
+        
+class LastRead(models.Model):
+  """
+  Stores a particular user's last read post for a particular thread.
+  """
+  user = models.ForeignKey(User)
+  post = models.ForeignKey(Post)
+  thread = models.ForeignKey(Thread)
+  
+  class Meta:
+    unique_together = (("user", "thread"),)
+  
+  
+  
+
