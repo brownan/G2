@@ -97,6 +97,7 @@ def thread(request, thread, editid=None):
       edit_form = None
     
     page = request.REQUEST.get("page", 1)
+    can_lock = can_sticky = True
     
     return object_list( request,
                         queryset=p,
@@ -111,9 +112,53 @@ def thread(request, thread, editid=None):
                             'editid':editid,
                             'edit_form':edit_form,
                             'page':page,
+                            'can_lock':can_lock,
+                            'can_sticky':can_sticky,
                             #'body':edit_form.body,
                         })
-                        
+
+def mod_action(request, threadid=None, action=None):
+  if not (threadid and action):
+    return Http404
+  try:
+    thread = Thread.objects.get(pk=threadid)
+    author = thread.post_set.select_related("author").all()[0].author
+  except Thread.DoesNotExist:
+    raise Http404
+  
+  if action == "lock":
+    if not (request.user.has_perm("lock_thread") or (author != request.user)):
+      raise Http404
+    thread.closed = True
+    thread.save()
+    return HttpResponseRedirect(thread.get_absolute_url())
+    
+  elif action == "unlock":
+    if not (request.user.has_perm("lock_thread") or (author != request.user)):
+      raise Http404
+    thread.closed = False
+    thread.save()
+    return HttpResponseRedirect(thread.get_absolute_url())
+    
+  elif action == "sticky":
+    if not request.user.has_perm("sticky_thread"):
+      raise Http404
+    thread.sticky = True
+    thread.save()
+    return HttpResponseRedirect(thread.get_absolute_url())
+    
+  elif action == "unsticky":
+    if not request.user.has_perm("sticky_thread"):
+      raise Http404
+    thread.sticky = False
+    thread.save()
+    return HttpResponseRedirect(thread.get_absolute_url())
+    
+  else:
+    raise Http404
+  
+
+
 def edit_post(request, postid=None):
   if postid is None: 
     raise Http404

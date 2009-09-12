@@ -187,6 +187,10 @@ class Thread(models.Model):
         ordering = ('-sticky', '-latest_post_time')
         verbose_name = _('Thread')
         verbose_name_plural = _('Threads')
+        permissions = (
+        ("sticky_thread",  "g2 Can (un)sticky all forum threads"),
+        ("lock_thread",  "g2 Can (un)lock all forum threads"),
+        )
 
     def save(self, force_insert=False, force_update=False):
         f = self.forum
