@@ -14,6 +14,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from forum.managers import ForumManager
 
+FORUM_PAGINATION = getattr(settings, 'FORUM_PAGINATION', 10)
+
 class Category(models.Model):
   
   name = models.CharField(max_length=100, editable=True)
@@ -206,7 +208,7 @@ class Thread(models.Model):
     get_absolute_url = models.permalink(get_absolute_url)
     
     def __unicode__(self):
-        return u'%s' % self.title
+        return u'%s' % self.title    
 
 class Post(models.Model):
     """ 
@@ -257,9 +259,18 @@ class Post(models.Model):
         ordering = ('-time',)
         verbose_name = _('Post')
         verbose_name_plural = _('Posts')
+        permissions = (
+        ("edit_post",  "g2 Can edit all forum posts"),
+        )
         
     def get_absolute_url(self):
-        return '%s?page=last#post%s' % (self.thread.get_absolute_url(), self.id)
+        posts = list(Post.objects.filter(thread=self.thread).order_by("time"))
+        page = int(posts.index(self)/FORUM_PAGINATION)+1
+        
+        pageno = FORUM_PAGINATION
+        return '%s?page=%d#post%s' % (self.thread.get_absolute_url(), page, self.id)
+        
+    #objects = PostManager()
     
     def __unicode__(self):
         return u"%s" % self.id

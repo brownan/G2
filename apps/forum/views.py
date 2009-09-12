@@ -18,7 +18,7 @@ from django.utils.translation import ugettext as _
 from django.views.generic.list_detail import object_list
 
 from forum.models import Forum,Thread,Post,Subscription,Category
-from forum.forms import CreateThreadForm, ReplyForm
+from forum.forms import CreateThreadForm, ReplyForm, EditForm
 
 FORUM_PAGINATION = getattr(settings, 'FORUM_PAGINATION', 10)
 LOGIN_URL = getattr(settings, 'LOGIN_URL', '/accounts/login/')
@@ -56,7 +56,7 @@ def forum(request, slug):
                             'form': form,
                         })
 
-def thread(request, thread):
+def thread(request, thread, editid=None):
     """
     Increments the viewed count on a thread then displays the 
     posts for that thread, in chronological order.
@@ -64,11 +64,14 @@ def thread(request, thread):
     try:
         t = Thread.objects.select_related().get(pk=thread)
         if not Forum.objects.has_access(t.forum, request.user.groups.all()):
-            raise Http404
+            raise Http404, "insufficient permissions"
     except Thread.DoesNotExist:
-        raise Http404
+        raise Http404, "thread does not exist"
     
-    p = t.post_set.select_related('author').all().order_by('time')
+    perm = request.user.has_perm("edit_post")
+    
+    p = t.post_set.extra(select={'can_edit': 'author_id = %s OR %s'}, 
+    select_params=[request.user.id, int(perm)]).select_related('author').all().order_by('time')
     s = None
     if request.user.is_authenticated():
         s = t.subscription_set.select_related().filter(author=request.user)
@@ -83,6 +86,18 @@ def thread(request, thread):
 
     form = ReplyForm(initial=initial)
     
+    if editid:
+      try:
+        post = p.get(pk=editid)
+      except Post.DoesNotExist:
+        raise Http404
+      edit_form = EditForm(instance=post)
+      editid = int(editid)
+    else:
+      edit_form = None
+    
+    page = request.REQUEST.get("page", 1)
+    
     return object_list( request,
                         queryset=p,
                         paginate_by=FORUM_PAGINATION,
@@ -93,7 +108,29 @@ def thread(request, thread):
                             'thread': t,
                             'subscription': s,
                             'form': form,
+                            'editid':editid,
+                            'edit_form':edit_form,
+                            'page':page,
+                            #'body':edit_form.body,
                         })
+                        
+def edit_post(request, postid=None):
+  if postid is None: 
+    raise Http404
+
+  try:
+    post = Post.objects.select_related("thread", "author").get(pk=postid)
+  except Post.DoesNotExist:
+    raise Http404
+  
+  if (request.user.has_perm("edit_post") or post.author == request.user) and request.method == "POST":
+    form = EditForm(request.POST, instance=post)
+    if form.is_valid():  
+      form.save()
+      
+  return HttpResponseRedirect(post.get_absolute_url())
+  
+    
 
 def reply(request, thread):
     """

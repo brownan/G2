@@ -13,9 +13,16 @@
 {% for post in post_list %}
 <tr>
 <th class='djangoForumThreadPostDetail' id='post{{ post.id }}'>{% blocktrans with post.time|timesince as time %}{{ time }} ago{% endblocktrans %}<br />
-{% ifnotequal thread.forum.id 3 %}{% trans "by" %} <strong>{{ post.author }}</strong></th>{% endifnotequal %}
-{% if post.can_edit %}<a href="">(edit)</a>{% endif %}
+{% ifnotequal thread.forum.id 3 %}{% trans "by" %} <strong>{{ post.author }}</strong>{% endifnotequal %}{% if post.can_edit %}<br />
+<a href="{% url thread_post_edit thread.id,post.id %}?page={{page}}#post{{post.id}}">(edit)</a>{% endif %}</th>
+{% ifequal editid post.id %}
+<td><form method='post' action='{% url post_edit post.id %}'>
+<p>{{edit_form.body}}</p>
+<p><input type='submit' value='Update' /></p>
+</form></td>
+{% else %}
 <td>{{ post.body|bbcode }}</td>
+{% endifequal %}
 </tr>{% endfor %}
 
 </table>
@@ -33,7 +40,7 @@
 {% if request.user.is_authenticated %}<p><a href="{% url forum_subscriptions %}">{% trans "Update Subscriptions" %}</a></p>{% endif %}
 <h2>{% trans "Post a Reply" %}</h2>
 {% if thread.closed %}
-<p>{% trans "Sorry, this thread is closed. No further replies are permitted." %}</p>
+<p>{% trans "This thread is closed. No further replies are permitted." %}</p>
 {% else %}
 {% if user.is_authenticated %}
 <form method='post' action='reply/'>
