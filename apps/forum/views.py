@@ -4,7 +4,7 @@ All forum logic is kept here - displaying lists of forums, threads
 and posts, adding new threads, and adding replies.
 """
 
-from datetime import datetime
+from datetime import datetime as dt
 from django.shortcuts import get_object_or_404, render_to_response
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotAllowed
 from django.template import RequestContext, Context, loader
@@ -214,7 +214,7 @@ def reply(request, thread):
                 thread=t, 
                 author=request.user,
                 body=body,
-                time=datetime.now(),
+                time=dt.now(),
                 )
             p.save()
 
@@ -299,7 +299,7 @@ def newthread(request, forum):
                 thread=t,
                 author=request.user,
                 body=form.cleaned_data['body'],
-                time=datetime.now(),
+                time=dt.now(),
             )
             p.save()
     
