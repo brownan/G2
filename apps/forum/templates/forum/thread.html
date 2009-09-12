@@ -8,7 +8,14 @@
 {% block breadcrumbs %}{% for title, url in thread.forum.get_url_name %} &raquo; <a href='{{ url }}'>{{ title }}</a>{% endfor %} &raquo; <a href='{{ thread.get_absolute_url }}'>{{ thread.title|escape }}</a> ({{ thread.posts }} {% blocktrans count thread.posts as counter %}post{% plural %}posts{% endblocktrans %}){% endblock %}
 
 {% block content %}
-
+<p class="forumThreadModActions">
+{% if can_sticky %}
+{% if thread.sticky %}<a href="{% url mod_action thread.id,"unsticky" %}">(unsticky this)</a>{% else %}<a href="{% url mod_action thread.id,"sticky" %}">(sticky this)</a>{% endif %}
+{% endif %}
+{% if can_lock %} 
+{% if thread.closed %}<a href="{% url mod_action thread.id,"unlock" %}">(unlock this)</a>{% else %}<a href="{% url mod_action thread.id,"lock" %}">(lock this)</a>{% endif %}
+{% endif %}
+</p>
 <table id='djangoForumThreadPosts'>
 {% for post in post_list %}
 <tr>
@@ -40,7 +47,7 @@
 {% if request.user.is_authenticated %}<p><a href="{% url forum_subscriptions %}">{% trans "Update Subscriptions" %}</a></p>{% endif %}
 <h2>{% trans "Post a Reply" %}</h2>
 {% if thread.closed %}
-<p>{% trans "This thread is closed. No further replies are permitted." %}</p>
+<p>{% trans "No replies allowed: this thread is locked." %}</p>
 {% else %}
 {% if user.is_authenticated %}
 <form method='post' action='reply/'>

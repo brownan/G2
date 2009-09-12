@@ -46,7 +46,7 @@
 
 {% for t in thread_list %}
 <tr>
-<td>{% if t.sticky %}Sticky {% endif %}<a href='{{ t.get_absolute_url }}'>{{ t.title|escape }}</a>{% if t.closed %} (Closed){% endif %}</td>
+<td>{% if t.sticky %}Sticky: {% endif %}<a href='{{ t.get_absolute_url }}'>{{ t.title|escape }}</a>{% if t.closed %} (locked){% endif %}</td>
 <td style='width: 50px;'>{{ t.posts }}</td>
 <td style='width: 50px;'>{{ t.views }}</td>
 {% with t.thread_latest_post as latest_post %}
