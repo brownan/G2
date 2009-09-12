@@ -457,6 +457,7 @@ def song(request, songid=0, edit=None):
     editform = SongForm(request.POST, instance=song)
     if editform.is_valid():
       editform.save()
+      logging.info("User/mod %s (uid %d) edited songid %d at %s" % (request.user.username, request.user.id, song.id, now()))
   else:
     editform = SongForm(instance=song)
   commentform = CommentForm()
