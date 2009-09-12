@@ -25,9 +25,9 @@ LOGIN_URL = getattr(settings, 'LOGIN_URL', '/accounts/login/')
 
 def forums_list(request):
     
-  forums = Forum.objects.for_groups(request.user.groups.all()).filter(parent__isnull=True).order_by('sort_order')
+  forums = Forum.objects.for_groups(request.user.groups.all()).select_related().filter(parent__isnull=True).order_by('sort_order')
   categories = []
-  for category in Category.objects.all().order_by('sort_order'):
+  for category in Category.objects.select_related().all().order_by('sort_order'):
     categories.append({'name': category.name, 'object':category.forums.all().order_by('sort_order')})
     
   return render_to_response('forum/forum_list.html', {'categories': categories}, context_instance=RequestContext(request))
@@ -68,7 +68,7 @@ def thread(request, thread, editid=None):
     except Thread.DoesNotExist:
         raise Http404, "thread does not exist"
     
-    perm = request.user.has_perm("edit_post")
+    perm = request.user.has_perm("forum.edit_post")
     
     p = t.post_set.extra(select={'can_edit': 'author_id = %s OR %s'}, 
     select_params=[request.user.id, int(perm)]).select_related('author').all().order_by('time')
@@ -127,28 +127,28 @@ def mod_action(request, threadid=None, action=None):
     raise Http404
   
   if action == "lock":
-    if not (request.user.has_perm("lock_thread") or (author != request.user)):
+    if not (request.user.has_perm("forum.lock_thread") or (author != request.user)):
       raise Http404
     thread.closed = True
     thread.save()
     return HttpResponseRedirect(thread.get_absolute_url())
     
   elif action == "unlock":
-    if not (request.user.has_perm("lock_thread") or (author != request.user)):
+    if not (request.user.has_perm("forum.lock_thread") or (author != request.user)):
       raise Http404
     thread.closed = False
     thread.save()
     return HttpResponseRedirect(thread.get_absolute_url())
     
   elif action == "sticky":
-    if not request.user.has_perm("sticky_thread"):
+    if not request.user.has_perm("forum.sticky_thread"):
       raise Http404
     thread.sticky = True
     thread.save()
     return HttpResponseRedirect(thread.get_absolute_url())
     
   elif action == "unsticky":
-    if not request.user.has_perm("sticky_thread"):
+    if not request.user.has_perm("forum.sticky_thread"):
       raise Http404
     thread.sticky = False
     thread.save()
@@ -168,7 +168,7 @@ def edit_post(request, postid=None):
   except Post.DoesNotExist:
     raise Http404
   
-  if (request.user.has_perm("edit_post") or post.author == request.user) and request.method == "POST":
+  if (request.user.has_perm("forum.edit_post") or post.author == request.user) and request.method == "POST":
     form = EditForm(request.POST, instance=post)
     if form.is_valid():  
       form.save()
