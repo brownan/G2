@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
 """
 Post Markup
@@ -328,7 +328,7 @@ class QuoteTag(TagBase):
 
     def render_open(self, parser, node_index):
         if self.params:
-            return u'<blockquote><em>%s</em><br/>'%(PostMarkup.standard_replace(self.params))
+            return u'<blockquote><em>%s</em> said:<br/>'%(PostMarkup.standard_replace(self.params))
         else:
             return u'<blockquote>'
 
