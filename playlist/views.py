@@ -397,6 +397,20 @@ def ajax(request, resource=""):
   if resource == "metadata":
     song = getSong(request)
     return HttpResponse(song.artist.name + "\n" + song.album.name + "\n" + song.title)
+
+  if resource == "metadata2":
+    song = getSong(request)
+    return HttpResponse(song.artist.name + "\n" + song.album.name + "\n" + song.title + "\n" + str(song.length)) 
+
+  if resource == "randid":
+    randomid = randomdongid()
+    return HttpResponse(int(randomid[0]))
+
+  if resource == "plinfo":
+    pldongid = request.GET.get('plid', 0)
+    playlistinfo = plinfoq(pldongid)
+    return HttpResponse(str(playlistinfo[0]) + "\n" + playlistinfo[2] + "\n" + playlistinfo[3] + "\n" + playlistinfo[1])
+    #return HttpResponse(playlistinfo)
       
   if resource == "listeners":
     return HttpResponse(listenerCount())
