@@ -464,9 +464,9 @@ def skip(request):
 @permission_required('playlist.view_song')
 def song(request, songid=0, edit=None):
   try:
-    song = Song.objects.select_related().get(id=songid)
+    song = Song.objects.select_related("uploader", "artist", "album", "location").get(id=songid)
   except Song.DoesNotExist:
-    return render_to_response('song.html', {'error': 'Song not found.'})
+    raise Http404 # render_to_response('song.html', {'error': 'Song not found.'})
   if request.method == "POST" and (request.user.has_perm('playlist.edit_song') or (request.user == song.uploader)):
     editform = SongForm(request.POST, instance=song)
     if editform.is_valid():
@@ -499,7 +499,6 @@ def song(request, songid=0, edit=None):
   is_orphan = (song.uploader == User.objects.get(username="Fagin"))
     
     
-  
   return render_to_response('song.html', \
   {'song': song, 'editform':editform, 'edit':edit,'commentform':commentform, \
   'currentuser':request.user, 'comments':comments, 'can_ban':can_ban, 'is_orphan':is_orphan, \
@@ -640,7 +639,9 @@ def upload(request):
 @permission_required('playlist.view_artist')
 def artist(request, artistid=None):
   artist = Artist.objects.get(id=artistid)
-  songs = Song.objects.select_related().filter(artist=artist).order_by("album__name")
+  print artist
+  songs = Song.objects.select_related("artist").filter(artist=artist).order_by("album__name")
+  print songs
   return render_to_response("artist.html", {'songs': songs, 'artist': artist}, context_instance=RequestContext(request))
     
 @permission_required('playlist.queue_song')

@@ -43,6 +43,16 @@ class UploadedFile:
     f = open(self.file)
     self.info['sha_hash'] = hashlib.sha1(f.read()).hexdigest()
     f.close()
+    
+  def store(self):
+    """Store song in a usable directory using SongDir
+    and record it in the database. Return the Song object created."""
+    storage = SongDir.objects.getUsableDir()
+    storage.storeSong(self.file, self.info)
+    self.info['location'] = storage
+    s = Song(**self.info)
+    s.save()
+    return s
   
   def getTags(self):
     """Run correct tagging method. 
@@ -65,8 +75,8 @@ class UploadedFile:
       try:
         tags[value] = tags[value][0] #list to string (first element)
       except IndexError:
-        #no tag 
-        pass
+        tags[value] = ""
+        
       
     tags['length'] = round(song.info.length)
     tags['bitrate'] = song.info.bitrate/1000 #b/s -> kb/s

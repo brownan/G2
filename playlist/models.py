@@ -102,7 +102,8 @@ class UserProfile(models.Model):
   def __unicode__(self): return self.name
   
   def addSong(self,  file):
-    #FIXME: change to uploadSong, ambiguous naming at the moment
+    #FIXME: change to uploadSong, ambiguous naming at the moment (fixed)
+    #DEPRECIATED
     try: 
       info = self._getSongInfo(file)
       info['sha_hash'] = utils.hashSong(file)
@@ -139,8 +140,7 @@ class UserProfile(models.Model):
       raise FileTooBigError
     
     upload.info['uploader'] = self.user
-    s = Song(**upload.info)
-    utils.storeSong(upload.file,  upload.info)
+    s = upload.store()
     
     if s.length > settings.MAX_SONG_LENGTH: #10 mins
       s.ban("Autobahned because the dong is too long. Ask a mod to unban it if you want to play it.")
@@ -248,6 +248,8 @@ class Song(models.Model):
   banreason = models.CharField(max_length=100, blank=True, editable=False)
   unban_adds = models.IntegerField(default=0, editable=False) #number of plays till rebanned: 0 is forever
   
+  location = models.ForeignKey("SongDir", null=True)
+  
   avgscore = models.FloatField(default=0, editable=False)
   voteno = models.IntegerField(default=0, editable=False)
   # ratings, comments, entries & oldentries are related_names
@@ -298,7 +300,7 @@ class Song(models.Model):
   def __unicode__(self): return self.artist.name + ' - ' + self.title
   
   def getPath(self):
-    return MUSIC_PATH+'/'+ self.sha_hash+ '.' + self.format
+    return self.location.genPath(self.sha_hash, self.format)
   
   def ban(self, reason=""):
     self.banned = True
@@ -376,7 +378,45 @@ class Song(models.Model):
     )
     
 
+class SongDirManager(models.Manager):
+
+  
+  def getUsableDir(self):
+    """Return the first directory object we can find that's usable"""
     
+    return super(SongDirManager, self).filter(usable=True)[0]
+
+    
+
+
+
+class SongDir(models.Model):
+  """Represents a directory for storing song files in"""
+  #absolute path to directory 
+  path = models.CharField(max_length=300)
+  #number of letters of file hash to use for subdirectories. 0 means no subdirectories
+  hash_letters = models.IntegerField()
+  #True if accepting new uploads
+  usable = models.BooleanField(default=True)
+  
+  objects = SongDirManager()
+  
+  def storeSong(self, temp_path, info):
+    
+    new_file = open(self.genPath(info['sha_hash'], info['format']),  'w')
+    temp_file = open(temp_path)
+    try:
+      new_file.write(temp_file.read())
+    finally:
+      temp_file.close() #Django temp file so no need to delete
+      new_file.close()
+    
+  def genPath(self, sha_hash, format):
+    hash_dir = sha_hash[0:self.hash_letters] #get appripriate number of hash digits
+    return self.path+'/'+ hash_dir + '/' + sha_hash + '.' + format
+      
+      
+
 class Comment(models.Model):
   text = models.CharField(max_length=400)
   user = models.ForeignKey(User, editable=False)
@@ -479,7 +519,7 @@ class OldPlaylistEntry(models.Model):
     ordering = ['id']
 
 class Settings(models.Model):
-  key = value = models.CharField(max_length=200)
+  key = models.CharField(max_length=200)
   value = models.CharField(max_length=3000)
   
   def __unicode__(self): return self.key
@@ -487,7 +527,8 @@ class Settings(models.Model):
   class Meta:
     ordering = ['key']
 
-## DJ Shows ##
+
+####### DJ Shows ########
 
 class Series(models.Model):
   name = models.CharField(max_length=200)
