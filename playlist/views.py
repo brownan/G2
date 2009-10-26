@@ -52,6 +52,7 @@ from django.db import connection
 from pydj.playlist.models import *
 from pydj.playlist.utils import getSong, getObj, listenerCount
 from pydj.playlist.upload import UploadedFile
+from pydj.playlist.search import Search
 
 
 permissions = ["upload_song", "view_artist", "view_playlist", "view_song", "view_user", "queue_song"]
@@ -757,7 +758,7 @@ def search(request):
       query = form.cleaned_data['query']
       
       artists = Artist.objects.select_related().filter(name__icontains=query).order_by('name')
-      songs = Song.objects.select_related().filter(title__icontains=query).order_by('title')
+      songs = Search(query).getResults().order_by('title')
       albums = Album.objects.select_related().filter(name__icontains=query).order_by('name')
       if form.cleaned_data['orphan']:
         scuttle = User.objects.get(username="Fagin")
