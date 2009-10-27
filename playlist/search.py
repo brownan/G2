@@ -11,9 +11,18 @@ class Search:
     self.actions = {"artist": "artist__name",
                     "album": "album__name",
                     "title": "title",
+                    "uploader": "uploader__username",
+                    "length": "length",
+                    "score": "avgscore",
+                    "votes": "voteno",
+                    
+                    
                     }
     self.modifiers = {"=": "__iexact",
-                      ":": "__icontains"}
+                      ":": "__icontains",
+                      ">": "__gt",
+                      "<": "__lt",
+                      }
     
     tokens = [Str(token) for token in self.actions.keys()] 
     self.lexicon = Lexicon([(Alt(*tokens), "token"),
@@ -33,7 +42,6 @@ class Search:
     last = s.read()
     tuples = []
     while last[0]: #read up till final None
-      print last
       if last[0] == "term":
         last = self._parseTerm(last)
       else:
@@ -76,7 +84,6 @@ class Search:
     queries = [] #list of argument name, argument tuples for filter
     action = "title__icontains" #default action
     term = []
-    print tuples
     for i, (type, arg) in enumerate(tuples):
       if type == "term":
         term.append(arg) #part of a search string
@@ -116,7 +123,7 @@ class Search:
       
     
 if __name__ == "__main__":
-  s = Search("title = electioneering")
+  s = Search("score > 5")
   print s._makeQuery(s._parseString())
   print s.getResults()
 
