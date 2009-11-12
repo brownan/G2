@@ -53,6 +53,7 @@ from pydj.playlist.models import *
 from pydj.playlist.utils import getSong, getObj, listenerCount
 from pydj.playlist.upload import UploadedFile
 from pydj.playlist.search import Search
+from sa import SAProfile
 
 
 permissions = ["upload_song", "view_artist", "view_playlist", "view_song", "view_user", "queue_song"]
@@ -714,23 +715,32 @@ def newregister(request):
   if request.method == "POST":
     
     form = NewRegisterForm(request.POST)
+
+
     if form.is_valid():
+      username = form.cleaned_data['saname']
+      password = form.cleaned_data['password1']
+      email = form.cleaned_data['email']
+      authcode = get_authcode(form.cleaned_data['randcode'])
+      error = None
       randcode = form.cleaned_data['randcode']
+      
       try:
-        cj = cookielib.LWPCookieJar()
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-        urllib2.install_opener(opener)
-        opener.open("http://forums.somethingawful.com/account.php", \
-                    urlencode([("username", settings.SA_USERNAME), ("password", settings.SA_PASSWORD), ("action", "login")]))
-        if not get_authcode(form.cleaned_data['randcode']) in \
-           opener.open(SA_PREFIX + quote(form.cleaned_data['saname'])).read() and LIVE:
-          error = "Verification code not found on your profile."
+        profile = SAProfile(username)  
       except URLError:
         error = "Couldn't find your profile. Check you haven't made a typo and that SA isn't down."
-      if not error:
-        username = form.cleaned_data['saname']
-        password = form.cleaned_data['password1']
-        email = form.cleaned_data['email']
+      
+      if LIVE:
+        if not profile.has_authcode(authcode):
+          error = "Verification code not found on your profile."
+        if len(UserProfile.objects.filter(sa_id=profile.get_id())) > 0:
+          error = "You appear to have already registered with this SA account"
+        
+      if len(User.objects.filter(username__iexact=username)):  
+        error = "This username has already been taken. Please contact Jonnty to get a different one."
+         
+        
+      if error is None:
         user = User.objects.create_user(username=username, email=email, password=password)
         try: g = Group.objects.get(name="Listener")
         except Group.DoesNotExist:
@@ -740,7 +750,9 @@ def newregister(request):
           g.save()
         user.groups.add(g)
         user.save()
-        UserProfile(user=user).save()
+        up = UserProfile(user=user)
+        up.sa_id = profile.get_id()
+        up.save()
         return HttpResponseRedirect(reverse(django.contrib.auth.views.login))
     else:
       randcode = request.POST['randcode']

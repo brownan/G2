@@ -26,9 +26,6 @@ class FileTooBigError(Exception): pass
 
 
 
-
-
-
 class Artist(models.Model):
   name = models.CharField(max_length=255, unique=True)
   sort_name = models.CharField(max_length=300)
@@ -95,6 +92,8 @@ class UserProfile(models.Model):
   uploads = models.IntegerField(default=0)
   #last_ip = models.CharField(max_length=15)
   api_key = models.CharField(max_length=40, editable=False, blank=True)
+  sa_id = models.IntegerField(blank=True, null=True, unique=True,
+                              help_text="Something Awful account ID") 
   
   #settings
   s_playlistHistory = models.IntegerField(default=10, help_text="Number of previously played dongs shown") 
@@ -215,7 +214,7 @@ class UserProfile(models.Model):
     ("view_user",  "g2 Can view user pages"), 
     )
 
-  def __unicode__(self): return self.user.name
+  def __unicode__(self): return self.user.username
   
 class ChatboxPost(models.Model):
   user = models.ForeignKey(User)
