@@ -50,7 +50,7 @@ from playlist.models import *
 from playlist.utils import getSong, getObj, listenerCount
 from playlist.upload import UploadedFile
 from playlist.search import Search
-from sa import SAProfile
+from sa import SAProfile, IDNotFoundError
 
 
 
@@ -655,10 +655,15 @@ def newregister(request):
         error = "Couldn't find your profile. Check you haven't made a typo and that SA isn't down."
       
       if LIVE:
+
+        try:
+          if len(UserProfile.objects.filter(sa_id=profile.get_id())) > 0:
+            error = "You appear to have already registered with this SA account"
+        except IDNotFoundError:
+          error = "Your SA ID could not be found. Please contact Jonnty"
+        
         if not profile.has_authcode(authcode):
           error = "Verification code not found on your profile."
-        if len(UserProfile.objects.filter(sa_id=profile.get_id())) > 0:
-          error = "You appear to have already registered with this SA account"
         
       if len(User.objects.filter(username__iexact=username)):  
         error = "This username has already been taken. Please contact Jonnty to get a different one."

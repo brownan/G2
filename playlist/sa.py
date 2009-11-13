@@ -9,8 +9,8 @@ from django.conf import settings
 login_addr = "http://forums.somethingawful.com/account.php"
 profile_addr = "http://forums.somethingawful.com/member.php?action=getinfo&username="
 
-username = settings.SA_USERNAME
-password = settings.SA_PASSWORD
+sa_username = settings.SA_USERNAME
+sa_password = settings.SA_PASSWORD
 
 userid = re.compile(r'<input type="hidden" name="userid" value="(\d+)">')
 
@@ -18,6 +18,7 @@ userid = re.compile(r'<input type="hidden" name="userid" value="(\d+)">')
 randcode = lambda: md5(str(getrandbits(64))).hexdigest()
 
 
+class IDNotFoundError(Exception): pass
 
 class SAProfile:
   
@@ -26,12 +27,16 @@ class SAProfile:
     cj = cookielib.LWPCookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
     urllib2.install_opener(opener)
-    args = urlencode([("username", username), ("password", password), ("action", "login")])
+    args = urlencode([("username", sa_username), ("password", sa_password), ("action", "login")])
     opener.open(login_addr, args) #login
     self.page = opener.open(profile_addr + quote(username)).read()
     
   def get_id(self):
-    return int(userid.search(self.page).group(1))
+    s = userid.search(self.page)
+    if s:
+      return int(s.group(1))
+    else:
+      raise IDNotFoundError
   
   def has_authcode(self, code):
     return code in self.page
