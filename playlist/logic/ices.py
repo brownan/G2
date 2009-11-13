@@ -5,7 +5,7 @@ import sys
 sys.path.append("/home/jonnty/")
 import pydj.settings
 
-NEXT_URL="http://localhost/next/"+pydj.settings.NEXT_AUTHID
+NEXT_URL="http://localhost/next/"+pydj.settings.NEXT_PASSWORD
 
 
 def ices_init():
