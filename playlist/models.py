@@ -15,6 +15,7 @@ from django.db import IntegrityError
 from django.conf import settings
 from django.db.models.signals import pre_save
 from django.db.models import Avg, Count, Sum
+from django.db.models.query import QuerySet
 
 
 MUSIC_PATH = settings.MUSIC_DIR
@@ -226,6 +227,36 @@ class ChatboxPost(models.Model):
   #pid  = dbsettings.PositiveIntegerValue()
   
 
+
+class SongSet(QuerySet):
+  """Extends QuerySet for aggregated song checking methods"""
+  
+#  def __init__(self, model=None):
+#    super(SongSet, self).__init__(model)
+         
+  def check_playable(self, user):
+    
+    #song already on playlist
+    playlist = 'SELECT COUNT(*) FROM playlist_playlistentry \
+            WHERE playlist_playlistentry.song_id = playlist_song.id'
+            
+    #song too recently played
+    recent = '(SELECT count(*) FROM playlist_oldplaylistentry \
+              WHERE (playlist_oldplaylistentry.song_id = playlist_song.id) AND \
+              (playlist_oldplaylistentry.playtime-0 > NOW()-INTERVAL %d HOUR))' % (settings.REPLAY_INTERVAL)
+    
+    select = {#'is_banned' : 'banned = 1',
+              #'on_playlist' : playlist,
+              'recently_played': recent,
+              }
+    return super(SongSet, self).annotate(on_playlist=Count('entries')).\
+                                          extra(select=select)
+  
+class SongManager(models.Manager):
+  def get_query_set(self):
+    return SongSet(self.model)  #force Song to use extended queryset
+  
+
 class Song(models.Model):
   #TODO: sort out artist/composer/lyricist/remixer stuff as per note
   title = models.CharField(max_length=300)
@@ -253,17 +284,45 @@ class Song(models.Model):
   voteno = models.IntegerField(default=0, editable=False)
   # ratings, comments, entries & oldentries are related_names
   
+  
+  objects = SongManager()
   #stream_options = StreamOptions()
   
-  def addDisallowed(self, entries=None, oldentries=None):
+  def addDisallowed(self):
     """Returns (reason, shortreason) tuple. 
     Reason for user, shortreason for add button.
-    Otherwise returns None."""
+    More effcient & comprehensive if called on queryset returned from check_playable
+    Otherwise returns False.
+    """
+    try:
+      if self.on_playlist:
+         return ("song already on playlist", "on playlist")
+      if self.recently_played:
+        return ("song played too recently", "recently played")
+      if self.banned:
+        return ("song banned", "banned")
+#      elif self.greedy_user:
+#        return ("you already have too many songs on the playlist", "user is greedy")
+    except:
+      if self.banned:
+        return ("song banned", "banned")
+      if len(PlaylistEntry.objects.filter(song=self)) > 0:
+        return ("song already on playlist", "on playlist")
+      #check song hasn't been played recently: dt is definition of 'recently'
+      dt = datetime.datetime.now()-datetime.timedelta(hours=int(settings.REPLAY_INTERVAL))
+      if len(OldPlaylistEntry.objects.filter(song=self, playtime__gt=dt)) > 0:
+        return ("song played too recently", "recently played")
     
-    if not entries:
-      entries = PlaylistEntry.objects.all()
-    if not oldentries:
-      oldentries = OldPlaylistEntry.objects.all()
+    return False
+      
+  
+  def addDisallowedOld(self, entries=None, oldentries=None):
+    """Returns (reason, shortreason) tuple. 
+    Reason for user, shortreason for add button.
+    Otherwise returns None.
+    
+    Depreciated."""
+    
     if self.banned:
       return ("song banned", "banned")
     if len(PlaylistEntry.objects.filter(song=self)) > 0:
@@ -276,7 +335,7 @@ class Song(models.Model):
     
   def playlistAdd(self,  user):
     """Adds song to the playlist. 
-    Raises AddError if there's a problem, with the reason as its only arg."""
+    Raises AddError if there's a problem, with (reason, shortreason) as its arg."""
     reasons = self.addDisallowed()
     if reasons:
       reason, shortreason = reasons
@@ -433,12 +492,15 @@ class Comment(models.Model):
     permissions = (
     ("can_comment",  "g2 Can comment on songs"),
     )
+
     
 class PlaylistManager(models.Manager):
   
   def length(self):
     """Returns dictionary of playlist length in seconds and song count."""
     return super(PlaylistManager, self).select_related('song').filter(playing=False).aggregate(seconds=Sum('song__length'), song_count=Count('song'))
+  
+
     
 class PlaylistEntry(models.Model):
   

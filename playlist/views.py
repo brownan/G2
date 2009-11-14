@@ -434,7 +434,7 @@ def song(request, songid=0, edit=None):
 @login_required()
 def album(request, albumid=None):
   album = Album.objects.select_related().get(id=albumid)
-  songs = album.songs.all().select_related()
+  songs = album.songs.all().check_playable(request.user).select_related()
   return render_to_response('album.html', {'album': album, 'songs': songs}, context_instance=RequestContext(request))
   
 @login_required()
@@ -566,7 +566,7 @@ def upload(request):
 def artist(request, artistid=None):
   artist = Artist.objects.get(id=artistid)
   print artist
-  songs = Song.objects.select_related("artist").filter(artist=artist).order_by("album__name")
+  songs = Song.objects.select_related("artist", "album").check_playable(request.user).filter(artist=artist).order_by("album__name")
   print songs
   return render_to_response("artist.html", {'songs': songs, 'artist': artist}, context_instance=RequestContext(request))
     
@@ -699,7 +699,7 @@ def search(request):
       query = form.cleaned_data['query']
       
       artists = Artist.objects.select_related().filter(name__icontains=query).order_by('name')
-      songs = Search(query).getResults().order_by('title')
+      songs = Search(query).getResults().check_playable(request.user).order_by('title')
       albums = Album.objects.select_related().filter(name__icontains=query).order_by('name')
       if form.cleaned_data['orphan']:
         scuttle = User.objects.get(username="Fagin")
