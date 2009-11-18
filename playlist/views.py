@@ -369,7 +369,10 @@ def keygen(request):
 
 @login_required()
 def removeentry(request, entryid):
-  entry = PlaylistEntry.objects.select_related().get(id=entryid)
+  try:
+    entry = PlaylistEntry.objects.select_related().get(id=entryid)
+  except PlaylistEntry.DoesNotExist:
+    raise Http404
   if ((entry.adder == request.user) or request.user.has_perm("playlist.remove_entry")) and not entry.playing:
     logging.info("User %s (uid %d) removed songid %d from playlist at %s" % (request.user.username, request.user.id, entry.song.id, now()))
     entry.remove()
@@ -433,7 +436,10 @@ def song(request, songid=0, edit=None):
 
 @login_required()
 def album(request, albumid=None):
-  album = Album.objects.select_related().get(id=albumid)
+  try:
+    album = Album.objects.select_related().get(id=albumid)
+  except Album.DoesNotExist:
+    raise Http404
   songs = album.songs.all().check_playable(request.user).select_related()
   return render_to_response('album.html', {'album': album, 'songs': songs}, context_instance=RequestContext(request))
   
@@ -564,7 +570,10 @@ def upload(request):
 
 @permission_required('playlist.view_artist')
 def artist(request, artistid=None):
-  artist = Artist.objects.get(id=artistid)
+  try:
+    artist = Artist.objects.get(id=artistid)
+  except Artist.DoesNotExist:
+    raise Http404
   print artist
   songs = Song.objects.select_related("artist", "album").check_playable(request.user).filter(artist=artist).order_by("album__name")
   print songs
@@ -573,7 +582,10 @@ def artist(request, artistid=None):
 @permission_required('playlist.queue_song')
 def add(request, songid=0): 
   try:
-    song = Song.objects.get(id=songid)
+    try:
+      song = Song.objects.get(id=songid)
+    except Song.DoesNotExist:
+      raise Http404
     song.playlistAdd(request.user)
   except AddError, e:
     msg = "Error: %s" % (e.args[0])
@@ -712,7 +724,10 @@ def orphans(request, page=0):
 
 @login_required()
 def adopt(request, songid):
-  song = Song.objects.get(id=songid)
+  try:
+    song = Song.objects.get(id=songid)
+  except Song.DoesNotExist:
+    raise Http404
   scuttle = User.objects.get(username="Fagin")
   if not song in Song.objects.filter(uploader=scuttle):
     request.user.message_set.create(message="You may not adopt this dong.")
