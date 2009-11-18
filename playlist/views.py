@@ -579,20 +579,16 @@ def add(request, songid=0):
     msg = "Error: %s" % (e.args[0])
     request.user.message_set.create(message=msg)
     return HttpResponseRedirect(reverse("playlist"))      
-  else:
-    scuttle = User.objects.get(username="Fagin")
-    if song.uploader == scuttle:
-      song.uploader = request.user
-      song.save()
-      request.user.message_set.create(message="This dong was an orphan, so you have automatically adopted it. Take good care of it!")
-    request.user.message_set.create(message="Track added successfully!")
-    if settings.DEBUG:
-      f = open(settings.LOG_DIR + "/sql.log", "a")
-      f.write("---\n")
-      for q in connection.queries:
-        f.write(q['time'] + " : " + q['sql'] + '\n')
-      f.close()
-    return HttpResponseRedirect(reverse("playlist"))
+
+  if song.isOrphan(): 
+    song.uploader = request.user
+    song.save()
+    msg = "This dong was an orphan, so you have automatically adopted it. Take good care of it!"
+    request.user.message_set.create(message=msg)
+    
+  request.user.message_set.create(message="Track added successfully!")
+
+  return HttpResponseRedirect(reverse("playlist"))
   
 def next(request, authid):
   if authid == settings.NEXT_PASSWORD:
@@ -604,33 +600,6 @@ def next(request, authid):
     except PlaylistEntry.DoesNotExist:
       pass
   return HttpResponse()
-
-def register(request):
-  if request.method == "POST":
-    form = RegisterForm(request.POST, request.FILES)
-    if form.is_valid():
-      if form.cleaned_data['passcode'] != 'dongboners':
-        error = "Incorrect passcode"
-        return render_to_response('register.html', {'form': form, 'error':error})
-      username = form.cleaned_data['username']
-      password = form.cleaned_data['password1']
-      user = User.objects.create_user(username=username, email="", password=password)
-      try: g = Group.objects.get(name="Listener")
-      except Group.DoesNotExist:
-        g = Group(name="user")
-        g.save()
-        [g.permissions.add(Permission.objects.get(codename=s)) for s in permissions]
-        g.save()
-      user.groups.add(g)
-      user.save()
-      UserProfile(user=user).save()
-      return HttpResponseRedirect(reverse(django.contrib.auth.views.login))
-  else:
-    form = RegisterForm()
-    error = "Fill in the form properly"
-  return render_to_response('register.html', {'form': form}, context_instance=RequestContext(request))
-   
-
    
 def newregister(request):
   get_authcode = lambda randcode: md5(settings.SECRET_KEY + randcode).hexdigest()
