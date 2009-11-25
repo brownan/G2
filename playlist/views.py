@@ -524,7 +524,10 @@ def deletesong(request, songid=0):
   
 @login_required()
 def user(request, userid):
-  owner=  User.objects.get(id=userid)
+  try:
+    owner=  User.objects.get(id=userid)
+  except User.DoesNotExist:
+    raise Http404
   return render_to_response("user.html", {'owner':owner}, context_instance=RequestContext(request))
 
 @permission_required('playlist.can_comment')

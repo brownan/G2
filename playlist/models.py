@@ -278,7 +278,7 @@ class Song(models.Model):
   banreason = models.CharField(max_length=100, blank=True, editable=False)
   unban_adds = models.IntegerField(default=0, editable=False) #number of plays till rebanned: 0 is forever
   
-  location = models.ForeignKey("SongDir", null=True)
+  location = models.ForeignKey("SongDir", null=True, editable=False)
   
   avgscore = models.FloatField(default=0, editable=False)
   voteno = models.IntegerField(default=0, editable=False)
