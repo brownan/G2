@@ -123,7 +123,7 @@ document.getElementById("link"+id).innerHTML = "Explain";
   </tr>
   <tr>
     <td>Album:</td>
-    <td class="details"><a href='{% url playlist.views.artist song.artist.id %}#{{song.album.id}}'>{{ song.album }}</a></td>
+    <td class="details"><a href='{% url playlist.views.album song.album.id %}'>{{ song.album }}</a></td>
   </tr>
   <tr>
     <td>Title:</td>
