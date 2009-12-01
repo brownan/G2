@@ -486,6 +486,9 @@ class PlaylistManager(models.Manager):
   def length(self):
     """Returns dictionary of playlist length in seconds and song count."""
     return super(PlaylistManager, self).select_related('song').filter(playing=False).aggregate(seconds=Sum('song__length'), song_count=Count('song'))
+    
+  def nowPlaying(self):
+    return super(PlaylistManager, self).get(playing=True)
   
 
     
