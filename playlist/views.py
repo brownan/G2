@@ -26,6 +26,7 @@ from hashlib import md5
 from urllib2 import URLError
 from subprocess import Popen
 import logging
+import json 
 
 from django.http import *
 from django.template import Context, loader
@@ -50,6 +51,7 @@ from playlist.models import *
 from playlist.utils import getSong, getObj, listenerCount
 from playlist.upload import UploadedFile
 from playlist.search import Search
+from playlist.cue import CueFile
 from sa import SAProfile, IDNotFoundError
 
 
@@ -341,6 +343,15 @@ def ajax(request, resource=""):
   if resource == "listeners":
     return HttpResponse(listenerCount())
     
+  if resource == "position":
+    cue = CueFile(settings.LOGIC_DIR + "/ices.cue")
+    d = {}
+    now_playing = PlaylistEntry.objects.nowPlaying().song
+    d['position'] = cue.getTime(now_playing)
+    d['progress'] = cue.getProgress()
+    d['length'] = now_playing.length
+    return HttpResponse(json.dumps(d))  
+  
   raise Http404
   
 @login_required()

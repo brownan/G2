@@ -243,7 +243,7 @@ div.progbar {
   height:8px;
   background-color:#050;
 }
-div.clutterbar, div.notices {
+div.clutterbar, div.notices, div.topbar {
   font-size:smaller;
   border:1px solid black;
   padding:10px;
@@ -255,7 +255,10 @@ div.notices {
   margin-right:10px;
 }
 div.clutterbar {
+  float: right;
+  position: fixed;
   min-height:55px;
+  bottom: 0px;
   /* background-position:top right;   No need for this.. yet
   background-repeat:no-repeat; */ 
 }

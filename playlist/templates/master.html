@@ -42,6 +42,70 @@
 <script type="text/javascript" src="images/swfobject.js"></script>
 <script type="text/javascript" src="images/playload.js"></script>
 <script type="text/javascript">
+
+//both of these are in seconds
+var songLength = {{song_length}};
+var songPosition = {{song_position}};
+var songProgress = {{song_progress}};
+
+//convert seconds to minutes:seconds
+var stom = function(time){
+  seconds = time%60;
+  minutes = parseInt(time/60);
+  if (seconds < 10) { 
+    seconds = "0" + seconds.toString(); //add zero to single digit numbers
+  } else {
+    seconds = seconds.toString();
+  }
+  return minutes.toString() + ':' + seconds;
+}
+
+function setSongLength(length) {
+  if (songLength != length) {
+    songLength = length;
+    $('#songLength').html(stom(length));
+  }
+}
+
+function setSongPosition(pos) {
+  pos = Math.min(pos, songLength);
+  if (songPosition != pos) {
+    $('#songPosition').html(stom(pos));
+    songPosition = pos;
+    setSongProgress((pos/songLength)*100);
+  }
+}
+
+function setSongProgress(percentage) {
+  $(".progbar").css("width", Math.round(percentage).toString() + '%');
+  //alert(percentage.toString() * '%');
+  songProgress = percentage;
+}
+
+
+function secondLoop() {
+  setSongPosition(songPosition+1);
+  setTimeout('secondLoop()', 1000);
+}
+
+function syncHandler(data) {
+  
+  if (songLength != data.length) {
+    setSongLength(data.length)
+  }
+  //check tolerance +/-5 in seconds
+  if (songPosition + 5 < data.position || songPosition - 5 > data.position) {
+    setSongPosition(Math.round(data.position));
+  }
+}
+
+function syncLoop() {
+  $.getJSON("{% url playlist.views.ajax resource="position" %}", syncHandler);
+  setTimeout('syncLoop()', 5000);
+}
+
+
+
 $(document).ready(function(){
   //quick search handler
   searchbox = $('#id_query');
@@ -53,6 +117,9 @@ $(document).ready(function(){
       searchbox.css('color', 'black');
     }
   });
+  setSongLength(10);
+  secondLoop();
+  syncLoop();
 });
 </script>
 
@@ -107,16 +174,18 @@ $(document).ready(function(){
 {% endif %}
 {% block main %}
 {% endblock %}
-<!--    <div class="clutterbar">  this whole clutterbar should probably work and be positionable top or bottom 
-      <div class="voteboxbar"><div class="progtube"><div style="width:40%;" class="progbar"></div></div>4:56/7:23
-      <p>Vote: <a class="selectedvote" href="#">1</a> the width here^^ in percent is the progress of the song 
+    <div class="clutterbar">  <!--this whole clutterbar should probably work and be positionable top or bottom -->
+      <div class="voteboxbar"><div class="progtube"><div style="width:40%;" class="progbar"></div></div>
+      <span id="songPosition">4:56</span>/<span id="songLength">7:23</span>
+      <p>Vote: <a class="selectedvote" href="#">1</a> <!--the width here^^ in percent is the progress of the song -->
       <a href="#">2</a>
       <a href="#">3</a>
       <a href="#">4</a>
       <a href="#">5</a>
       </p>
       </div>
-      <div class="voteboxsong"> Song title, comments... I dunno... -->
+    </div>
+      <div class="voteboxsong"> Song title, comments... I dunno... 
       {% if debug %}
       <p><em>Total query count:</em> {{ sqllog|length }}<br/>
       <em>Total execution time:</em> {{ sqltime }}</p>
@@ -130,7 +199,7 @@ $(document).ready(function(){
       {% endif %}
       
       </div>
-    </div>
+    
 </div>
 </body>
 </html>
