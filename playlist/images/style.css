@@ -44,7 +44,9 @@ tr.even, #columns tr {
 
 div.playlist {
   margin-left: 133px;
-  margin-right:3px;
+  margin-right: 3px;
+  margin-bottom: 100px; /*to clear progress bar */
+
 }
 div.playlist table {
   width:100%;
@@ -253,6 +255,8 @@ div.clutterbar, div.notices, div.topbar {
 
 div.clutterbar {
   float: right;
+  right:8px; 
+  left:8px;
   position: fixed;
   min-height:55px;
   bottom: 0px;
