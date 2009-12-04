@@ -26,7 +26,7 @@ from hashlib import md5
 from urllib2 import URLError
 from subprocess import Popen
 import logging
-import json 
+import simplejson as json
 
 from django.http import *
 from django.template import Context, loader
