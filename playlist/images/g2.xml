@@ -4,7 +4,7 @@
 <track> <!-- Shoutcast Stream -->
 <title>G2</title>
 <creator>G2</creator>
-<location>http://gbsfm.ath.cx:8001/;stream.nsv</location>
+<location>http://gbsfm.ath.cx:8080/;stream.nsv</location>
 <identifier/>
 <meta rel="type">mp3</meta>
 <info>http://gbsfm.ath.cx/</info>
