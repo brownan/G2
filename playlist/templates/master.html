@@ -146,7 +146,7 @@ $(document).ready(function(){
       <li><a id="menuitem" href="{% url user_settings %}"><img id="butansurface" src="images/butansurface.png" alt="settings" title="Settings" />Settings</a></li>
       <li><a id="menuitem" href="{% url forum_index %}"><img id="butansurface" src="images/butansurface.png" alt="forums" title="Forums" />Forums</a></li>
       <li><a id="menuitem" href="http://www.thegreenwood.info/irc/"><img id="butansurface" src="images/butansurface.png" alt="irc" title="IRC" />IRC</a></li>
-      <li><a id="menuitem" href="http://gbs.fm:8001/listen.pls"><img id="butansurface" src="images/butansurface.png" alt="listen" title="Listen!" />Listen!</a></li>
+      <li><a id="menuitem" href="http://gbs.fm:8080/listen.pls"><img id="butansurface" src="images/butansurface.png" alt="listen" title="Listen!" />Listen!</a></li>
       <li><a id="menuitem" href="#" onClick="listenswf(); return false;"><img id="butansurface" src="images/butansurface.png" alt="Flash Player" title="Flash Player" />Flash Player</a></li>
       <li><a id="menuitem" href="{% url django.contrib.auth.views.logout %}"><img id="butansurface" src="images/butansurface.png" alt="logout" title="Logout" />Logout</a></li>
       {% if perms.playlist.view_g2admin %}
