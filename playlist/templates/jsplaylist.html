@@ -26,14 +26,6 @@ var lastremoval = {{ lastremoval|default:"0" }};
 var getLastEntry = function(){
   return $('#playlist > :last-child').attr('id');
 }
-/*var getLastOldEntry = function(){
-  playlist = $('#playlist > tr')
-  for (i=0; i<playlist.length; i++) {
-    if ($(playlist[i]).is('.playing')) {
-      return $(playlist[i-1]).attr('id')
-    }
-  }
-}*/
 
 var removeCallback = function() {
   $(this).remove();

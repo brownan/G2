@@ -248,12 +248,9 @@ div.clutterbar, div.notices, div.topbar {
   border:1px solid black;
   padding:10px;
   background-color:#F5FFEE;
-  margin:5px 0px;
+  margin:5px 10px 5px 140px;
 }
-div.notices {
-  margin-left:140px;
-  margin-right:10px;
-}
+
 div.clutterbar {
   float: right;
   position: fixed;
