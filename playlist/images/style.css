@@ -45,7 +45,6 @@ tr.even, #columns tr {
 div.playlist {
   margin-left: 133px;
   margin-right: 3px;
-  margin-bottom: 100px; /*to clear progress bar */
 
 }
 div.playlist table {
@@ -234,6 +233,9 @@ div.messages p {    /* MESSAGES bar- "track added", "too many dongs" etc. */
   margin-left:140px;
   margin-right:10px;
   font-weight:bold;
+}
+div.main {
+    margin-bottom: 100px; /*to clear clutterbar */
 }
 div.progtube {
   width:320px;
