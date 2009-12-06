@@ -172,17 +172,29 @@ $(document).ready(function(){
   {% endfor %}
   </div>
 {% endif %}
+<div class="main">
 {% block main %}
 {% endblock %}
+</div>
     <div class="clutterbar">  <!--this whole clutterbar should probably work and be positionable top or bottom -->
-      <div class="voteboxbar"><div class="progtube"><div style="width:40%;" class="progbar"></div></div>
-      <span id="songPosition">4:56</span>/<span id="songLength">7:23</span>
-      <p>Vote: <a class="selectedvote" href="#">1</a> <!--the width here^^ in percent is the progress of the song -->
+      
+      <div class="progbarbox">
+<!--       <p> -->
+        <div class="progtube">
+          <div style="width:40%;" class="progbar"></div>
+        </div>
+        <span id="songPosition">4:56</span>/<span id="songLength">7:23</span>
+<!--       </p> -->
+      </div>
+      
+      <div class="voteboxbar">
+      <!--<p>-->Vote: 
+      <a class="selectedvote" href="#">1</a> <!--the width here^^ in percent is the progress of the song -->
       <a href="#">2</a>
       <a href="#">3</a>
       <a href="#">4</a>
       <a href="#">5</a>
-      </p>
+<!--       </p> -->
       </div>
     </div>
       <div class="voteboxsong"> <!--Song title, comments... I dunno... -->

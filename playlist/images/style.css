@@ -253,24 +253,19 @@ div.clutterbar, div.notices, div.topbar {
   margin:5px 10px 5px 140px;
 }
 
-div.clutterbar {
+div.progbarbox {
   float: right;
-  right:8px; 
-  left:8px;
-  position: fixed;
-  min-height:55px;
-  bottom: 0px;
-  /* background-position:top right;   No need for this.. yet
-  background-repeat:no-repeat; */ 
 }
+
 div.voteboxbar {
-  float:right;
+  float: left;
   padding-left:5px;
-}
-div.voteboxbar p {
   font-size:larger;
 }
-div.clutterbar p a, td.votes a {
+div.voteboxbar p {
+  
+}
+div.voteboxbar a, td.votes a {
   border:1px solid black;
   padding:1px;
   margin:1px;
@@ -290,14 +285,28 @@ td.votes {
   white-space:nowrap;    /* THE VOTE ROW SHALT NOT BREAK! */
   width:75px;           /* also that pesky unnecessary space at the end needs to go */
 }
-div.clutterbar p a.selectedvote, div.clutterbar p a.selectedvote:hover, #playlist td.votes a.voted, #playlist td.votes a.voted:hover {
+div.voteboxbar a.selectedvote, div.clutterbar p a.selectedvote:hover, #playlist td.votes a.voted, #playlist td.votes a.voted:hover {
   color:white;
   background-color:black;
   font-weight:bold;
 }
-div.clutterbar p a:hover, #playlist td.votes a:hover {
+div.voteboxbar a:hover, #playlist td.votes a:hover {
   background-color:#9C9;
   text-decoration:none;
+}
+div.clutterbar {
+  float: right;
+  right:0px; 
+  left:0px;
+  position: fixed;
+/*   min-height:20px; */
+  bottom: 0px;
+  border: 0px;
+  border-top: 1px solid black;
+  background: #9C9;
+  margin: 0px;
+  /* background-position:top right;   No need for this.. yet
+  background-repeat:no-repeat; */ 
 }
 div.voteboxsong {
   display:block;
