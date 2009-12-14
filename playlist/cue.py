@@ -6,12 +6,18 @@ class CueFile:
     if path is None:
       pass #TODO get path from settings
       
-    self._file = open(path)
+    try:
+      self._file = open(path)
+    except IOError:
+      pass
     
   def _getLine(self, line):
     """Return the contents of the line specified and go back to the start of the file"""
-    line = self._file.readlines()[line]
-    self._file.seek(0)
+    try:
+      line = self._file.readlines()[line]
+      self._file.seek(0)
+    except IOError:
+      line = "0"
     return line
     
   def getProgress(self):
