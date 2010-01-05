@@ -64,27 +64,12 @@ var addVoteHandler = function(data) {
 /**
 * Main loop: handles all periodic calls
 **/
-// function checkLoop() {
-//   args = {
-//     'last_removal': lastremoval,
-//     'last_add': getLastEntry(),
-//     'now_playing': getNowPlayingID(),
-//   };
-//   $.getJSON("{% url playlist.views.ajax %}", args, eventDispatcher);
-//   
-//   $.getJSON("{% url playlist.views.api resource="deletions" %}", {'lastid': lastremoval}, delHandler);
-//   //$.getJSON("{% url playlist.views.api resource="adds" %}", {'lastid': getLastEntry()}, addHandler);
-//   $.get("/playlist/"+getLastEntry(), addHandler);
-//   $.getJSON("{% url playlist.views.api resource="nowplaying" %}", nowPlayingHandler);
-//   //$.getJSON("{% url playlist.views.api resource="history" %}", {'lastid': getLastOldEntry()}, oldEntryHandler);
-//   $.get("{% url playlist.views.api resource="pltitle" %}", {}, titleHandler);
-//   $.get("{% url playlist.views.api resource="pllength" %}?formatted", {}, lenHandler);
-//   addVoteHandler();
-//   pruneHandler();
-//   stripe();
-// 
-//   setTimeout('checkLoop()', DELAY);
-// }
+function funLoop() {
+  addVoteHandler();
+  pruneHandler();
+  stripe();
+  setTimeout('checkLoop()', DELAY);
+}
 
 var removeCallback = function() {
   $(this).remove();
@@ -146,6 +131,7 @@ $(document).ready(function(){
   //no-arg event handlers
   $('body').bind('pltitle', pltitleHandler);
   $('body').bind('pllength', pllengthHandler);
+  funLoop();
 
 });
 
