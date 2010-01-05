@@ -38,6 +38,7 @@ import django.contrib.auth.views
 import django.contrib.auth as auth
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.template import RequestContext
+from django.template.loader import render_to_string
 from django.conf import settings
 from django.db import connection, transaction
 from django.db.models import Avg, Max, Min, Count, Q
@@ -52,6 +53,7 @@ from playlist.utils import getSong, getObj, listenerCount
 from playlist.upload import UploadedFile
 from playlist.search import Search
 from playlist.cue import CueFile
+from playlist.pllib import Playlist
 from sa import SAProfile, IDNotFoundError
 
 
@@ -62,6 +64,7 @@ permissions = ["upload_song", "view_artist", "view_playlist", "view_song", "view
 PIDFILE = settings.LOGIC_DIR+"/pid"
 SA_PREFIX = "http://forums.somethingawful.com/member.php?action=getinfo&username="
 LIVE = settings.IS_LIVE
+MAX_EVENTS = 20 #maximum number of events premissible for one event type
 
 
 def now():
@@ -95,8 +98,8 @@ def splaylist(request):
   try:
     if authenticate(username=request.REQUEST['username'], password=request.REQUEST['password']):
       return jsplaylist(request)
-  except KeyError: pass
-  return HttpResponseRedirect(reverse('login'))
+  except KeyError: 
+    return HttpResponseRedirect(reverse('login'))
     
 @permission_required('playlist.view_playlist')
 def playlist(request, lastid=None):
@@ -113,41 +116,9 @@ def jsplaylist(request, lastid=None):
       historylength = request.user.get_profile().s_playlistHistory
     except AttributeError:
       historylength = 10
-    #historylength = 10
-    oldentries = OldPlaylistEntry.objects.all()
-    oldentries = oldentries.extra(where=['playlist_oldplaylistentry.id > \
-    (select max(id) from playlist_oldplaylistentry)-%s'], params=[historylength], 
-    select={"user_vote": "SELECT ROUND(score, 0) FROM playlist_rating WHERE playlist_rating.user_id = %s AND playlist_rating.song_id = playlist_oldplaylistentry.song_id", "avg_score": "SELECT AVG(playlist_rating.score) FROM playlist_rating WHERE playlist_rating.song_id = playlist_oldplaylistentry.song_id", "vote_count": "SELECT COUNT(*) FROM playlist_rating WHERE playlist_rating.song_id = playlist_oldplaylistentry.song_id"},
-    select_params=[request.user.id]).select_related()
-  else:
-    oldentries = []
-  
-  newentries = PlaylistEntry.objects.extra(select={"user_vote": "SELECT ROUND(score, 0) FROM playlist_rating WHERE playlist_rating.user_id = \
-  %s AND playlist_rating.song_id = playlist_playlistentry.song_id", "avg_score": "SELECT AVG(playlist_rating.score) FROM playlist_rating WHERE playlist_rating.song_id = playlist_playlistentry.song_id", "vote_count": "SELECT COUNT(*) FROM playlist_rating WHERE playlist_rating.song_id = playlist_playlistentry.song_id"},
-  select_params=[request.user.id]).select_related("song__artist", "song__album", "song__uploader", "adder").all().order_by('addtime')
-
-  if lastid is not None:
-    newentries = newentries.filter(id__gt=lastid)
-  playlist = itertools.chain(oldentries, newentries)
-
-  
-  aug_playlist= []
-
-  for entry in playlist:
-    if isinstance(entry, PlaylistEntry) and not entry.playing and (request.user.has_perm('remove_entry') or request.user == entry.adder):
-      aug_playlist.append({'can_remove':True, 'object':entry, 'pl':True})
-    elif isinstance(entry, PlaylistEntry):
-      aug_playlist.append({'can_remove':False, 'object':entry, 'pl':True})
-    else:
-      aug_playlist.append({'can_remove':False, 'object':entry, 'pl':False})
-
-  accuracy = 1
-  if lastid is not None:
-    return render_to_response('playlist_table.html',  {'aug_playlist': aug_playlist, 'accuracy':accuracy},
-    context_instance=RequestContext(request))
-  
-
-  
+    
+  aug_playlist = Playlist(request.user, historylength).fullList()
+  accuracy = 1 #TODO: make accuracy user setting
   can_skip = request.user.has_perm('playlist.skip_song')
   now_playing = PlaylistEntry.objects.get(playing=True).song.metadataString()
   lastremoval = RemovedEntry.objects.aggregate(Max('id'))['id__max']
@@ -165,8 +136,78 @@ def jsplaylist(request, lastid=None):
   
  # return render_to_response('index.html',  {'aug_playlist': aug_playlist, 'msg':msg, 'can_skip':can_skip}, context_instance=RequestContext(request))
   
+
+@login_required()
+def ajax(request):
+    events = []
+    length_changed = False #True if any actions would have changed the playlist length
+    
+    #new removals
+    try:
+      last_removal = int(request.REQUEST['last_removal'])
+    except (TypeError, KeyError):
+      last_removal = None
+    if last_removal is not None:
+      removals = RemovedEntry.objects.filter(id__gt=last_removal)
+      removal_events = []
+      if removal_events:
+        length_changed = True
+      for removal in removals:
+        removal_events.append(('removal', {"entryid": removal.oldid, "id": removal.id}))
+      if len(removal_events) > MAX_EVENTS:
+        removal_events = removal_events[:MAX_EVENTS] 
+      events.extend(removal_events)
+      
+        
+    #now playing 
+    try:
+      now_playing = int(request.REQUEST['now_playing'])
+    except (TypeError, KeyError):
+      now_playing = 0
+    #always output as if this isn't given it's definitely needed 
+    server_playing = PlaylistEntry.objects.nowPlaying()
+    if server_playing.id != now_playing:
+      events.append(('now_playing', server_playing.id))
+      length_changed = True
+      #new title needed
+      events.append(('pltitle', PlaylistEntry.objects.get(playing=True).song.metadataString() + " - GBS-FM"))
+      #new song length needed
+      events.append(('songLength', PlaylistEntry.objects.nowPlaying().song.length))
+      
+    #new adds
+    try:
+      last_add = int(request.REQUEST['last_add'])
+    except (TypeError, KeyError):
+      pass
+    else:
+      accuracy = 1 #TODO: replace with user setting
+      aug_playlist = Playlist(request.user).fromLastID(last_add)
+      if len(aug_playlist) > 0:
+        length_changed = True
+        if len(aug_playlist) > MAX_EVENTS:
+          aug_playlist = aug_playlist[:MAX_EVENTS]
+        html = render_to_string('playlist_table.html',  {'aug_playlist': aug_playlist, 'accuracy':accuracy},
+        context_instance=RequestContext(request))
+        events.append(("adds", html))   
+
+    if length_changed:
+      length = PlaylistEntry.objects.length()
+      events.append(('pllength', render_to_string('pl_length.html', {'length':length})))
+
+    #handle cuefile stuff
+    tolerance = 5 #tolerance in seconds between real and recieved time TODO: replace with setting
+    
+    position = request.REQUEST.get('position', None)
+    if position:
+      cue = CueFile(settings.LOGIC_DIR + "/ices.cue")
+      now_playing = PlaylistEntry.objects.nowPlaying().song
+      if abs(int(position) - cue.getTime(now_playing)) >= tolerance: 
+        events.append(('songPosition', cue.getTime(now_playing)))
+    
+    return HttpResponse(json.dumps(events))
   
-def ajax(request, resource=""):
+
+def api(request, resource=""):
   
   #authentication
   if request.user.is_authenticated():
@@ -200,32 +241,18 @@ def ajax(request, resource=""):
   if resource == "nowplaying":
     entryid = PlaylistEntry.objects.get(playing=True).id
     return HttpResponse(str(entryid))
-    
-  #if resource == "olsequence":
-    #historylength = request.user.get_profile().s_playlistHistory
-    #oldentries = OldPlaylistEntry.objects.all()
-    #if historylength <= oldentries.count():
-      #oldlist = list(oldentries[oldentries.count()-historylength:])
-    #else:
-      #oldlist = list(oldentries)
-    #data = serialize("json", oldlist, fields=('id'))
-    #return HttpResponse(data)
-      
-  #if resource == "plsequence":
-    #playlist = PlaylistEntry.objects.all()
-    #oldentries = OldPlaylistEntry.objects.all()
-    #data = serialize("json", playlist, fields=('id', 'playing'))
-    #return HttpResponse(data)
   
   if resource == "deletions":
     try:
       lastid = request.REQUEST['lastid']
     except KeyError:
       lastid = 0
-    if not lastid: lastid = 0
+    if not lastid: lastid = 0 #in case of "&lastid="
     deletions = RemovedEntry.objects.filter(id__gt=lastid)
     data = serialize("json", deletions, fields=('oldid'))
     return HttpResponse(data)
+    
+  
 
   if resource == "adds":
     try:

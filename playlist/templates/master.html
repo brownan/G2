@@ -37,19 +37,14 @@
   .playing {background-color: #4466bb;}
   .banned {text-decoration: line-through;}
 </style>-->
-{% block head %}
-{% endblock %}
+
 <script type="text/javascript" src="images/swfobject.js"></script>
 <script type="text/javascript" src="images/playload.js"></script>
 <script type="text/javascript">
 
-//both of these are in seconds
-var songLength = {{song_length}};
-var songPosition = {{song_position}};
-var songProgress = {{song_progress}};
 
 //convert seconds to minutes:seconds
-var stom = function(time){
+function stom(time){
   seconds = time%60;
   minutes = parseInt(time/60);
   if (seconds < 10) { 
@@ -59,6 +54,14 @@ var stom = function(time){
   }
   return minutes.toString() + ':' + seconds;
 }
+
+/*** progress bar stuff ***/
+
+//both of these are in seconds
+var songLength = {{song_length}};
+var songPosition = {{song_position}};
+//percentage
+var songProgress = {{song_progress}}; 
 
 function setSongLength(length) {
   if (songLength != length) {
@@ -74,6 +77,7 @@ function setSongPosition(pos) {
     songPosition = pos;
     setSongProgress((pos/songLength)*100);
   }
+  ajax_args['position'] = pos;
 }
 
 function setSongProgress(percentage) {
@@ -88,26 +92,10 @@ function secondLoop() {
   setTimeout('secondLoop()', 1000);
 }
 
-function syncHandler(data) {
-  
-  if (songLength != data.length) {
-    setSongLength(data.length)
-  }
-  //check tolerance +/-5 in seconds
-  if (songPosition + 5 < data.position || songPosition - 5 > data.position) {
-    setSongPosition(Math.round(data.position));
-  }
-}
-
-function syncLoop() {
-  $.getJSON("{% url playlist.views.ajax resource="position" %}", syncHandler);
-  setTimeout('syncLoop()', 5000);
-}
-
-
-
-$(document).ready(function(){
-  //quick search handler
+/**
+* Sets up the quick search box properly
+**/
+function setupSearch() {
   searchbox = $('#id_query');
   searchbox.css('color', 'grey');
   searchbox.attr('value', "Quick search"); //override browser modifications
@@ -117,12 +105,59 @@ $(document).ready(function(){
       searchbox.css('color', 'black');
     }
   });
-  setSongLength(10);
+}
+
+
+/*** event handlers for clutterbar ***/
+
+function songLengthHandler(e, length) {
+  setSongLength(length);
+}
+
+function songPositionHandler(e, position) {
+  setSongPosition(position);
+}
+
+  
+/*** event loop stuff ***/
+
+//delay between ajax calls
+DELAY = 10000; 
+
+//associative array storing args for ajax calls
+//TODO: replace with array of functions to be called to obtain args
+ajax_args = {}
+
+
+//Called when list of events is recieved from server: triggers the correct javascript events with the correct arguments
+function eventDispatcher(data) {
+  for (i=0; i<data.length; i++) {
+    $('body').trigger(data[i][0], [data[i][1]]);
+  }
+}
+
+
+//Main AJAX loop: handles all periodic AJAX calls
+function ajaxLoop() {
+  $.getJSON("{% url playlist.views.ajax %}", ajax_args, eventDispatcher);
+  setTimeout('ajaxLoop()', DELAY);
+}
+
+$(document).ready(function(){
+  
+  ajax_args['position'] = songPosition;
+  $('body').bind('songPosition', songPositionHandler);
+  $('body').bind('songLength', songLengthHandler);
+  setupSearch();
   secondLoop();
-  syncLoop();
+  ajaxLoop();
+  
 });
 </script>
 
+
+{% block head %}
+{% endblock %}
 </head>
 
 <body>
@@ -148,7 +183,8 @@ $(document).ready(function(){
       <li><a id="menuitem" href="http://www.thegreenwood.info/irc/"><img id="butansurface" src="images/butansurface.png" alt="irc" title="IRC" />IRC</a></li>
       <li><a id="menuitem" href="http://gbs.fm:8080/listen.pls"><img id="butansurface" src="images/butansurface.png" alt="listen" title="Listen!" />Listen!</a></li>
       <li><a id="menuitem" href="#" onClick="listenswf(); return false;"><img id="butansurface" src="images/butansurface.png" alt="Flash Player" title="Flash Player" />Flash Player</a></li>
-      <li><a id="menuitem" href="{% url django.contrib.auth.views.logout %}"><img id="butansurface" src="images/butansurface.png" alt="logout" title="Logout" />Logout</a></li>
+      <li><a id="menuitem" href="{% url django.contrib.auth.views.logout %}"><img id="butansurface" src="images/butansurface.png" alt="logout" 
+      title="Logout" />Logout</a></li>
       {% if perms.playlist.view_g2admin %}
       <!--<a href="{#{% url admin_site %}#}"><li>Admin</li></a>-->
       <li><a id="menuitem" href="{% url g2admin %}"><img id="butansurface" src="images/butansurface.png" alt="admin" title="Admin" />Admin</a></li>

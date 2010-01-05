@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from django.db import models
 from pydj.playlist import utils
 from subprocess import Popen
@@ -323,6 +324,7 @@ class Song(models.Model):
   def playlistAdd(self,  user):
     """Adds song to the playlist. 
     Raises AddError if there's a problem, with (reason, shortreason) as its arg."""
+    
     reasons = self.addDisallowed()
     if reasons:
       reason, shortreason = reasons
@@ -656,7 +658,7 @@ def plinfoq(self):
     cursor = connection.cursor()
 
     # Data retrieval operation - no commit required
-    cursor.execute("select song.id,song.title,artist.name,album.name from playlist_song song,playlist_artist artist,playlist_album album where song.artist_id = artist.id and song.album_id = album.id and song.id = (SELECT song_id FROM `gbsfm`.`playlist_playlistentry` order by id limit %s,1)", [int(self)])
+    cursor.execute("select song.id, song.title, artist.name, album.name from playlist_song song, playlist_artist artist, playlist_album album where song.artist_id = artist.id and song.album_id = album.id and song.id = (SELECT song_id FROM `gbsfm`.`playlist_playlistentry` order by id limit %s,1)", [int(self)])
     row = cursor.fetchone()
     return row
 

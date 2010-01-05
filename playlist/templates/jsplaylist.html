@@ -7,52 +7,15 @@
 
 <script type="text/javascript">
 
-var DELAY = 10000;
-
-
-
-var slideFix = function(){
-  $(document.getElementById("700")).attr("style", "");
-}
-
-var olHandler = function(data){
-  alert(data);
-}
-  
-var lastremoval = {{ lastremoval|default:"0" }};
-//var userid = {{user.id}}; //you're wasting your time, I'm not that stupid
-
-
 var getLastEntry = function(){
   return $('#playlist > :last-child').attr('id');
 }
 
-var removeCallback = function() {
-  $(this).remove();
-}
-
-var nowPlayingHandler = function(data){  
-  currplaying = $(".playing");
-  if (currplaying.attr('id') != data) {
-    currplaying.removeClass('playing');
-    currplaying.addClass('history');
-    currplaying.children(".actions").html(""); //remove actions buttons
-    nextplaying = $(document.getElementById(data));
-    nextplaying.addClass('playing');
-    nextplaying.children(".actions").html(""); //remove actions buttons
-  }
-}
-
-var delHandler = function(data){
-  for (var i=0; i < data.length; i++) {
-    deleted = $(document.getElementById(data[i].fields.oldid));
-    if (deleted.hasClass("playing")) {
-
-    } else {
-      deleted.fadeOut("slow", removeCallback);
-    }
-    lastremoval = data[i].pk;
-  }
+/*
+* Get the entry ID of the currently playing track
+*/
+function getNowPlayingID() {
+  return $(".playing").attr('id')
 }
 
 var stom = function(time){
@@ -64,11 +27,6 @@ var stom = function(time){
     seconds = seconds.toString();
   }
   return minutes.toString() + ':' + seconds;
-}
-
-var addHandler = function(data){
-  lastentry = $('#playlist > :last-child');
-  newentry = lastentry.after(data);
 }
 
 var stripe = function(data) {
@@ -83,75 +41,113 @@ var pruneHandler = function(){
   }
 }
 
-var titleHandler = function(data) {
-  if ($("title").html() != data) {
-    $("title").html(data)
+function voteHandler(event) {
+  tgt = $(event.target);
+  votelink = event.target.href;
+  if (tgt.hasClass('voted')) {
+    //clicking again to clear vote
+    votelink = votelink.slice(0, votelink.length-1); //get rid of vote at end
+    $.get(votelink + '0'); //vote 0 to clear vote
+    tgt.removeClass("voted");
+  } else {
+    $.get(votelink);
+    tgt.parent().children().removeClass("voted");
+    tgt.addClass("voted");
   }
+  event.preventDefault();
 }
 
 var addVoteHandler = function(data) {
-  $("a[href*='/vote?']").not('.handled').click(function(event) {
-    tgt = $(event.target);
-    votelink = event.target.href;
-    if (tgt.hasClass('voted')) {
-      //clicking again to clear vote
-      votelink = votelink.slice(0, votelink.length-1); //get rid of vote at end
-      $.get(votelink + '0'); //vote 0 to clear vote
-      tgt.removeClass("voted");
-    } else {
-      $.get(votelink);
-      tgt.parent().children().removeClass("voted");
-      tgt.addClass("voted");
-    }
-    event.preventDefault();
-  }).addClass('handled');
+  $("a[href*='/vote?']").not('.handled').click(voteHandler).addClass('handled');
 }
 
-var lenHandler = function(data) {
-  length = $("#length")
-  if (length.html() != data) {
-      length.html(data);
+/**
+* Main loop: handles all periodic calls
+**/
+// function checkLoop() {
+//   args = {
+//     'last_removal': lastremoval,
+//     'last_add': getLastEntry(),
+//     'now_playing': getNowPlayingID(),
+//   };
+//   $.getJSON("{% url playlist.views.ajax %}", args, eventDispatcher);
+//   
+//   $.getJSON("{% url playlist.views.api resource="deletions" %}", {'lastid': lastremoval}, delHandler);
+//   //$.getJSON("{% url playlist.views.api resource="adds" %}", {'lastid': getLastEntry()}, addHandler);
+//   $.get("/playlist/"+getLastEntry(), addHandler);
+//   $.getJSON("{% url playlist.views.api resource="nowplaying" %}", nowPlayingHandler);
+//   //$.getJSON("{% url playlist.views.api resource="history" %}", {'lastid': getLastOldEntry()}, oldEntryHandler);
+//   $.get("{% url playlist.views.api resource="pltitle" %}", {}, titleHandler);
+//   $.get("{% url playlist.views.api resource="pllength" %}?formatted", {}, lenHandler);
+//   addVoteHandler();
+//   pruneHandler();
+//   stripe();
+// 
+//   setTimeout('checkLoop()', DELAY);
+// }
+
+var removeCallback = function() {
+  $(this).remove();
+}
+
+
+/** event callbacks **/
+function removalHandler(e, data) {
+  removal = $(document.getElementById(data['entryid']));
+  if (!removal.hasClass("playing")) { //if it's playing, it should stay there and become historical
+    removal.fadeOut("slow", removeCallback);
+  }
+  ajax_args['last_removal'] = data['id'];
+}
+
+function addsHandler(e, html) {
+  lastentry = $('#playlist > :last-child');
+  newentry = lastentry.after(html);
+  ajax_args['last_add'] = getLastEntry();
+}
+
+function nowPlayingHandler(e, entryid) {
+  currplaying = $(".playing");
+  currplaying.removeClass('playing');
+  currplaying.addClass('history');
+  currplaying.children(".actions").html(""); //remove actions buttons
+  nextplaying = $(document.getElementById(entryid));
+  nextplaying.addClass('playing');
+  nextplaying.children(".actions").html(""); //remove actions buttons
+  ajax_args['now_playing'] = getNowPlayingID();
+}
+
+function pltitleHandler(e, pltitle) {
+  if ($("title").html() != pltitle) {
+    $("title").html(pltitle)
   }
 }
 
-var checkLoop = function(){
-  $.getJSON("{% url playlist.views.ajax resource="deletions" %}", {'lastid': lastremoval}, delHandler);
-  //$.getJSON("{% url playlist.views.ajax resource="adds" %}", {'lastid': getLastEntry()}, addHandler);
-  $.get("/playlist/"+getLastEntry(), addHandler);
-  $.getJSON("{% url playlist.views.ajax resource="nowplaying" %}", nowPlayingHandler);
-  //$.getJSON("{% url playlist.views.ajax resource="history" %}", {'lastid': getLastOldEntry()}, oldEntryHandler);
-  $.get("{% url playlist.views.ajax resource="pltitle" %}", {}, titleHandler);
-  $.get("{% url playlist.views.ajax resource="pllength" %}?formatted", {}, lenHandler);
-  addVoteHandler();
-  pruneHandler();
-  stripe();
-
-  setTimeout('checkLoop()', DELAY);
+function pllengthHandler(e, html) {
+  length = $("#length")
+  if (length.html() != html) {
+      length.html(html);
+  }
 }
 
-$(document).ready(function(){
-  checkLoop();
-/*  addVoteHandler();*/
-//     $("a[href*='/vote?']").click(function(event) {
-//     alert(event.target.href);
-//     $.get(event.target.href);
-//     $(event.target).parent().children().removeClass("voted");
-//     $(event.target).addClass("voted");
-//     event.preventDefault();
-//   });
-//   nowPlaying();
-//   $('tbody').append("\
-//       <tr id='700'>\
-//         <td><a href='/artist/1'>A Song</a></td>\
-//         <td><a href='/song/1'>An Album</a></td>\
-//         <td>4:38</td>\
-//         <td><a href='/user/1'>jj</a></td>\
-//       </tr>");
-//   $(document.getElementById("700")).hide();
-//   setTimeout('$(document.getElementById("700")).fadeIn("slow")', 3000);
-//   setTimeout('$(document.getElementById("1")).fadeOut("slow")', 3500);
-});
 
+$(document).ready(function(){
+  //ajax calls & event handler bindings
+  //TODO: do this automatically with just the events and args or something
+  ajax_args['last_removal'] = {{ lastremoval|default:"0" }};
+  $('body').bind('removal', removalHandler);
+  
+  ajax_args['last_add'] = getLastEntry();
+  $('body').bind('adds', addsHandler);
+  
+  ajax_args['now_playing'] = getNowPlayingID();
+  $('body').bind('now_playing', nowPlayingHandler);
+  
+  //no-arg event handlers
+  $('body').bind('pltitle', pltitleHandler);
+  $('body').bind('pllength', pllengthHandler);
+
+});
 
 </script>
 

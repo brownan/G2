@@ -9,7 +9,7 @@
         <td class="votes details">
         {% num_range 1 6 as vote_range %}
         {% for vote in vote_range %}
-          <a href="{% url playlist.views.ajax "vote" %}?songid={{entry.object.song.id}}&vote={{vote}}" class="vote{{vote}} {% ifequal entry.object.user_vote vote %}voted{% endifequal %}">{{vote}}</a>
+          <a href="{% url playlist.views.api "vote" %}?songid={{entry.object.song.id}}&vote={{vote}}" class="vote{{vote}} {% ifequal entry.object.user_vote vote %}voted{% endifequal %}">{{vote}}</a>
         {% endfor %}
         </td>
         <td class="score">
