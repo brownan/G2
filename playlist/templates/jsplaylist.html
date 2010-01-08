@@ -30,8 +30,13 @@ var stom = function(time){
 }
 
 var stripe = function(data) {
-  $('#playlist tr:nth-child(odd)').removeClass('even').addClass('odd');
-  $('#playlist tr:nth-child(even)').removeClass('odd').addClass('even');
+  if($('#playlist tr:first').hasClass('even')) {
+    $('#playlist tr:nth-child(odd)').removeClass('even').addClass('odd');
+    $('#playlist tr:nth-child(even)').removeClass('odd').addClass('even');
+  } else {
+    $('#playlist tr:nth-child(even)').removeClass('even').addClass('odd');
+    $('#playlist tr:nth-child(odd)').removeClass('odd').addClass('even');
+  }
 }
 
 var pruneHandler = function(){
