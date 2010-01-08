@@ -91,10 +91,10 @@ var songPosition = {{song_position}};
 var songProgress = {{song_progress}}; 
 
 function setSongLength(length) {
-  if (songLength != length) {
-    songLength = length;
-    $('#songLength').html(stom(length));
-  }
+  console.log(length);
+  songLength = length;
+  $('#songLength').html(stom(length));
+  
 }
 
 function setSongPosition(pos) {
@@ -159,6 +159,7 @@ ajax_args = {}
 //Called when list of events is recieved from server: triggers the correct javascript events with the correct arguments
 function eventDispatcher(data) {
   for (i=0; i<data.length; i++) {
+    console.log(data[i]);
     $('body').trigger(data[i][0], [data[i][1]]);
   }
 }
@@ -171,7 +172,8 @@ function ajaxLoop() {
 }
 
 $(document).ready(function(){
-  
+  setSongLength(songLength);
+  setSongPosition(songPosition);
   ajax_args['position'] = songPosition;
   $('body').bind('songPosition', songPositionHandler);
   $('body').bind('songLength', songLengthHandler);
