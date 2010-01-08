@@ -55,6 +55,33 @@ function stom(time){
   return minutes.toString() + ':' + seconds;
 }
 
+/*** vote handling stuff ***/
+
+function voteHandler(event) {
+  tgt = $(event.target);
+  votelink = event.target.href;
+  if (tgt.hasClass('voted')) {
+    //clicking again to clear vote
+    votelink = votelink.slice(0, votelink.length-1); //get rid of vote at end
+    $.get(votelink + '0'); //vote 0 to clear vote
+    tgt.removeClass("voted");
+  } else {
+    $.get(votelink);
+    tgt.parent().children().removeClass("voted");
+    tgt.addClass("voted");
+  }
+  event.preventDefault();
+}
+
+function addVoteHandler () {
+  $("a[href*='/vote?']").not('.handled').click(voteHandler).addClass('handled');
+}
+
+function voteLoop() {
+  addVoteHandler();
+}
+  
+
 /*** progress bar stuff ***/
 
 //both of these are in seconds
@@ -151,6 +178,7 @@ $(document).ready(function(){
   setupSearch();
   secondLoop();
   ajaxLoop();
+  voteLoop();
   
 });
 </script>

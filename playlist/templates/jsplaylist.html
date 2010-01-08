@@ -41,34 +41,15 @@ var pruneHandler = function(){
   }
 }
 
-function voteHandler(event) {
-  tgt = $(event.target);
-  votelink = event.target.href;
-  if (tgt.hasClass('voted')) {
-    //clicking again to clear vote
-    votelink = votelink.slice(0, votelink.length-1); //get rid of vote at end
-    $.get(votelink + '0'); //vote 0 to clear vote
-    tgt.removeClass("voted");
-  } else {
-    $.get(votelink);
-    tgt.parent().children().removeClass("voted");
-    tgt.addClass("voted");
-  }
-  event.preventDefault();
-}
 
-var addVoteHandler = function(data) {
-  $("a[href*='/vote?']").not('.handled').click(voteHandler).addClass('handled');
-}
 
 /**
 * Main loop: handles all periodic calls
 **/
 function funLoop() {
-  addVoteHandler();
   pruneHandler();
   stripe();
-  setTimeout('checkLoop()', DELAY);
+  setTimeout('funLoop()', DELAY);
 }
 
 var removeCallback = function() {
