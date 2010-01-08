@@ -30,7 +30,7 @@ var stom = function(time){
 }
 
 var stripe = function(data) {
-  if($('#playlist tr:first').hasClass('even')) {
+  if($('#playlist tr:first').hasClass('odd')) {
     $('#playlist tr:nth-child(odd)').removeClass('even').addClass('odd');
     $('#playlist tr:nth-child(even)').removeClass('odd').addClass('even');
   } else {
