@@ -91,7 +91,6 @@ var songPosition = {{song_position}};
 var songProgress = {{song_progress}}; 
 
 function setSongLength(length) {
-  console.log(length);
   songLength = length;
   $('#songLength').html(stom(length));
   
@@ -159,7 +158,6 @@ ajax_args = {}
 //Called when list of events is recieved from server: triggers the correct javascript events with the correct arguments
 function eventDispatcher(data) {
   for (i=0; i<data.length; i++) {
-    console.log(data[i]);
     $('body').trigger(data[i][0], [data[i][1]]);
   }
 }
