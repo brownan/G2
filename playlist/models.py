@@ -543,7 +543,7 @@ class PlaylistEntry(models.Model):
   objects = PlaylistManager()
       
   class Meta:
-    ordering = ['hijack', 'id']
+    ordering = ['-playing', '-hijack', 'addtime']
     permissions = (
     ("view_playlist",  "g2 Can view the playlist"), 
     ("queue_song",  "g2 Can add song to the playlist"), #golden_appel <3
