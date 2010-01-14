@@ -17,6 +17,7 @@ from django.conf import settings
 from django.db.models.signals import pre_save
 from django.db.models import Avg, Count, Sum
 from django.db.models.query import QuerySet
+from playlist.cue import CueFile
 
 
 MUSIC_PATH = settings.MUSIC_DIR
@@ -397,7 +398,13 @@ class Song(models.Model):
     return prevscore
     
   def comment(self, user, comment):
-    c = Comment(text=comment, user=user, song=self)
+   
+    if PlaylistEntry.objects.nowPlaying().song == self:
+      cue = CueFile(settings.LOGIC_DIR + "/ices.cue")
+      time = cue.getTime(self)
+    else:
+      time = 0
+    c = Comment(text=comment, user=user, song=self, time=time)
     c.save()    
     
   def save(self):

@@ -214,7 +214,7 @@ document.getElementById("link"+id).innerHTML = "Explain";
 <tr> <th class="song" colspan="4">Comments</th> </tr>
 <tr>
   <td>{{ currentuser.username }}</td>
-  <td>0.00</td>
+  <td><!--0.00--></td>
   <form action='{% url playlist.views.comment song.id%}' method="post">
   <td><input id="id_comment" type="text" name="comment" maxlength="400" /></td>
   <td><input type="submit" value="Comment" /></td>
@@ -223,7 +223,14 @@ document.getElementById("link"+id).innerHTML = "Explain";
 {% for comment in comments %}
 <tr>
   <td>{{ comment.user.username }}</td>
-  <td>{{ comment.time }}</td>
+  
+  <td>
+  {% if comment.time %}
+    {{comment.time|stom}}
+  {% endif %}
+  </td>
+  
+  
   <td>{{ comment.text }}</td>
   <td>{{ comment.datetime|date:"D jS M Y \a\t g:i:s A" }}</td>
 <tr>
