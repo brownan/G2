@@ -64,7 +64,7 @@ class Playlist(object):
                      WHERE playlist_rating.song_id = \
                      playlist_playlistentry.song_id"
     },
-    select_params=[self.user.id]).select_related("song__artist", "song__album", "song__uploader", "adder").order_by('addtime')
+    select_params=[self.user.id]).select_related("song__artist", "song__album", "song__uploader", "adder")
 
     
     
