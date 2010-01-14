@@ -315,9 +315,9 @@ def api(request, resource=""):
     except KeyError:
       raise Http404
     song = getSong(request)
-    song.comment(user, comment)
+    time = song.comment(user, comment)
     
-    return HttpResponse()
+    return HttpResponse(str(time))
     
   if resource == "pllength":
     length = PlaylistEntry.objects.length()

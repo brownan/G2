@@ -406,6 +406,7 @@ class Song(models.Model):
       time = 0
     c = Comment(text=comment, user=user, song=self, time=time)
     c.save()    
+    return time #for API
     
   def save(self):
     #ensure add_date is creation date
