@@ -469,6 +469,12 @@ class SongDir(models.Model):
   def genPath(self, sha_hash, format):
     hash_dir = sha_hash[0:self.hash_letters] #get appripriate number of hash digits
     return self.path+'/'+ hash_dir + '/' + sha_hash + '.' + format
+    
+  def __unicode__(self):
+    if self.usable:
+      return str(self.path) + " (Usable)"
+    else:
+      return str(self.path) + " (Not Usable)"
       
       
 
@@ -484,6 +490,7 @@ class Comment(models.Model):
     if not self.id:
         self.datetime = datetime.datetime.today()
     super(Comment, self).save()
+    
   class Meta:
     ordering = ['-datetime']
     permissions = (
