@@ -4,8 +4,8 @@
     # This file is part of the g2 project.                                #
     #                                                                     #
     # g2 is free software: you can redistribute it and/or modify          #
-    # it under the terms of the Affero General Public License, Version 1, #
-    # as published by Affero, Incorporated, but not any later             #
+    # it under the terms of the Affero General Public License, Version 1  #
+    # (as published by Affero, Incorporated) but not any later            #
     # version.                                                            #
     #                                                                     #
     # g2 is distributed in the hope that it will be useful,               #
@@ -43,7 +43,7 @@ from django.conf import settings
 from django.db import connection, transaction
 from django.db.models import Avg, Max, Min, Count, Q
 from django.contrib.auth import authenticate
-from django.db import connection
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import permission_required, login_required
 
 
@@ -370,6 +370,10 @@ def api(request, resource=""):
   if resource == "listeners":
     return HttpResponse(listenerCount())
     
+  if resource == "users":
+    return HttpResponse(Users.objects.all().count())
+    
+    
   if resource == "position":
     cue = CueFile(settings.LOGIC_DIR + "/ices.cue")
     d = {}
@@ -387,7 +391,16 @@ def user_settings(request):
   if not profile.api_key:
     keygen(request)
   api_key = profile.api_key
-  return render_to_response('user_settings.html', {'api_key': api_key}, context_instance=RequestContext(request))
+  
+  if request.method == "POST":
+    password_form = PasswordChangeForm(request.user, request.POST)
+    if password_form.is_valid():
+      password_form.save() #resets password appropriately
+      request.user.message_set.create(message="Password changed sucessfully")
+  else:
+    password_form = PasswordChangeForm(request.user)
+      
+  return render_to_response('user_settings.html', {'api_key': api_key, 'password_form': password_form}, context_instance=RequestContext(request))
   
 @login_required()
 def keygen(request):
