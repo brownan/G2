@@ -1,6 +1,26 @@
 {% load filters %}
 {% for entry in aug_playlist %}
-        <tr {% if entry.pl %} id="{{ entry.object.id }}" {% else %} id="h{{ entry.object.id }}" {% endif %} class="{% if entry.object.playing %}playing {% endif %}{% if forloop.counter|divisibleby:"2" %}even{% else %}odd{% endif %}{% if not entry.pl %} history{% endif %}">
+        <tr 
+        {% if entry.pl %} 
+          id="{{ entry.object.id }}" 
+        {% else %} 
+          id="h{{ entry.object.id }}" 
+        {% endif %} 
+        class="
+        {% if entry.object.playing %}
+          playing 
+        {% endif %}
+        {% cycle 'odd ' 'even ' %}
+        {% if not entry.pl %}
+          history 
+        {% endif %}
+        {% ifequal entry.song.uploader request.user %}
+          uploaded
+        {% endifequal %}
+        {% ifequal entry.song.adder request.user %}
+          added
+        {% endifequal %}
+        ">
         
         <td><a href='{% url playlist.views.artist entry.object.song.artist.id %}'>{{ entry.object.song.artist }}</a></td>
         <td><a href='{% url song entry.object.song.id %}'>{{ entry.object.song.title }}</a></td>

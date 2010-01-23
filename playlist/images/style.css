@@ -31,6 +31,21 @@ tr.even, #columns tr {
   text-decoration:none; /* THEME: playlist item text decoration */
   color:black; /* THEME: playlist item color */
 }
+
+#playlist tr.uploaded {
+  background-color:#00CCCC; /* THEME: track on playlist uploaded by user */
+}
+
+#playlist tr.added, #playlist tr.added a {
+  background-color:#4863A0; /* THEME: track on playlist uploaded by user */
+  color: white;
+}
+#playlist tr.playing, #playlist tr.playing a {
+  background-color: #9C9; /* THEME: playlist currently playing item background color */
+  font-weight: bold; /* THEME: playlist currently playing item font weight */
+  color: black;
+}
+
 #playlist td {
   padding:0px 5px;
 }
@@ -174,10 +189,7 @@ tbody#playlist td img {
   font-weight: bold;
   text-align: center;
 }
-.playing td {
-  background-color: #9C9; /* THEME: playlist currently playing item background color */
-  font-weight:bold; /* THEME: playlist currently playing item font weight */
-}
+
 .banned {
   text-decoration: line-through;
 }
@@ -329,3 +341,5 @@ li #id_query {
   margin:1px 3px 1px 3px;
   padding:0px;
 }
+
+
