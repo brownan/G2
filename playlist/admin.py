@@ -2,7 +2,10 @@
 from pydj.playlist.models import *
 from django.contrib import admin
 
-admin.site.register(Artist)
+class ArtistAdmin(admin.ModelAdmin):
+  search_fields = ['name']
+
+admin.site.register(Artist, ArtistAdmin)
 admin.site.register(Album)
 admin.site.register(Song)
 admin.site.register(PlaylistEntry)
