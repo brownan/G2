@@ -14,14 +14,13 @@
         {% if not entry.pl %}
           history 
         {% endif %}
-        {% ifequal entry.song.uploader request.user %}
+        {% ifequal entry.object.song.uploader.username request.user.username %}
           uploaded
         {% endifequal %}
-        {% ifequal entry.song.adder request.user %}
+        {% ifequal entry.object.adder request.user %}
           added
         {% endifequal %}
         ">
-        
         <td><a href='{% url playlist.views.artist entry.object.song.artist.id %}'>{{ entry.object.song.artist }}</a></td>
         <td><a href='{% url song entry.object.song.id %}'>{{ entry.object.song.title }}</a></td>
         <td class="time">{{ entry.object.song.length|stom }}</td>
