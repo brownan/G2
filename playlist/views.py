@@ -393,7 +393,7 @@ def user_settings(request):
   api_key = profile.api_key
   
   if request.method == "POST":
-    password_form = PasswordChangeForm(request.user, request.POST)
+    password_form = PasswordChangeForm(request.user, request.POST, min_length=4)
     if password_form.is_valid():
       password_form.save() #resets password appropriately
       request.user.message_set.create(message="Password changed sucessfully")
