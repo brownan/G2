@@ -1,0 +1,19 @@
+{% extends "master.html" %}
+
+{% block title %}Confirm delete of {{song.getMetaData}} - GBS-FM{% endblock %}
+
+{% load filters %}
+
+{% block main %}
+<div class="playlist">
+
+
+<p>
+  <div style="border-style: dashed; border-width: 1px; padding:5px;">
+  <p> Are you sure you want to delete {{song.title}}?</p>
+  <p><a href="{% url playlist.views.deletesong songid=song.id confirm='yes'%}">Yes</a>  <a href="{% url song song.id%}">No</a></p>
+  </div>
+</p>
+
+
+{% endblock %} 
