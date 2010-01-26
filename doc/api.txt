@@ -1,0 +1,32 @@
+nowplaying -> PlaylistEntry ID of currently playing track 
+
+deletions(lastid) -> List of RemovedEntries where RemovedEntry ID > lastid
+
+adds(lastid) -> List of PlaylistEntries where PlaylistEntry ID > lastid. Each PlaylistEntry also has the extra attribs: user_vote (user's vote rounded to an integer or 0 if user hasn't voted), avg_score (average score for the entry's song) and vote_count (number of votes made for entry's song) attribs.
+
+pltitle -> The metadataString formatted title of the currently playing song (currently "Artist (Album) - Title") followed by " - GBS-FM"
+
+vote(vote, songid) ->  Vote <vote> on song with song ID songid. Uses currently playing song if songid not specified.
+
+comment(comment, songid) -> Make comment on song with song ID songid. Uses currently playing song if songid not specified
+  
+pllength(formatted) -> Length of playlist in seconds, a newline, then the number of songs on it. If formatted is specified, return same information in format suitable for website's playlist page
+
+add(songid) -> add song with Song ID songid to the playlist, returning the metadataString of the song on success. 404 if song referenced doesn't exist, 400 if there's some other problem, with the body as a string representing the error that has occured 
+ 
+uncomment -> remove the most recent comment made by the user and return metadatString of song comment was made on, or 404 if the user has made no comments  
+
+metadata(songid) -> newline-separated list of the artist, album, title and length (in seconds) of the song with song ID songid, or the currently playing song if songid is not specified
+
+listeners -> number of listeners
+
+position -> JSON dictionary of:
+  position - number of seconds of currently playing song that have been played
+  progress - percentage of currently playing song that has been played
+  length   - length of currently playing song, in seconds
+  
+randsongid -> the song ID of a randomly chosen song
+
+plinfo(entryid) -> newline-separated list of the songid, artist, album and title of the song contained by PlaylistEntry ID entryid
+
+ 

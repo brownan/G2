@@ -1,0 +1,55 @@
+         _ ._  _ , _ ._
+       (_ ' ( `  )_  .__)
+     ( (  (    )   `)  ) _)
+    (__ (_   (_ . _) _) ,__)
+        `~~`\ ' . /`~~`
+        ,::: ;   ; :::,
+       ':::::::::::::::'
+ ___________/_ __ \__________
+|                            |
+| Restarting g2 from scratch |
+|____________________________|
+
+
+- Ensure no relevent processes are still running:
+$ killall sc_serv
+$ killall manage.py
+$ killall python
+$ killall ices
+
+- Ensure lighttpd is running
+
+  $ sudo /etc/init.d/lighttpd start
+  
+  (note: to properly restart lighttpd, manage.py must first be killed if it's running)
+
+- Start the website
+
+  $ cd ~jonnty/pydj
+  $ ./manage.py runfcgi method=prefork socket=/tmp/fcgi.sock maxrequests=500 maxchildren=7
+  
+  (This'll take about 10 seconds - in the meantime, it'll display an error page. Don't panic.)
+
+- Start the FTP server
+
+  $ cd ~jonnty/pydj/playlist
+  $ nohup python ftp.py &
+
+- Start the shoutcast server
+
+  $ cd ~jonnty/sc_serv
+  $ nohup ./sc_serv &
+
+- The ices server can now be started from the website. If, for some reason, that doesn't work, this command should:
+  
+  $ cd ~/jonnty/playlist/logic
+  $ ices0 -c ices.conf
+  
+  (This will terminate/not start if the website is down for too long, as it relies upon it for finding out what the next song is. 
+  Therefore, it must always be run after the website has finished starting up.)
+  
+  
+Wonderful music should now be flowing into the ears of about 5 people. If not, something's gone wrong. As a first resort, check ices.log and any server error messages. Otherwise, get me.
+
+--Jonnty
+
