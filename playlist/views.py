@@ -303,27 +303,27 @@ def api(request, resource=""):
   
   if resource == "favourite":
     song = getSong(request)
-    if song in request.user.get_profile().favourites.all():
+    if song in user.get_profile().favourites.all():
       state = "old favourite"
     else:
-      request.user.get_profile().favourites.add(song)
+      user.get_profile().favourites.add(song)
       state = "new favourite"
     return HttpResponse(song.metadataString() +'\n' + state)
     
   if resource == "unfavourite":
     song = getSong(request)
-    request.user.get_profile().favourites.remove(song)
+    user.get_profile().favourites.remove(song)
     return HttpResponse(song.metadataString())
     
-  if resource == "getuser":
-    try:
-      user = User.objects.get(username=request.REQUEST['username'])
-    except KeyError:
-      user = request.user
-    except User.DoesNotExist:
-      raise Http404
+  #if resource == "getuser":
+    #try:
+      #user = User.objects.get(username=request.REQUEST['username'])
+    #except KeyError:
+      #user = request.user
+    #except User.DoesNotExist:
+      #raise Http404
     
-    return HttpResponse(user.id)
+    #return HttpResponse(user.id)
     
   if resource == "getfavourite":
     """
@@ -331,13 +331,13 @@ def api(request, resource=""):
     Trys to make it addable but will return best unaddable one otherwise.
     """
     try:
-      user = User.objects.get(id=int(request.REQUEST['userid']))
+      lover = User.objects.get(id=int(request.REQUEST['loverid']))
     except KeyError:
       try:
-        user = User.objects.get(username=str(request.REQUEST['username']))
+        lover = User.objects.get(username=str(request.REQUEST['lovername']))
       except KeyError:
-        user = request.user
-    songs = user.get_profile().favourites.all().check_playable(user)
+        loverr = request.user
+    songs = lover.get_profile().favourites.all().check_playable(user)
     unplayed = songs.filter(on_playlist=False, banned=False) #TODO: use recently_played too!
     if unplayed: #only use it if there are actually unplayed songs!
       songs = unplayed
@@ -642,9 +642,16 @@ def unbansong(request, songid=0, plays=0):
   return HttpResponseRedirect(reverse('song', args=[songid]))
 
 @login_required()
-def deletesong(request, songid=0):
+def deletesong(request, songid=0, confirm=None):
   """Deletes song with songid from db. Does not yet delete file."""
-  song = Song.objects.get(id=songid)
+  try:
+    song = Song.objects.get(id=songid)
+  except Song.DoesNotExist:
+    raise Http404
+  
+  if confirm != "yes":
+    return render_to_response("delete_confirm.html", {'song': song}, context_instance=RequestContext(request))
+
   if request.user.get_profile().canDelete(song):
     logging.info("User %s (uid %d) deleted song '%s' with hash %s at %s" % (request.user.username, request.user.id, 
                                                                         song.metadataString(), song.sha_hash, now()))
