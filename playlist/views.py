@@ -303,13 +303,27 @@ def api(request, resource=""):
   
   if resource == "favourite":
     song = getSong(request)
-    request.user.get_profile().favourites.add(song)
-    return HttpResponse(song.metadataString())
+    if song in request.user.get_profile().favourites.all():
+      state = "old favourite"
+    else:
+      request.user.get_profile().favourites.add(song)
+      state = "new favourite"
+    return HttpResponse(song.metadataString() +'\n' + state)
     
   if resource == "unfavourite":
     song = getSong(request)
     request.user.get_profile().favourites.remove(song)
     return HttpResponse(song.metadataString())
+    
+  if resource == "getuser":
+    try:
+      user = User.objects.get(username=request.REQUEST['username'])
+    except KeyError:
+      user = request.user
+    except User.DoesNotExist:
+      raise Http404
+    
+    return HttpResponse(user.id)
     
   if resource == "getfavourite":
     """
@@ -319,12 +333,19 @@ def api(request, resource=""):
     try:
       user = User.objects.get(id=int(request.REQUEST['userid']))
     except KeyError:
-      user = request.user
+      try:
+        user = User.objects.get(username=str(request.REQUEST['username']))
+      except KeyError:
+        user = request.user
     songs = user.get_profile().favourites.all().check_playable(user)
-    #unplayed = songs.filter(recently_played=False, on_playlist=False, banned=False)
-    #if unplayed:
-      #songs = unplayed
-    song = random.choice(songs)
+    unplayed = songs.filter(on_playlist=False, banned=False) #TODO: use recently_played too!
+    if unplayed: #only use it if there are actually unplayed songs!
+      songs = unplayed
+    try:
+      song = random.choice(songs)
+    except:
+      raise Http404
+    
     return HttpResponse(str(song.id) + "\n" + song.metadataString())
   
   if resource == "vote":
