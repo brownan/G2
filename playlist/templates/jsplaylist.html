@@ -81,10 +81,13 @@ function nowPlayingHandler(e, entryid) {
   currplaying = $(".playing");
   currplaying.removeClass('playing');
   currplaying.addClass('history');
-  currplaying.children(".actions").html(""); //remove actions buttons
+  //remove irrelevent action buttons
+  currplaying.children(".actions").children(".skip").hide();
   nextplaying = $(document.getElementById(entryid));
   nextplaying.addClass('playing');
-  nextplaying.children(".actions").html(""); //remove actions buttons
+  //change action buttons
+  nextplaying.children(".action").children(".remove").hide();
+  nextplaying.children(".action").children(".skip").show();
   ajax_args['now_playing'] = getNowPlayingID();
 }
 

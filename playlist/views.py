@@ -373,7 +373,6 @@ def api(request, resource=""):
   if resource == "users":
     return HttpResponse(Users.objects.all().count())
     
-    
   if resource == "position":
     cue = CueFile(settings.LOGIC_DIR + "/ices.cue")
     d = {}
@@ -386,6 +385,27 @@ def api(request, resource=""):
   raise Http404
   
 @login_required()
+def favourite(request, songid=0):
+  try:
+    song = Song.objects.get(id=songid)
+  except Song.DoesNotExist:
+    raise Http404
+  request.user.get_profile().favourites.add(song)
+  request.user.message_set.create(message="Song favourited successfully")
+  return HttpResponseRedirect(reverse(playlist))
+  
+@login_required()
+def unfavourite(request, songid=0):
+  try:
+    song = Song.objects.get(id=songid)
+  except Song.DoesNotExist:
+    raise Http404
+  request.user.get_profile().favourites.remove(song)
+  request.user.message_set.create(message="Song unfavourited successfully")
+  return HttpResponseRedirect(reverse(playlist))
+  
+  
+@login_required()
 def user_settings(request):
   profile = request.user.get_profile()
   if not profile.api_key:
@@ -393,7 +413,7 @@ def user_settings(request):
   api_key = profile.api_key
   
   if request.method == "POST":
-    password_form = PasswordChangeForm(request.user, request.POST, min_length=4)
+    password_form = PasswordChangeForm(request.user, request.POST)
     if password_form.is_valid():
       password_form.save() #resets password appropriately
       request.user.message_set.create(message="Password changed sucessfully")

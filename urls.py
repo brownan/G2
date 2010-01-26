@@ -52,6 +52,8 @@ url(r'^admin/(.*)', admin.site.root, {}, "admin_site"),
 (r'^artists/(123|all|\w)/(\d+)$', 'pydj.playlist.views.listartists'), 
 (r'^api/(?P<resource>.+)$', 'pydj.playlist.views.api'), 
 (r'^ajax$', 'pydj.playlist.views.ajax'), 
+(r'^favourite/(?P<songid>\d+)$', 'pydj.playlist.views.favourite'), 
+(r'^unfavourite/(?P<songid>\d+)$', 'pydj.playlist.views.unfavourite'), 
 
 (r'^settings/?$', 'pydj.playlist.views.user_settings', {}, 'user_settings'),
 (r'^keygen/?$', 'pydj.playlist.views.keygen', {}, 'keygen'),

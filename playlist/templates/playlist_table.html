@@ -39,16 +39,27 @@
           {% endif %}
         </td>
         <td class="actions">
+          {% if entry.favourite %}
+            <a href='{% url playlist.views.unfavourite entry.object.song.id %}'>
+              <img src="images/heart_delete.png" title="Remove this dong from your favourites" alt="unfavourite" />
+            </a>
+          {% else %}
+            <a href='{% url playlist.views.favourite entry.object.song.id %}'>
+              <img src="images/heart_add.png" title="Add this dong to your favourites" alt="favourite" />
+            </a>
+          {% endif %}
           {% if entry.can_remove %}
-          <a href='{% url playlist.views.removeentry entry.object.id %}' class="removebutton">
-          <img src = "images/cross.png" title="Remove song from playlist" alt="cross" >
-          </a>
+            <a class="remove" href='{% url playlist.views.removeentry entry.object.id %}' class="removebutton">
+              <img src = "images/cross.png" title="Remove song from playlist" alt="cross" >
+            </a>
           {% endif %}
-          {% if can_skip and entry.object.playing %}
-          <a href='{% url playlist.views.skip %}'>
-          <img src = "images/skip.png" title="Skip currently playing song" alt="skip" >
-          </a>
+          {% if can_skip %}
+            <a class="skip" {% if not entry.object.playing %}style="display: none;" {% endif %}href='{% url playlist.views.skip %}'>
+              <img src = "images/skip.png" title="Skip currently playing song" alt="skip" >
+            </a>
           {% endif %}
+
+              
         </td>
         </tr>
       {% endfor %}

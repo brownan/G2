@@ -22,13 +22,22 @@ class Playlist(object):
     """Augment the entries so that they can be happily used in the playlist template"""
     
     aug_entries= []
+    
     for entry in entries:
+      d = {}
       if isinstance(entry, PlaylistEntry) and not entry.playing and (self.user.has_perm('remove_entry') or self.user == entry.adder):
-        aug_entries.append({'can_remove':True, 'object':entry, 'pl':True})
+        d = {'can_remove':True, 'object':entry, 'pl':True}
       elif isinstance(entry, PlaylistEntry):
-        aug_entries.append({'can_remove':False, 'object':entry, 'pl':True})
+        d = {'can_remove':False, 'object':entry, 'pl':True}
       else:
-        aug_entries.append({'can_remove':False, 'object':entry, 'pl':False})
+        d = {'can_remove':False, 'object':entry, 'pl':False}
+        
+      if entry.song in self.user.get_profile().favourites.all():
+        d['favourite'] = True
+      else:
+        d['favourite'] = False
+      aug_entries.append(d)
+      
     return aug_entries
         
   def _genEntries(self):
