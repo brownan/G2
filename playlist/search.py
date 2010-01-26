@@ -15,8 +15,7 @@ class Search:
                     "length": "length",
                     "score": "avgscore",
                     "votes": "voteno",
-                    
-                    
+                    "favourites": "lovers__user__username"
                     }
     self.modifiers = {"=": "__iexact",
                       ":": "__icontains",
@@ -83,6 +82,7 @@ class Search:
     """Returns a list of queries ready to be used like so: Song.objects.filter(**query)"""
     queries = [] #list of argument name, argument tuples for filter
     action = "title__icontains" #default action
+    modifier_handled = False
     term = []
     for i, (type, arg) in enumerate(tuples):
       if type == "term":

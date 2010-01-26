@@ -5,7 +5,7 @@
 
 {% block main %}
   <div class="playlist">
-    <form action='{% url playlist.views.search %}' method="POST">
+    <form action='{% url playlist.views.search %}' method="GET">
     <p>
       {{ form.query }} {{ form.query.errors }}
       Only orphans {{ form.orphan }}
@@ -34,7 +34,16 @@
     {% endfor %}
   </p>
   {% endif %}
-  {% if songs %}
+  {% if songs.object_list %}
+  
+  {% if artists.has_previous %}
+      <a href="{% url playlist.views.search %}?page={{ songs.previous_page_number }}&query={{query}}">&lt;&lt;</a>
+    {% endif %}
+    Results: page {{ songs.number }} of {{ songs.paginator.num_pages }}
+    {% if songs.has_next %}
+      <a href="{% url playlist.views.search %}?page={{ songs.next_page_number }}&query={{query}}">&gt;&gt;</a>
+  {% endif %}
+    
   <table width="620" class="songs">
     <tr id="columns">
       <th>Artist</th>
@@ -43,7 +52,7 @@
       <th>Uploaded by</th>
       <th>Add</th>
     </tr>
-    {% for song in songs %}
+    {% for song in songs.object_list %}
     <tr {% if song.banned %} class="banned" {% endif %}>
       <td><a href='{% url playlist.views.artist song.artist.id %}'>{{ song.artist }}</a></td>
       <td><a href='{% url playlist.views.song song.id %}'>{{ song.title }}</a></td>

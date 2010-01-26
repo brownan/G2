@@ -45,6 +45,7 @@ from django.db.models import Avg, Max, Min, Count, Q
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import permission_required, login_required
+from django.views.generic.list_detail import object_list
 
 
 from playlist.forms import *
@@ -748,8 +749,8 @@ def newregister(request):
   
 @login_required()
 def search(request):
-  if request.method == 'POST': # If the form has been submitted...
-    form = SearchForm(request.POST) # A form bound to the POST data
+  if request.method == 'GET' and "query" in request.GET: # If the form has been submitted...
+    form = SearchForm(request.GET) # A form bound to the POST data
     if form.is_valid(): # All validation rules pass
       query = form.cleaned_data['query']
       
@@ -768,8 +769,21 @@ def search(request):
         artists = temp
         songs = orphans
         
+      paginator = Paginator(songs, 100) 
+      try: #sanity check
+        page = int(request.GET.get('page', '1'))
+      except ValueError:
+        page = 1
+        
+      try: #range check
+        songs = paginator.page(page)
+      except (EmptyPage, InvalidPage):
+        songs = paginator.page(paginator.num_pages)
+
+        
       return render_to_response('search.html', {'form':form, 'artists':list(artists), 'albums':list(albums), 'songs':songs, 'query':query},\
       context_instance=RequestContext(request))
+      
   else:
     form = SearchForm()
   return render_to_response('search.html', {'form':form}, context_instance=RequestContext(request))
