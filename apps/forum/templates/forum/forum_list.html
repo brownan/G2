@@ -16,7 +16,7 @@
 <td class='djangoForumListDetails'><p><strong><a href='{{ forum.get_absolute_url }}'>{{ forum.title }}</a></strong><br /><span class='djangoForumStats'>{% blocktrans with forum.threads as thread_count and forum.posts as post_count %}{{ thread_count }} threads, {{ post_count }} posts{% endblocktrans %}</span></p>
 <p>{{ forum.description }}</p></td>
 {% with forum.forum_latest_post as latest_post %}
-<td class='djangoForumListLastPost'>Last Post: {% if latest_post %}{{ latest_post.time|timesince }} ago{% if forum.anonymous %} by {{ latest_post.author }}{% endif %} (<a href='{{ latest_post.get_absolute_url }}'>{% trans "view" %}</a>){% else %}{% trans "No Posts" %}{% endif %}</td>
+<td class='djangoForumListLastPost'>Last Post: {% if latest_post %}{{ latest_post.time|timesince }} ago{% if not forum.anonymous %} by {{ latest_post.author }}{% endif %} (<a href='{{ latest_post.get_absolute_url }}'>{% trans "view" %}</a>){% else %}{% trans "No Posts" %}{% endif %}</td>
 {% endwith %}
 </tr>
 {% endfor %}
