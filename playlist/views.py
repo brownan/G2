@@ -678,7 +678,19 @@ def comment(request, songid):
       #TODO: include song time
       song.comment(request.user, form.cleaned_data['comment'])
   return HttpResponseRedirect(reverse('song', args=[songid]))
-
+  
+@login_required()
+def delete_comment(request, commentid):
+  try:
+    comment = Comment.objects.get(id=commentid)
+  except:
+    raise Http404
+  if request.user.has_perm("playlist.delete_comment") or request.user == comment.user:
+    comment.delete()
+    request.user.message_set.create(message="Comment deleted successfully")
+  else:
+    request.user.message_set.create(message="You don't have permission to delete this comment")
+  return HttpResponseRedirect(reverse('song', args=[comment.song.id]))
 
 @permission_required('playlist.can_rate')
 def rate(request, songid, vote):

@@ -496,6 +496,7 @@ class Comment(models.Model):
     ordering = ['-datetime']
     permissions = (
     ("can_comment",  "g2 Can comment on songs"),
+    ("delete_comment", "g2 Can delete all comments"),
     )
 
     
