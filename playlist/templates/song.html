@@ -69,7 +69,7 @@ document.getElementById("link"+id).innerHTML = "Explain";
 
 {% block main %}
 <div class="song">
-<!--<img class="center" src = "images/down.png" style="float: left;">
+<!--<img class="centecool you worthless nerd   r" src = "images/down.png" style="float: left;">
 <img class="center" src = "images/down.png" style="float: right;">-->
 <div style="float: right; font-size: 24px; font-weight: bold; color: grey;">{{song.id}}</div>
 <table>
@@ -79,8 +79,25 @@ document.getElementById("link"+id).innerHTML = "Explain";
 </tr>
 <tr>
     <td colspan="2">
-      {% if can_edit %}<a href='{% url playlist.views.song song.id,"/edit" %}'>(edit)</a>{% endif %}
-      {% if can_delete %}<a href='{% url playlist.views.deletesong song.id %}'>(delete)</a>{% endif %}
+      {% if can_edit %}
+        <a href='{% url playlist.views.song song.id,"/edit" %}'>
+          <img src="/images/page_edit.png" title="Edit dong info" alt="edit" />
+        </a>
+      {% endif %}
+      {% if can_delete %}
+        <a href='{% url playlist.views.deletesong song.id %}'>
+          <img src="/images/cross.png" title="Delete dong" alt="delete" />
+        </a>
+      {% endif %}
+      {% if favourite %}
+        <a href='{% url playlist.views.unfavourite song.id %}'>
+          <img src="/images/heart_delete.png" title="Unfavourite this dong" alt="unfavourite" />
+        </a>
+      {% else %}
+        <a href='{% url playlist.views.favourite song.id %}'>
+          <img src="/images/heart_add.png" title="Favourite this dong" alt="favourite" />
+        </a>
+      {% endif %}
     </td>
 {% if edit %}
 <form action='{% url playlist.views.song song.id %}' method="post">

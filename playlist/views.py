@@ -441,7 +441,12 @@ def favourite(request, songid=0):
     raise Http404
   request.user.get_profile().favourites.add(song)
   request.user.message_set.create(message="Song favourited successfully")
-  return HttpResponseRedirect(reverse(playlist))
+  
+  referrer = request.META.get('HTTP_REFERER', None)
+  if referrer:
+    return HttpResponseRedirect(referrer)
+  else:
+    return HttpResponseRedirect(reverse(playlist))
   
 @login_required()
 def unfavourite(request, songid=0):
@@ -451,7 +456,12 @@ def unfavourite(request, songid=0):
     raise Http404
   request.user.get_profile().favourites.remove(song)
   request.user.message_set.create(message="Song unfavourited successfully")
-  return HttpResponseRedirect(reverse(playlist))
+  
+  referrer = request.META.get('HTTP_REFERER', None)
+  if referrer:
+    return HttpResponseRedirect(referrer)
+  else:
+    return HttpResponseRedirect(reverse(playlist))
   
   
 @login_required()
@@ -544,14 +554,16 @@ def song(request, songid=0, edit=None):
     path = song.getPath()
   else:
     path = None
-  
+    
+  favourite = song in request.user.get_profile().favourites.all()
   is_orphan = (song.uploader == User.objects.get(username="Fagin"))
     
     
   return render_to_response('song.html', \
-  {'song': song, 'editform':editform, 'edit':edit,'commentform':commentform, \
-  'currentuser':request.user, 'comments':comments, 'can_ban':can_ban, 'is_orphan':is_orphan, \
-  'banform':banform, 'can_delete':can_delete, 'can_edit':can_edit, 'vote':vote, 'path':path,}, \
+  {'song': song, 'editform':editform, 'edit':edit,'commentform':commentform, 
+  'currentuser':request.user, 'comments':comments, 'can_ban':can_ban, 'is_orphan':is_orphan, 
+  'banform':banform, 'can_delete':can_delete, 'can_edit':can_edit, 'vote':vote, 'path':path, 
+  'favourite' : favourite}, \
   context_instance=RequestContext(request))
 
 @login_required()
