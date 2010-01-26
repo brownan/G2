@@ -22,6 +22,7 @@ import signal
 import itertools
 import datetime
 from random import getrandbits
+import random
 from hashlib import md5
 from urllib2 import URLError
 from subprocess import Popen
@@ -309,6 +310,22 @@ def api(request, resource=""):
     song = getSong(request)
     request.user.get_profile().favourites.remove(song)
     return HttpResponse(song.metadataString())
+    
+  if resource == "getfavourite":
+    """
+    Get a song from favourites of the specified user (ID: userid).
+    Trys to make it addable but will return best unaddable one otherwise.
+    """
+    try:
+      user = User.objects.get(id=int(request.REQUEST['userid']))
+    except KeyError:
+      user = request.user
+    songs = user.get_profile().favourites.all().check_playable(user)
+    #unplayed = songs.filter(recently_played=False, on_playlist=False, banned=False)
+    #if unplayed:
+      #songs = unplayed
+    song = random.choice(songs)
+    return HttpResponse(str(song.id) + "\n" + song.metadataString())
   
   if resource == "vote":
     try:
