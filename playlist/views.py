@@ -299,7 +299,17 @@ def api(request, resource=""):
         song = OldPlaylistEntry.objects.select_related("song").extra(where=['playlist_oldplaylistentry.id =\
         (select max(playlist_oldplaylistentry.id) from playlist_oldplaylistentry)'])[0].song
     return song
+  
+  if resource == "favourite":
+    song = getSong(request)
+    request.user.get_profile().favourites.add(song)
+    return HttpResponse(song.metadataString())
     
+  if resource == "unfavourite":
+    song = getSong(request)
+    request.user.get_profile().favourites.remove(song)
+    return HttpResponse(song.metadataString())
+  
   if resource == "vote":
     try:
       vote = float(request.REQUEST['vote'])
