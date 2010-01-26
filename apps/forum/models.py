@@ -42,6 +42,7 @@ class Forum(models.Model):
     threads = models.IntegerField(_("Threads"), default=0, editable=False)
     posts = models.IntegerField(_("Posts"), default=0, editable=False)
     category = models.ForeignKey(Category, related_name="forums")
+    anonymous = models.BooleanField()
     sort_order = models.IntegerField(default=0)
 
     objects = ForumManager()

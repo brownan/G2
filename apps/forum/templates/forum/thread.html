@@ -20,7 +20,7 @@
 {% for post in post_list %}
 <tr>
 <th class='djangoForumThreadPostDetail' id='post{{ post.id }}'>{% blocktrans with post.time|timesince as time %}{{ time }} ago{% endblocktrans %}<br />
-{% ifnotequal thread.forum.id 3 %}{% trans "by" %} <strong>{{ post.author }}</strong>{% endifnotequal %}{% if post.can_edit %}<br />
+{% if not thread.forum.anonymous %}{% trans "by" %} <strong>{{ post.author }}</strong>{% endif %}{% if post.can_edit %}<br />
 <a href="{% url thread_post_edit thread.id,post.id %}?page={{page}}#post{{post.id}}">(edit)</a>{% endif %}</th>
 {% ifequal editid post.id %}
 <td><form method='post' action='{% url post_edit post.id %}'>

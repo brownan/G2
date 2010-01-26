@@ -27,7 +27,7 @@
 <td class='djangoForumListDetails'><p><strong><a href='{{ subforum.get_absolute_url }}'>{{ subforum.title }}</a></strong><br /><span class='djangoForumStats'>{{ subforum.threads }} {% trans "thread" %}{{ subforum.threads|pluralize }}, {{ subforum.posts }} {% trans "post" %}{{ subforum.posts|pluralize }}</span></p>
 <p>{{ subforum.description }}</p></td>
 {% with subforum.forum_latest_post as latest_post %}
-<td class='djangoForumListLastPost'>{% if latest_post %}{% ifnotequal forum.id 3 %}{% blocktrans with post.time|timesince as time and latest_post.author as author %}{{ time }} ago by {{ author }}{% endblocktrans %}{%else%}{% blocktrans with post.time|timesince as time and latest_post.author as author %}{{ time }} ago {% endblocktrans %}{% endifnotequal %} (<a href='{{ latest_post.get_absolute_url }}'>{% trans "view" %}</a>){% else %}{% trans "No Posts" %}{% endif %}</td>
+<td class='djangoForumListLastPost'>{% if latest_post %}{% if forum.anonymous %}{% blocktrans with post.time|timesince as time %}{{ time }} ago{% endblocktrans %}{%else%}{% blocktrans with post.time|timesince as time and latest_post.author as author %}{{ time }} ago by {{ author }}{% endblocktrans %}{% endif %} (<a href='{{ latest_post.get_absolute_url }}'>{% trans "view" %}</a>){% else %}{% trans "No Posts" %}{% endif %}</td>
 {% endwith %}
 </tr>
 {% endfor %}
@@ -52,7 +52,7 @@
 <td style='width: 50px;'>{{ t.views }}</td>
 <td style='width: 9em;'><a href="{% url forum_view_thread thread=t.id,lastread="lastread" %}">(last read post)</a></td>
 {% with t.thread_latest_post as latest_post %}
-<td style='width: 220px;' class='djangoForumThreadLastPost'>{% blocktrans with latest_post.time|timesince as time and latest_post.author as author %}{{ time }} ago by {{ author }}{% endblocktrans %} (<a href='{{ latest_post.get_absolute_url }}'>{% trans "view" %}</a>)</td>
+<td style='width: 220px;' class='djangoForumThreadLastPost'>{% with latest_post.time|timesince as time %} {% with latest_post.author as author %}{{ time }} ago{% if not forum.anonymous %} by {{ author }}{% endif %}{% endwith %}{% endwith %} (<a href='{{ latest_post.get_absolute_url }}'>{% trans "view" %}</a>)</td>
 {% endwith %}
 </tr>
 {% endfor %}
