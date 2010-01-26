@@ -336,7 +336,7 @@ def api(request, resource=""):
       try:
         lover = User.objects.get(username=str(request.REQUEST['lovername']))
       except KeyError:
-        loverr = request.user
+        lover = user
     songs = lover.get_profile().favourites.all().check_playable(user)
     unplayed = songs.filter(on_playlist=False, banned=False) #TODO: use recently_played too!
     if unplayed: #only use it if there are actually unplayed songs!
