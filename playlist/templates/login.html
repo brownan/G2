@@ -12,6 +12,7 @@
 	<div class="playlist">
   <p class="regreg">Login:</p>
     <form enctype="multipart/form-data" action="/login" method="POST">
+    {% csrf_token %}
     <table>
       {{ form.as_p }}
       <input class="butan" type="submit" value="Submit" />
