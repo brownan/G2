@@ -91,9 +91,13 @@ class UploadedFile:
     else: 
       tags['album'] = Album.objects.get_or_create(name='(empty)')[0]
     
-    for x in ["tracknumber", "version", "date"]:
+    for x in ["version", "date"]:
       if x in tags.keys():
         del tags[x] #not stored
+    if "tracknumber" in tags.keys():
+      tags['track'] = tags['tracknumber']
+      del tags['tracknumber']
+        
     tags['format'] = "mp3"
     
     self.info.update(tags)
@@ -101,6 +105,6 @@ class UploadedFile:
 #if __name__ == "__main__":
   #u = UploadedFile("/home/jadh/mus/Collection/06 - Weight Of My Words.mp3")
   #print u.info
-  #User.objects.get(username='jj').get_profile().uploadSong(u)
+  ##User.objects.get(username='jj').get_profile().uploadSong(u)
     
     

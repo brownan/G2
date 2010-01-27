@@ -219,16 +219,6 @@ class UserProfile(models.Model):
     )
 
   def __unicode__(self): return self.user.username
-  
-class ChatboxPost(models.Model):
-  user = models.ForeignKey(User)
-  postdate = models.DateTimeField()
-  post = models.CharField(max_length=300)
-  
-
-#class StreamOptions(dbsettings.Group):
-  #pid  = dbsettings.PositiveIntegerValue()
-  
 
 
 class SongSet(QuerySet):
@@ -269,6 +259,8 @@ class Song(models.Model):
   lyricist = models.CharField(max_length=300, blank=True)
   remixer = models.CharField(max_length=300, blank=True) #balthcat <3
   genre = models.CharField(max_length=100, blank=True)
+  track = models.PositiveIntegerField(blank=True, editable=True)
+  
   length = models.IntegerField(editable=False) #in seconds
   bitrate = models.IntegerField(editable=False) #in kbps
   sha_hash = models.CharField(max_length=40, unique=True, editable=False)

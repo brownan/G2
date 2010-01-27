@@ -6,6 +6,22 @@ from django.contrib.auth.forms import UserCreationForm
 from playlist.utils import getObj
 from playlist.models import *
 
+class StringObjectField(forms.CharField):
+  """Converts a string to the appropriate (presumably artist/album) object"""
+  
+  def __init__(self, model, *args, **kwargs):
+    self.model = model
+    #kwargs['initial'] = kwargs['initial'].name
+    forms.CharField.__init__(self, *args, **kwargs)
+    
+  def to_python(self, value):
+    value = super(forms.CharField, self).to_python(value)
+    return getObj(self.model, value)
+    
+  def clean(self, value):
+    #must be clean if it got through to_python
+    return value
+  
 
 class UploadFileForm(forms.Form):
   file  = forms.FileField()
@@ -20,18 +36,25 @@ class SearchForm(forms.Form):
     return self.cleaned_data['query']
   
 class SongForm(forms.ModelForm):
+  
+  #def __init__(self, *args, **kwargs):
+    ##self.artist.inital = kwargs['instance'].artist.name
+    ##self.album.inital = kwargs['instance'].album.name
+    #super(forms.ModelForm, self).__init__(self, *args, **kwargs)
+    
 
-  artist = forms.CharField(max_length=300) #replace dropdowns with charfields
-  album = forms.CharField(max_length=300) #they should be filled in the template 
+  artist = StringObjectField(Artist, max_length=300) #replace dropdowns with charfields
+  album = StringObjectField(Album, max_length=300) #they should be filled in the template 
   class Meta:
     model = Song
     
   
-  def save(self):
-    self.cleaned_data['artist'] = getObj(Artist, self.cleaned_data['artist'], self.initial['artist']) #convert strings to objects
-    self.cleaned_data['album'] = getObj(Album, self.cleaned_data['album'])
-    forms.ModelForm.save(self)
-  
+  #def clean_artist(self):
+     ##convert strings to objects
+    #self.cleaned_data['artist'] = getObj(Artist, self.cleaned_data['artist'])
+    #self.cleaned_data['album'] = getObj(Album, self.cleaned_data['album'])
+    #print super(MyModelFormSet, self).clean()
+    #return cleaned_data
 
 class SettingsForm(forms.ModelForm):
   class Meta:
