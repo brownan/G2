@@ -573,7 +573,8 @@ def download_song(request, songid):
   except:
     raise Http404
   
-  response = HttpResponse()
+  response = HttpResponse(mimetype="audio/mpeg")
+  response['Content-Disposition'] = "attachment; filename=" + song.title
   response['X-Sendfile'] = song.getPath()
   return response
 
