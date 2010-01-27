@@ -574,7 +574,7 @@ def download_song(request, songid):
     raise Http404
   
   response = HttpResponse(mimetype="audio/mpeg")
-  response['Content-Disposition'] = "attachment; filename=" + song.title
+  response['Content-Disposition'] = 'attachment; filename="' + song.title = '"'
   response['X-Sendfile'] = song.getPath()
   return response
 
