@@ -81,18 +81,14 @@
   </tr>
   <tr>
     <td>Album:</td>
-    <td class="details"><a href='{% url playlist.views.album song.album.id %}'>{{ song.album }}</a></td>
+    <td class="details">
+      <a href='{% url playlist.views.album song.album.id %}'>{{ song.album }}</a> {% if song.track %}(track {{song.track}}){% endif %}
+    </td>
   </tr>
   <tr>
     <td>Title:</td>
     <td class="details"><a href='{% url playlist.views.song song.id,None %}'>{{ song.title }}</a></td>
   </tr>
-  {% if song.track %}
-  <tr>
-    <td>Track:</td>
-    <td class="details">{{song.track}}</td>
-  </tr>
-  {% endif %}
   <tr>
     <td>Composer:</td>
     <td class="details">{{song.composer}}</td>

@@ -19,7 +19,8 @@ class StringObjectField(forms.CharField):
     return getObj(self.model, value)
     
   def clean(self, value):
-    #must be clean if it got through to_python
+    if not isinstance(value, self.model):
+      return getObj(self.model, value)
     return value
   
 

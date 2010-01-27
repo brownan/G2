@@ -259,7 +259,7 @@ class Song(models.Model):
   lyricist = models.CharField(max_length=300, blank=True)
   remixer = models.CharField(max_length=300, blank=True) #balthcat <3
   genre = models.CharField(max_length=100, blank=True)
-  track = models.PositiveIntegerField(blank=True, editable=True)
+  track = models.PositiveIntegerField(blank=True, null=True)
   
   length = models.IntegerField(editable=False) #in seconds
   bitrate = models.IntegerField(editable=False) #in kbps
