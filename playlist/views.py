@@ -574,7 +574,11 @@ def download_song(request, songid):
     raise Http404
   
   response = HttpResponse(mimetype="audio/mpeg")
-  response['Content-Disposition'] = 'attachment; filename="' + song.title + "." + song.format + '"'
+  try:
+    response['Content-Disposition'] = 'attachment; filename="' + song.title + "." + song.format + '"'
+  except UnicodeEncodeError:
+    #don't bother working around, just use the hash
+    response['Content-Disposition'] = 'attachment; filename="' + song.sha_hash + "." + song.format + '"'
   response['X-Sendfile'] = song.getPath()
   return response
 
