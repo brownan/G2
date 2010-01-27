@@ -45,7 +45,11 @@
             </a>
           {% else %}
             <a href='{% url playlist.views.favourite entry.object.song.id %}'>
+              {% if request.user.username != "Beelzebozo" %}
               <img src="images/heart_add.png" title="Add this dong to your favourites" alt="favourite" />
+              {% else %}
+              <img src="images/heart_add_beelz.png" title="Add this dong to your favourites" alt="favourite" />
+              {% endif %}
             </a>
           {% endif %}
           {% if entry.can_remove %}
