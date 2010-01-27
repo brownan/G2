@@ -13,7 +13,7 @@
     </p>
     </form>
   
-  {% if artists or songs or albums%}
+  {% if artists or songs.object_list or albums%}
   {% if artists %}
   <p class="artists">Artist{{ artists|length|pluralize }}:
     {% for artist in artists|slice:":-1" %}
@@ -65,7 +65,7 @@
   {% endif %}
   {% else %}
   {% if query %}
-  <p>No exact dong/artist matches for "{{query}}", sorry.</p>
+  <p>No exact dong/artist matches for search "{{query}}", sorry.</p>
   {% endif %}
   {% endif %}
   </div>

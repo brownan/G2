@@ -4,9 +4,20 @@
   
 {% block main %}
   <div class="playlist">
-  <p><em class="bold">Username:</em> {{owner.username}} </p>
-  <p><em class="bold">User status:</em> {{owner.groups.all.0.name}}</p>
-  <p><em class="bold">Number of uploads:</em> {{owner.uploads.count}}</p>
+  <p><span class="bold">Username:</span> {{owner.username}} </p>
+  <p><span class="bold">User status:</span> {{owner.groups.all.0.name}}</p>
+  <p><span class="bold">Number of uploads:</span> {{owner.uploads.count}}</p>
+  <p>
+    <a id="menuitem" href="{% url playlist.views.search %}?query=favourites%3D{{owner.username}}">
+      View user's favourites
+    </a>
+  <p>
+    <p>
+    <a id="menuitem" href="{% url playlist.views.search %}?query=uploader%3D{{owner.username}}">
+      View user's uploads
+    </a>
+  <p>
+  
   </div>
  
 {% endblock %} 
