@@ -423,6 +423,7 @@ class Song(models.Model):
     ("start_stream", "g2 Can start the stream."),
     ("stop_stream", "g2 Can stop the stream"),
     ("view_g2admin", "g2 Can view g2 Admin page."),
+    ("download_song", "g2 Can download songs directly from the server"),
     )
     
 

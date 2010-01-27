@@ -130,7 +130,15 @@
   </tr>
   {% if path %}<tr>
     <td>Filepath:</td>
-    <td class="details">{{path}}</td>
+    <td class="details">
+      {% if perms.playlist.download_song %}
+        <a href="{% url playlist.views.download_song song.id %}">
+          {{path}}
+        </a>
+      {% else %}
+        {{path}}
+      {% endif %}
+    </td>
   </tr>
   {% endif %}
   <tr>

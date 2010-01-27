@@ -566,6 +566,17 @@ def song(request, songid=0, edit=None):
   'favourite' : favourite}, \
   context_instance=RequestContext(request))
 
+@permission_required("playlist.download_song")
+def download_song(request, songid):
+  try:
+    song = Song.objects.get(id=songid)
+  except:
+    raise Http404
+  
+  response = HttpResponse()
+  response['X-Sendfile'] = song.getPath()
+  return response
+
 @login_required()
 def album(request, albumid=None):
   try:
