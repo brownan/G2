@@ -93,7 +93,11 @@ def create(include=None, exclude=None, use_pygments=True, **kwargs):
             postmarkup_add_tag(tag_class, name, *args, **kwargs)
 
 
-
+    #### new tags ####
+    
+    add_tag(BugTag, 'bug', 'http://gbs.fm/bugs/ticket/')
+    
+    #### old tags ####
     add_tag(SimpleTag, 'b', 'strong')
     add_tag(SimpleTag, 'i', 'em')
     add_tag(SimpleTag, 'u', 'u')
@@ -101,6 +105,7 @@ def create(include=None, exclude=None, use_pygments=True, **kwargs):
 
     add_tag(LinkTag, 'link', **kwargs)
     add_tag(LinkTag, 'url', **kwargs)
+    
 
     add_tag(QuoteTag, 'quote')
 
@@ -112,7 +117,9 @@ def create(include=None, exclude=None, use_pygments=True, **kwargs):
             u"http://dictionary.reference.com/browse/%s", u'dictionary.com', **kwargs)
     add_tag(SearchTag, u'dict',
             u"http://dictionary.reference.com/browse/%s", u'dictionary.com', **kwargs)
-
+    #add_tag(SearchTag, u'bug',
+            #u"http://dictionary.reference.com/browse/", u'dictionary.com', **kwargs)
+            #what the hell? what were the chances of them having a bug tag already?!
     add_tag(ImgTag, u'img')
     add_tag(ListTag, u'list')
     add_tag(ListItemTag, u'*')
@@ -188,6 +195,29 @@ class TagBase(object):
     def __str__(self):
         return '[%s]'%self.name
 
+
+#### new tags ####
+
+class BugTag(TagBase):
+  """Tag for linking to bugs on the bugtracker"""
+  
+  def __init__(self, name, url_prefix, **kwargs):
+    """ html_name -- the html tag to substitute."""
+    TagBase.__init__(self, name, inline=True)
+    self.url_prefix = url_prefix
+    
+  def render_open(self, parser, node_index):
+    try:
+      bugid = int(self.params.strip()) #ensure it's an int
+    except ValueError:
+      return ""
+      
+    return "<a href='%s'>#%d</a>" % (self.url_prefix + str(bugid), bugid)
+    
+  def render_close(self, parser, node_index):
+    return ""
+    
+#### old tags ####
 
 class SimpleTag(TagBase):
 
