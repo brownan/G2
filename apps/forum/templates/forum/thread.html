@@ -31,7 +31,20 @@
 <td>{{ post.body|bbcode }}</td>
 {% endifequal %}
 </tr>{% endfor %}
-
+<tr>
+<th class='djangoForumThreadPostDetail' id='newpost'>{% blocktrans %}now{% endblocktrans %}<br />
+{% if not thread.forum.anonymous %}{% trans "by" %} <strong>{{ user.username }}</strong>{% endif %}
+</th>
+<td>
+{% if user.is_authenticated and not thread.closed%}
+  <form method='post' action='reply/'>
+    {{form.body.errors}}
+    <textarea style="width: 97%; height: 15em; border: 1px solid; padding: 3px;" class="replybox" name="body" id="id_body"></textarea>
+<input type='submit' value='{% trans "Submit" %}' />
+</form>
+</td>
+</tr>
+{% endif %}
 </table>
 
 {% if is_paginated %}
@@ -45,19 +58,11 @@
 {% endif %}
 
 {% if request.user.is_authenticated %}<p><a href="{% url forum_subscriptions %}">{% trans "Update Subscriptions" %}</a></p>{% endif %}
-<h2>{% trans "Post a Reply" %}</h2>
 {% if thread.closed %}
 <p>{% trans "No replies allowed: this thread is locked." %}</p>
-{% else %}
-{% if user.is_authenticated %}
-<form method='post' action='reply/'>
-<p><label>{% trans "Posting As" %}</label><span>{{ user.username }}</span></p>
-{{ form.as_p }}
-<input type='submit' value='{% trans "Submit" %}' />
-</form>
-{% else %}
-<p>{% trans "Please login to post a reply." %}</p>
 {% endif %}
+{% if not user.is_authenticated and not thread.closed%}
+<p>{% trans "Please login to post a reply." %}</p>
 {% endif %}
 
 {% endblock %}
