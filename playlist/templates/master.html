@@ -133,6 +133,12 @@ function setupSearch() {
   });
 }
 
+/*
+* Hide message box
+**/
+function hideMessages() {
+  $("div.messages").fadeOut("slow");
+}
 
 /*** event handlers for clutterbar ***/
 
@@ -149,6 +155,9 @@ function songPositionHandler(e, position) {
 
 //delay between ajax calls
 DELAY = 10000; 
+
+//how long messages should show for
+MESSAGES_DELAY = 5000;
 
 //associative array storing args for ajax calls
 //TODO: replace with array of functions to be called to obtain args
@@ -179,6 +188,7 @@ $(document).ready(function(){
   secondLoop();
   ajaxLoop();
   voteLoop();
+  setTimeout('hideMessages()', MESSAGES_DELAY);
   
 });
 </script>
