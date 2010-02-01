@@ -74,7 +74,7 @@ if __name__ == "__main__":
   try:
     f1 = open('ftpd.log', 'a')
     f2 = open('ftpd.lines.log', 'a')
-    f2 = open('ftpd.error.log', 'a')
+    f3 = open('ftpd.error.log', 'a')
     ftpserver.log = standard_logger
     ftpserver.logline = line_logger
     ftpserver.logerror = error_logger
@@ -85,4 +85,4 @@ if __name__ == "__main__":
     ftpd = ftpserver.FTPServer(address, ftp_handler)
     ftpd.serve_forever()
   except Exception, e:
-    f2.write(e)
+    f2.write(e.args)

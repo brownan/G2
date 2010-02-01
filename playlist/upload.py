@@ -94,8 +94,19 @@ class UploadedFile:
     for x in ["version", "date"]:
       if x in tags.keys():
         del tags[x] #not stored
+        
     if "tracknumber" in tags.keys():
-      tags['track'] = tags['tracknumber']
+      try:
+        tags['track'] = int(tags['tracknumber'])
+      except ValueError:
+        #handle tracknumbers like 11/12 meaning 'track eleven of twelve'
+        tags['track']  = ""
+        for char in tags['tracknumber']:
+          try:
+            tags['track'] += str(int(char))
+          except ValueError:
+            break
+            
       del tags['tracknumber']
         
     tags['format'] = "mp3"

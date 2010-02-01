@@ -23,6 +23,10 @@ $ killall ices
   
   (note: to properly restart lighttpd, manage.py must first be killed if it's running)
 
+- Ensure a couple of environment variables are set correctly
+  $ export PYTHONATH="/home/jonnty/pydj"
+  $ export DJANGO_SETTINGS_MODULE="pydj.settings"
+
 - Start the website
 
   $ cd ~jonnty/pydj
