@@ -7,7 +7,7 @@
 {% block main %}
 	<div class="playlist">
 		<table width="620">
-			<tr><th>{{artist.name}}</th></tr>
+			<tr><th class='album' colspan='3'>{{artist.name}}</th></tr>
 			<tr>
 				<th>Title</th>
 				<th>Length</th>
@@ -17,7 +17,7 @@
 			{% for song in songs %}
         {% ifchanged song.album %} 
         <tr class="albumTitle">
-        <td class="album" colspan=3> <a name="{{song.album.id}}" id="{{song.album.id}}"> </a> {{ song.album.name }}</td>
+        <td class="album" colspan=3> <a href="{% url album song.album.id %}"> {{ song.album.name }}</a> </td>
         </tr> 
         {% endifchanged %}
         <tr class="{% if forloop.counter|divisibleby:"2" %}even{% else %}odd{% endif %}">
