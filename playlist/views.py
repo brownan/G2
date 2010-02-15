@@ -588,7 +588,7 @@ def album(request, albumid=None):
     album = Album.objects.select_related().get(id=albumid)
   except Album.DoesNotExist:
     raise Http404
-  songs = album.songs.all().check_playable(request.user).select_related()
+  songs = album.songs.all().check_playable(request.user).select_related().order_by('track')
   return render_to_response('album.html', {'album': album, 'songs': songs}, context_instance=RequestContext(request))
   
 @login_required()
@@ -745,7 +745,7 @@ def artist(request, artistid=None):
   except Artist.DoesNotExist:
     raise Http404
   print artist
-  songs = Song.objects.select_related("artist", "album").check_playable(request.user).filter(artist=artist).order_by("album__name")
+  songs = Song.objects.select_related("artist", "album").check_playable(request.user).filter(artist=artist).order_by("album__name", "track")
   print songs
   return render_to_response("artist.html", {'songs': songs, 'artist': artist}, context_instance=RequestContext(request))
     
