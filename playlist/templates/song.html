@@ -136,10 +136,10 @@
     <td>Score:</td>
     <td class="details">{{song.avgscore}} with {{song.voteno}} votes.</td>
   </tr>
-  {% if perms.playlist.can_merge %}
+  {% if perms.playlist.merge_song %}
   <tr>
     <td>Merge:</td>
-    <td>Nice way not done yet, use song/1/merge/2, which will merge song 2 into song 1, deleteing song 2
+    <td>Nice way not done yet, use song/1/merge/2, which will merge song 2 into song 1, deleting song 2
   </tr>
   {% endif %}
   {% if path %}<tr>
