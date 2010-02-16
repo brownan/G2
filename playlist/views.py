@@ -520,6 +520,25 @@ def skip(request):
   Popen(["killall", "-SIGUSR1", "ices"])
   return HttpResponseRedirect(reverse('playlist'))
 
+@permission_required('playlist.merge_song')
+def merge_song(request, mergeeid, mergerid):
+  """
+  Merge song merger into mergee, resulting in the destruction of song merger
+  """
+  try:
+    merger = Song.objects.get(id=mergerid)
+    mergee = Song.objects.get(id=mergeeid)
+  except Song.DoesNotExist:
+    raise Http404
+  
+  logging.info("Mod %s (uid %d) merged song with sha_hash %s into %d at %s" %
+    (request.user.username, request.user.id, merger.sha_hash, mergee.id, now()))
+    
+  mergee.merge(merger)
+  request.user.message_set.create(message="Song merged in successfully")
+
+  return HttpResponseRedirect(reverse('song', args=[mergee.id]))
+
 @permission_required('playlist.view_song')
 def song(request, songid=0, edit=None):
   try:
