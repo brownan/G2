@@ -129,9 +129,19 @@
     <td class="details"><a href="{% url playlist.views.user song.uploader.id%}">{{song.uploader}}</a></td>
   </tr>
   <tr>
+    <td>Playcount:</td>
+    <td class="details">{{song.getPlayCount}}</td>
+  </tr>
+  <tr>
     <td>Score:</td>
     <td class="details">{{song.avgscore}} with {{song.voteno}} votes.</td>
   </tr>
+  {% if perms.playlist.can_merge %}
+  <tr>
+    <td>Merge:</td>
+    <td>Nice way not done yet, use song/1/merge/2, which will merge song 2 into song 1, deleteing song 2
+  </tr>
+  {% endif %}
   {% if path %}<tr>
     <td>Filepath:</td>
     <td class="details">

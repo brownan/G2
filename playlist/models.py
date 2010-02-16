@@ -412,7 +412,47 @@ class Song(models.Model):
     if self.artist.songs.count() <= 1:
         self.artist.delete()
     super(Song, self).delete()
-
+    
+  def getPlayCount(self):
+    return OldPlaylistEntry.objects.filter(song=self).count()
+    
+  def merge(self, song):
+    """
+    Merge song into this one, copying all relevent metadata (like comments and votes) 
+    then deleting it.
+    """
+    
+    for comment in song.comments.all():
+      self.comments.add(comment)
+    
+    users = [rating.user for rating in self.ratings.all()]
+    for rating in song.ratings.all():
+      #ensure people who've voted on both songs only get one vote counted
+      if rating.user not in users: 
+        self.ratings.add(rating) 
+    #sort out statistics
+    stats = self.ratings.all().aggregate(id_count=Count('id'), avg_score=Avg('score'))
+    if (not stats['id_count']) or (not stats['avg_score']):
+      self.voteno = self.avgscore = 0
+    else:
+      self.voteno = stats['id_count'] 
+      self.avgscore = stats['avg_score'] 
+      
+    for entry in song.oldentries.all():
+      entry.song = self
+      entry.save()
+      
+    #steal old song's tags where this one lacks them
+    #MUST BE UPDATED IF/WHEN NEW TAGS ADDED (sorry code nazis)
+    for tag in ['title', 'artist', 'album', 'composer', 'lyricist', 'remixer', 'genre', 'track']:
+      if not getattr(self, tag) and getattr(song, tag):
+        setattr(self, tag, getattr(song, tag))
+      
+    song.delete()
+    
+        
+    
+    
   class Meta:
     permissions = (
     ("view_song",  "g2 Can view song pages"), 
@@ -424,6 +464,7 @@ class Song(models.Model):
     ("stop_stream", "g2 Can stop the stream"),
     ("view_g2admin", "g2 Can view g2 Admin page."),
     ("download_song", "g2 Can download songs directly from the server"),
+    ("merge_song", "g2 Can merge one song into another")
     )
     
 
