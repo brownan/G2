@@ -30,7 +30,7 @@ def storeSong(path,  info):
     new.close()
     
 def getSong(song):
-  return MUSIC_PATH+'/'+ song.sha_hash+ '.' + song.format
+  return song,getPath()
   
 def start_stream():
   olddir = os.curdir
