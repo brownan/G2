@@ -13,10 +13,14 @@ def listenersContextProcessor(request):
 def positionContextProcessor(request):
   cue = CueFile(settings.LOGIC_DIR + "/ices.cue")
   d = {}
-  now_playing = PlaylistEntry.objects.nowPlaying().song
-  d['song_position'] = cue.getTime(now_playing)
-  d['song_progress'] = cue.getProgress()
-  d['song_length'] = now_playing.length
+  try:
+    now_playing = PlaylistEntry.objects.nowPlaying().song
+  except PlaylistEntry.DoesNotExist:
+    d['song_position'] = d['song_progress'] = d['song_length'] = 0
+  else:
+    d['song_position'] = cue.getTime(now_playing)
+    d['song_progress'] = cue.getProgress()
+    d['song_length'] = now_playing.length
   return d
   
   

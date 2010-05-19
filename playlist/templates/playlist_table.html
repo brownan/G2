@@ -24,7 +24,7 @@
         <td class="artistry"><a href='{% url playlist.views.artist entry.object.song.artist.id %}'>{{ entry.object.song.artist }}</a></td> 
         <td><a href='{% url song entry.object.song.id %}'>{{ entry.object.song.title }}</a></td> 
         <td class="time">{{ entry.object.song.length|stom }}</td> 
-        <td><a title='uploaded by: {% entry.object.song.uploader.username %}' href='{% url playlist.views.user entry.object.adder.id %}'>{{ entry.object.adder.username }}</a></td> 
+        <td><a title='uploaded by: {{ entry.object.song.uploader.username }}' href='{% url playlist.views.user entry.object.adder.id %}'>{{ entry.object.adder.username }}</a></td> 
         <td class=" 
         {% if entry.pl %}
           notyet 

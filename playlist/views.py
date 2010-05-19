@@ -122,7 +122,10 @@ def jsplaylist(request, lastid=None):
   aug_playlist = Playlist(request.user, historylength).fullList()
   accuracy = 1 #TODO: make accuracy user setting
   can_skip = request.user.has_perm('playlist.skip_song')
-  now_playing = PlaylistEntry.objects.get(playing=True).song.metadataString()
+  try:
+    now_playing = PlaylistEntry.objects.nowPlaying().song.metadataString()
+  except PlaylistEntry.DoesNotExist:
+    now_playing = None
   lastremoval = RemovedEntry.objects.aggregate(Max('id'))['id__max']
   try:
     welcome_message = Settings.objects.get(key="welcome_message").value
@@ -172,7 +175,10 @@ def ajax(request):
       events.append(('now_playing', server_playing.id))
       length_changed = True
       #new title needed
-      events.append(('pltitle', PlaylistEntry.objects.get(playing=True).song.metadataString() + " - GBS-FM"))
+      try:
+        events.append(('pltitle', PlaylistEntry.objects.nowPlaying().song.metadataString() + " - GBS-FM"))
+      except PlaylistEntry.DoesNotExist:
+        pass
       #new song length needed
       events.append(('songLength', PlaylistEntry.objects.nowPlaying().song.length))
       
@@ -241,8 +247,12 @@ def api(request, resource=""):
         return HttpResponseForbidden()
         
   if resource == "nowplaying":
-    entryid = PlaylistEntry.objects.get(playing=True).id
-    return HttpResponse(str(entryid))
+    try:
+      entryid = PlaylistEntry.objects.nowPlaying().id
+      return HttpResponse(str(entryid))
+    except PlaylistEntry.DoesNotExist:
+      return HttpResponse()
+    
   
   if resource == "deletions":
     try:
@@ -282,7 +292,10 @@ def api(request, resource=""):
     #return HttpResponse(data)
   
   if resource == "pltitle":
-    return HttpResponse(PlaylistEntry.objects.get(playing=True).song.metadataString() + " - GBS-FM")
+    try:
+      return HttpResponse(PlaylistEntry.objects.nowPlaying().song.metadataString() + " - GBS-FM")
+    except PlaylistEntry.DoesNotExist:
+      return HtttpResponse("GBS-FM")
     
   
   def getSong(request):
@@ -292,10 +305,10 @@ def api(request, resource=""):
       songid = int(songid)
       song = Song.objects.get(id=songid)
     except KeyError:
-      song = PlaylistEntry.objects.select_related().get(playing=True).song
+      song = PlaylistEntry.objects.select_related().nowPlaying().song
     except ValueError:
       if songid == "curr":
-        song = PlaylistEntry.objects.select_related("song").get(playing=True).song
+        song = PlaylistEntry.objects.select_related("song").nowPlaying().song
       elif songid == "prev":
         song = OldPlaylistEntry.objects.select_related("song").extra(where=['playlist_oldplaylistentry.id =\
         (select max(playlist_oldplaylistentry.id) from playlist_oldplaylistentry)'])[0].song
@@ -794,7 +807,7 @@ def add(request, songid=0):
 def next(request, authid):
   if authid == settings.NEXT_PASSWORD:
     try:
-      entry = PlaylistEntry.objects.get(playing=True).next()
+      entry = PlaylistEntry.objects.nowPlaying().next()
       location = getSong(entry.song)
       metadata = u"%s [blame %s]" % (entry.song.metadataString(request.user), entry.adder.username)
       return HttpResponse(location +'\n'+ metadata)
@@ -903,9 +916,9 @@ def search(request):
   return render_to_response('search.html', {'form':form}, context_instance=RequestContext(request))
 
 
-def info(request):
-  song = PlaylistEntry.objects.get(playing=True)
-  return HttpResponse()
+#def info(request):
+  #song = PlaylistEntry.objects.get(playing=True)
+  #return HttpResponse()
 
 @login_required()
 def orphans(request, page=0):
