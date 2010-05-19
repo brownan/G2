@@ -1,12 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-<head>
-<title>{% block title %}g2{% endblock %}</title>
-<link rel="shortcut icon" href="/images/favicon.ico" />
-<link href="images/style.css" rel="stylesheet" type="text/css">
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js" type="text/javascript"></script>
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"> 
+<head> 
+<title>{% block title %}g2{% endblock %}</title> 
+<link rel="shortcut icon" href="/images/favicon.ico" /> 
+<link href="images/style.css" rel="stylesheet" type="text/css"> 
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js" type="text/javascript"></script> 
 <!-- <style type="text/css">
   body, th, td { font:12px/1.4em Verdana,sans-serif; }
   div.playlist {margin-left: auto; margin-right:auto; width: 640px; }
@@ -36,13 +36,13 @@
   .album {font-weight: bold; text-align: center;}
   .playing {background-color: #4466bb;}
   .banned {text-decoration: line-through;}
-</style>-->
-
-<script type="text/javascript" src="images/swfobject.js"></script>
-<script type="text/javascript" src="images/playload.js"></script>
-<script type="text/javascript">
-
-
+</style>--> 
+ 
+<script type="text/javascript" src="images/swfobject.js"></script> 
+<script type="text/javascript" src="images/playload.js"></script> 
+<script type="text/javascript"> 
+ 
+ 
 //convert seconds to minutes:seconds
 function stom(time){
   seconds = time%60;
@@ -54,9 +54,9 @@ function stom(time){
   }
   return minutes.toString() + ':' + seconds;
 }
-
+ 
 /*** vote handling stuff ***/
-
+ 
 function voteHandler(event) {
   tgt = $(event.target);
   votelink = event.target.href;
@@ -72,30 +72,30 @@ function voteHandler(event) {
   }
   event.preventDefault();
 }
-
+ 
 function addVoteHandler () {
   $("a[href*='/vote?']").not('.handled').click(voteHandler).addClass('handled');
 }
-
+ 
 function voteLoop() {
   addVoteHandler();
 }
   
-
+ 
 /*** progress bar stuff ***/
-
+ 
 //both of these are in seconds
 var songLength = {{song_length}};
 var songPosition = {{song_position}};
 //percentage
 var songProgress = {{song_progress}}; 
-
+ 
 function setSongLength(length) {
   songLength = length;
   $('#songLength').html(stom(length));
   
 }
-
+ 
 function setSongPosition(pos) {
   pos = Math.round(Math.min(pos, songLength));
   if (songPosition != pos) {
@@ -105,19 +105,19 @@ function setSongPosition(pos) {
   }
   ajax_args['position'] = pos;
 }
-
+ 
 function setSongProgress(percentage) {
   $(".progbar").css("width", percentage.toString() + '%');
   //alert(percentage.toString() * '%');
   songProgress = percentage;
 }
-
-
+ 
+ 
 function secondLoop() {
   setSongPosition(songPosition+1);
   setTimeout('secondLoop()', 1000);
 }
-
+ 
 /**
 * Sets up the quick search box properly
 **/
@@ -132,52 +132,52 @@ function setupSearch() {
     }
   });
 }
-
+ 
 /*
 * Hide message box
 **/
 function hideMessages() {
   $("div.messages").fadeOut("slow");
 }
-
+ 
 /*** event handlers for clutterbar ***/
-
+ 
 function songLengthHandler(e, length) {
   setSongLength(length);
 }
-
+ 
 function songPositionHandler(e, position) {
   setSongPosition(position);
 }
-
+ 
   
 /*** event loop stuff ***/
-
+ 
 //delay between ajax calls
 DELAY = 10000; 
-
+ 
 //how long messages should show for
 MESSAGES_DELAY = 5000;
-
+ 
 //associative array storing args for ajax calls
 //TODO: replace with array of functions to be called to obtain args
 ajax_args = {}
-
-
+ 
+ 
 //Called when list of events is recieved from server: triggers the correct javascript events with the correct arguments
 function eventDispatcher(data) {
   for (i=0; i<data.length; i++) {
     $('body').trigger(data[i][0], [data[i][1]]);
   }
 }
-
-
+ 
+ 
 //Main AJAX loop: handles all periodic AJAX calls
 function ajaxLoop() {
   $.getJSON("{% url playlist.views.ajax %}", ajax_args, eventDispatcher);
   setTimeout('ajaxLoop()', DELAY);
 }
-
+ 
 $(document).ready(function(){
   setSongLength(songLength);
   setSongPosition(songPosition);
@@ -191,102 +191,99 @@ $(document).ready(function(){
   setTimeout('hideMessages()', MESSAGES_DELAY);
   
 });
-</script>
-
-
+</script> 
+ 
+ 
 {% block head %}
 {% endblock %}
-</head>
-
-<body>
-<!-- extra comment gitted -->
-<!--<div class="banner">
-    <img src = "images/banner.png" alt="gbs-fm banner" title="gbs-fm" />
-</div>-->
-
-<div class="leftside"> <!-- ADDED DIV: to keep playlist from sliding under the menu when window is too small -->
-  <div class="sidebar">
-  <div class="sidebarbg">
-
-    <a href="{% url playlist.views.playlist %}"><img src="images/logo.png" class="logo" alt="g2 logo" title="g2" /></a>
-    <ol class='menu'>
-      <li><a id="menuitem" href="{% url playlist.views.playlist %}"><img id="butansurface" src="images/butansurface.png" alt="playlist" title="playlist" />Playlist</a></li>
-      <li><a id="menuitem" href="{% url playlist.views.search %}"><img id="butansurface" src="images/butansurface.png" alt="search" title="search" />Search:</a></li>
-      <li><form action="/search" method="GET"><input accesskey='F' id="id_query" name="query" maxlength="100" type="text" value="Quick search" /></form></li>
-      <li><a id="menuitem" href="{% url playlist.views.upload %}"><img id="butansurface" src="images/butansurface.png" alt="upload" title="upload" />Upload</a></li> 
-      <li><a id="menuitem" href="{% url playlist.views.search %}?query=favourites%3D{{request.user.username}}"><img id="butansurface" src="images/butansurface.png" alt="favourites" title="Your favourite tracks" />Favourites</a></li> 
-      <li><a id="menuitem" href="{% url playlist.views.listartists "all","1" %}"><img id="butansurface" src="images/butansurface.png" alt="artists" title="Browse Artists" />Artists</a></li>
-      <li><a id="menuitem" href="{% url playlist.views.user user.id %}"><img id="butansurface" src="images/butansurface.png" alt="user page" title="User Page" />User Page</a></li>
-      <li><a id="menuitem" href="{% url user_settings %}"><img id="butansurface" src="images/butansurface.png" alt="settings" title="Settings" />Settings</a></li>
-      <li><a id="menuitem" href="{% url forum_index %}"><img id="butansurface" src="images/butansurface.png" alt="forums" title="Forums" />Forums</a></li>
-      <li><a id="menuitem" href="http://www.thegreenwood.info/irc/"><img id="butansurface" src="images/butansurface.png" alt="irc" title="IRC" />IRC</a></li>
-      <li><a id="menuitem" href="http://gbs.fm:8080/listen.pls"><img id="butansurface" src="images/butansurface.png" alt="listen" title="Listen!" />Listen!</a></li>
-      <li><a id="menuitem" href="#" onClick="listenswf(); return false;"><img id="butansurface" src="images/butansurface.png" alt="Flash Player" title="Flash Player" />Flash Player</a></li>
-      <li><a id="menuitem" href="{% url django.contrib.auth.views.logout %}"><img id="butansurface" src="images/butansurface.png" alt="logout" 
-      title="Logout" />Logout</a></li>
-      {% if perms.playlist.view_g2admin %}
-      <!--<a href="{#{% url admin_site %}#}"><li>Admin</li></a>-->
-      <li><a id="menuitem" href="{% url g2admin %}"><img id="butansurface" src="images/butansurface.png" alt="admin" title="Admin" />Admin</a></li>
-      {% endif %}
-    </ol>
-
-    <div id="player"></div>
-    <p class="copyright">Icons from <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a></p>
-    <p class="copyright">Pretty bits by overdose</p>
-    <p class="listenersthing">Listeners: {{listeners}}</p>
-    <img src="images/menubottom.png" alt="" title="" />
-  </div>
-  </div>
-</div>
-
-<div class="content">
+</head> 
+ 
+<body> 
+ 
+<div id="bg1"></div> 
+<div id="bg2"></div> 
+<div id="leftmenu"> 
+<a href="http://localhost/" id="leftmenulogo"></a> 
+  <ul id="mainmenu"> 
+    <li><a href="http://localhost/" id="boxed">&nbsp;playlist</a></li> 
+    <li><a href="http://localhost/" id="boxed">&nbsp;search</a></li> 
+    <li><form action="/search" method="post"><input accesskey="f" id="id_query" name="query" maxlength="100" type="text" value="quick search"></form></li> 
+    <li><a href="http://localhost/" id="boxed">&nbsp;upload</a></li> 
+    <li><a href="http://localhost/" id="boxed">&nbsp;favourites</a></li> 
+    <li><a href="http://localhost/" id="boxed">&nbsp;artists</a></li> 
+    <li><a href="http://localhost/" id="boxed">&nbsp;user page</a></li> 
+    <li><a href="http://localhost/" id="boxed">&nbsp;settings</a></li> 
+    <li><a href="http://localhost/" id="boxed">&nbsp;forums</a></li> 
+    <li><a href="http://localhost/" id="boxed">&nbsp;irc</a></li> 
+    <li><a href="http://localhost/" id="boxed">&nbsp;listen!</a></li> 
+    <li><a href="#" id="boxed" onclick="flashplaypop();">&nbsp;flash player</a></li> 
+    <li><a href="http://localhost/" id="boxed">&nbsp;logout</a></li> 
+    {% if perms.playlist.view_g2admin %}
+    <!--<a href="{#{% url admin_site %}#}"><li>Admin</li></a>--> 
+    <li><a id="menuitem" href="{% url g2admin %}"><img id="butansurface" src="images/butansurface.png" alt="admin" title="Admin" />Admin</a></li> 
+    {% endif %}
+  </ul> 
+  <p class="listenersthing">icons from <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a></p> 
+  <p class="listenersthing" title="g2:{{listeners}} - ghetto:-">{{listeners}}</p> 
+ 
+</div> 
+ 
+ 
 {% if messages %}
-  <div class="messages">
   {% for message in messages %}
-    <p>{{ message }}</p>
+    <p id="messages">{{ message }}</p> 
   {% endfor %}
-  </div>
 {% endif %}
-<div class="main">
-{% block main %}
-{% endblock %}
-</div>
-    <div class="clutterbar">  <!--this whole clutterbar should probably work and be positionable top or bottom -->
-      
-      <div class="progbarbox">
-<!--       <p> -->
-        <div class="progtube">
-          <div style="width:40%;" class="progbar"></div>
-        </div>
-        <span id="songPosition">4:56</span>/<span id="songLength">7:23</span>
-<!--       </p> -->
-      </div>
-      
-      <div class="voteboxbar">
-      <!--<p>-->Vote: 
-      <a class="selectedvote" href="#">1</a> <!--the width here^^ in percent is the progress of the song -->
-      <a href="#">2</a>
-      <a href="#">3</a>
-      <a href="#">4</a>
-      <a href="#">5</a>
-<!--       </p> -->
-      </div>
-    </div>
-      <div class="voteboxsong"> <!--Song title, comments... I dunno... -->
-     <!-- {% if debug %}
-      <p><em>Total query count:</em> {{ sqllog|length }}<br/>
+<!-- {% if debug %}
+      <p id="messages"><em>Total query count:</em> {{ sqllog|length }}<br/>
       <em>Total execution time:</em> {{ sqltime }}</p>
       {% if show_queries %}
-      <ul class="sqllog">
+      <div id="messages"><ul class="sqllog">
           {% for sql in sqllog %}
               <li>{{ sql.time }}: {{ sql.sql }}</li>
           {% endfor %}
-      </ul>
+      </ul></div>
       {% endif %}
-      {% endif %}-->
+      {% endif %}--> 
+<div id="maincontainer"> 
+{% block main %}
+{% endblock %}
+</div> 
+ 
+<!-- this is the end mark i was talking about, the one you'll find with asdf23 --> 
+ 
+<div id="bottomcont"> 
+<div id="bottombg" title="geez what klutz designed this?"></div> 
+ 
+      <div id="leftist"> 
+        <form action="" method="post" id="commentform"><input accesskey="c" id="id_comment" name="query" maxlength="100" type="text" value=""></form> 
+          <div id="commentsbox"> 
+          <a id="expandbutt" href="#" title="expand comment box"></a> 
+ 
+          </div> 
+      </div> 
+      <div id="rightist"> 
       
-      </div>
-    
-</div>
-</body>
-</html>
+        <div id="progbarbox"> 
+          <div id="progtube"> 
+            <div style="width:40%;" id="progbar"></div> 
+          </div> 
+          <span id="songposition">4:56</span>/<span id="songlength">7:23</span> 
+        </div> 
+        <span class="disabled"><div id="songandartist"><a href="#">artist</a> - <a href="#">title</a></div> 
+        <div id="votebuttonslow"> 
+        vote: 
+        <a class="selectedvote" href="#">1</a> 
+        <a href="#">2</a> 
+        <a href="#">3</a> 
+        <a href="#">4</a> 
+        <a href="#">5</a> 
+        &nbsp;score:
+        </div></span> 
+        
+      </div> 
+ 
+ 
+</div> 
+</body> 
+</html> 

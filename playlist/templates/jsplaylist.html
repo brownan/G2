@@ -1,23 +1,23 @@
 {% extends "master.html" %}
 {% block title %}{{now_playing}} - GBS-FM{% endblock %}
 {% load filters %}
-
+ 
 {% block head %}
     
-
-<script type="text/javascript">
-
+ 
+<script type="text/javascript"> 
+ 
 var getLastEntry = function(){
   return $('#playlist > :last-child').attr('id');
 }
-
+ 
 /*
 * Get the entry ID of the currently playing track
 */
 function getNowPlayingID() {
   return $(".playing").attr('id')
 }
-
+ 
 var stom = function(time){
   seconds = time%60;
   minutes = parseInt(time/60);
@@ -28,7 +28,7 @@ var stom = function(time){
   }
   return minutes.toString() + ':' + seconds;
 }
-
+ 
 var stripe = function(data) {
   if($('#playlist tr:first').hasClass('odd')) {
     $('#playlist tr:nth-child(odd)').removeClass('even').addClass('odd');
@@ -38,16 +38,16 @@ var stripe = function(data) {
     $('#playlist tr:nth-child(odd)').removeClass('odd').addClass('even');
   }
 }
-
+ 
 var pruneHandler = function(){
   oldplaylist = $(".history");
   for (var i=0; i<(oldplaylist.length - 10); i++) { //TODO 10 should be a user setting so need to fix somehow
     $(oldplaylist[i]).fadeOut('slow', removeCallback);
   }
 }
-
-
-
+ 
+ 
+ 
 /**
 * Main loop: handles all periodic calls
 **/
@@ -56,12 +56,12 @@ function funLoop() {
   stripe();
   setTimeout('funLoop()', DELAY);
 }
-
+ 
 var removeCallback = function() {
   $(this).remove();
 }
-
-
+ 
+ 
 /** event callbacks **/
 function removalHandler(e, data) {
   removal = $(document.getElementById(data['entryid']));
@@ -70,13 +70,13 @@ function removalHandler(e, data) {
   }
   ajax_args['last_removal'] = data['id'];
 }
-
+ 
 function addsHandler(e, html) {
   lastentry = $('#playlist > :last-child');
   newentry = lastentry.after(html);
   ajax_args['last_add'] = getLastEntry();
 }
-
+ 
 function nowPlayingHandler(e, entryid) {
   currplaying = $(".playing");
   currplaying.removeClass('playing');
@@ -90,21 +90,21 @@ function nowPlayingHandler(e, entryid) {
   nextplaying.children(".action").children(".skip").show();
   ajax_args['now_playing'] = getNowPlayingID();
 }
-
+ 
 function pltitleHandler(e, pltitle) {
   if ($("title").html() != pltitle) {
     $("title").html(pltitle)
   }
 }
-
+ 
 function pllengthHandler(e, html) {
   length = $("#length")
   if (length.html() != html) {
       length.html(html);
   }
 }
-
-
+ 
+ 
 $(document).ready(function(){
   //ajax calls & event handler bindings
   //TODO: do this automatically with just the events and args or something
@@ -121,38 +121,36 @@ $(document).ready(function(){
   $('body').bind('pltitle', pltitleHandler);
   $('body').bind('pllength', pllengthHandler);
   funLoop();
-
+ 
 });
-
-</script>
-
-
+ 
+</script> 
+ 
+ 
 {% endblock %}
-
+ 
 {% block main %}  
   {% if welcome_message %}
-  <div class="notices">{{welcome_message|safe}}</div>
+  <p id="noticearea">{{welcome_message|safe}}</p> 
   {% endif %}
-  <div class="playlist" id ="playlistdiv">
-    {% if msg %}<p class="message">{{msg}}</p>{% endif %}
+    {% if msg %}<p id="messages">{{msg}}</p>{% endif %}
     {% if aug_playlist %}
-    <table class="playlist" id="playlisttable">
-    <tbody id='playlist'>
-      <th colspan="7" id="length">{% include "pl_length.html" %}</th>
-      <tr id='columns'>
-        <th>Artist</th>
-        <th>Title</th>
-        <th>Time</th>
-        <th>Added by</th>
-        <th>Vote</th>
-        <th>Score</th>
-        <th>Actions</th>
-      </tr>
+    <table class="playlist" id="playlisttable"> 
+    <tbody id='playlist'> 
+      <th colspan="7" id="length">{% include "pl_length.html" %}</th> 
+      <tr id='columns'> 
+        <th>Artist</th> 
+        <th>Title</th> 
+        <th>Time</th> 
+        <th>Added by</th> 
+        <th>Vote</th> 
+        <th>Score</th> 
+        <th>Actions</th> 
+      </tr> 
       {% include "playlist_table.html" %}
-    </tbody>
-    </table>
+    </tbody> 
+    </table> 
     {% else %}
-    <p>Playlist empty!</p>
+    <p>Playlist empty!</p> 
     {% endif %}
-</div>
 {% endblock %}

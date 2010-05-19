@@ -6,7 +6,7 @@
         {% else %} 
           id="h{{ entry.object.id }}" 
         {% endif %} 
-        class="
+        class=" 
         {% if entry.object.playing %}
           playing 
         {% endif %}
@@ -20,50 +20,54 @@
         {% ifequal entry.object.adder request.user %}
           added
         {% endifequal %}
-        ">
-        <td><a href='{% url playlist.views.artist entry.object.song.artist.id %}'>{{ entry.object.song.artist }}</a></td>
-        <td><a href='{% url song entry.object.song.id %}'>{{ entry.object.song.title }}</a></td>
-        <td class="time">{{ entry.object.song.length|stom }}</td>
-        <td><a href='{% url playlist.views.user entry.object.adder.id %}'>{{ entry.object.adder.username }}</a></td>
-        <td class="votes details">
+        "> 
+        <td class="artistry"><a href='{% url playlist.views.artist entry.object.song.artist.id %}'>{{ entry.object.song.artist }}</a></td> 
+        <td><a href='{% url song entry.object.song.id %}'>{{ entry.object.song.title }}</a></td> 
+        <td class="time">{{ entry.object.song.length|stom }}</td> 
+        <td><a title='uploaded by: {% entry.object.song.uploader.username %}' href='{% url playlist.views.user entry.object.adder.id %}'>{{ entry.object.adder.username }}</a></td> 
+        <td class=" 
+        {% if entry.pl %}
+          notyet 
+        {% endif %}
+        votes details"> 
         {% num_range 1 6 as vote_range %}
         {% for vote in vote_range %}
-          <a href="{% url playlist.views.api "vote" %}?songid={{entry.object.song.id}}&vote={{vote}}" class="vote{{vote}} {% ifequal entry.object.user_vote vote %}voted{% endifequal %}" data-songid="{{entry.object.song.id}}" data-vote="{{vote}}">{{vote}}</a>
+          <a href="{% url playlist.views.api "vote" %}?songid={{entry.object.song.id}}&vote={{vote}}" class="vote{{vote}} {% ifequal entry.object.user_vote vote %}voted{% endifequal %}" data-songid="{{entry.object.song.id}}" data-vote="{{vote}}">{{vote}}</a> 
         {% endfor %}
-        </td>
-        <td class="score">
+        </td> 
+        <td class="score"> 
           {% if entry.object.avg_score %}
           {{entry.object.avg_score|floatformat:accuracy}} ({{entry.object.vote_count}} vote{{entry.object.vote_count|pluralize}})
           {% else %}
           no votes
           {% endif %}
-        </td>
-        <td class="actions">
+        </td> 
+        <td class="actions"> 
           {% if entry.favourite %}
-            <a href='{% url playlist.views.unfavourite entry.object.song.id %}'>
-              <img src="images/heart_delete.png" title="Remove this dong from your favourites" alt="unfavourite" />
-            </a>
+            <a href='{% url playlist.views.unfavourite entry.object.song.id %}'> 
+              <img src="images/heart_delete.png" title="Remove this dong from your favourites" alt="unfavourite" /> 
+            </a> 
           {% else %}
-            <a href='{% url playlist.views.favourite entry.object.song.id %}'>
+            <a href='{% url playlist.views.favourite entry.object.song.id %}'> 
               {% if request.user.username != "Beelzebozo" %}
-              <img src="images/heart_add.png" title="Add this dong to your favourites" alt="favourite" />
+              <img src="images/heart_add.png" title="Add this dong to your favourites" alt="favourite" /> 
               {% else %}
-              <img src="images/heart_add_beelz.png" title="Add this dong to your favourites" alt="favourite" />
+              <img src="images/heart_add_beelz.png" title="Add this dong to your favourites" alt="favourite" /> 
               {% endif %}
-            </a>
+            </a> 
           {% endif %}
           {% if entry.can_remove %}
-            <a class="remove" href='{% url playlist.views.removeentry entry.object.id %}' class="removebutton">
-              <img src = "images/cross.png" title="Remove song from playlist" alt="cross" >
-            </a>
+            <a class="remove" href='{% url playlist.views.removeentry entry.object.id %}' class="removebutton"> 
+              <img src = "images/cross.png" title="Remove song from playlist" alt="cross" > 
+            </a> 
           {% endif %}
           {% if can_skip %}
-            <a class="skip" {% if not entry.object.playing %}style="display: none;" {% endif %}href='{% url playlist.views.skip %}'>
-              <img src = "images/skip.png" title="Skip currently playing song" alt="skip" >
-            </a>
+            <a class="skip" {% if not entry.object.playing %}style="display: none;" {% endif %}href='{% url playlist.views.skip %}'> 
+              <img src = "images/skip.png" title="Skip currently playing song" alt="skip" > 
+            </a> 
           {% endif %}
-
+ 
               
-        </td>
-        </tr>
+        </td> 
+        </tr> 
       {% endfor %}
