@@ -150,7 +150,7 @@ def ajax(request):
     #new removals
     try:
       last_removal = int(request.REQUEST['last_removal'])
-    except (TypeError, KeyError):
+    except (ValueError, TypeError, KeyError):
       last_removal = None
     if last_removal is not None:
       removals = RemovedEntry.objects.filter(id__gt=last_removal)
@@ -167,7 +167,7 @@ def ajax(request):
     #now playing 
     try:
       now_playing = int(request.REQUEST['now_playing'])
-    except (TypeError, KeyError):
+    except (ValueError, TypeError, KeyError):
       now_playing = 0
     #always output as if this isn't given it's definitely needed 
     server_playing = PlaylistEntry.objects.nowPlaying()
@@ -185,7 +185,7 @@ def ajax(request):
     #new adds
     try:
       last_add = int(request.REQUEST['last_add'])
-    except (TypeError, KeyError):
+    except (ValueError, TypeError, KeyError):
       pass
     else:
       accuracy = 1 #TODO: replace with user setting

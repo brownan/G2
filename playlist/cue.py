@@ -16,7 +16,7 @@ class CueFile:
     try:
       line = self._file.readlines()[line]
       self._file.seek(0)
-    except AttributeError:
+    except (AttributeError, IndexError):
       line = "0"
     return line
     
