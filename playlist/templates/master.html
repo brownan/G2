@@ -107,7 +107,7 @@ function setSongPosition(pos) {
 }
  
 function setSongProgress(percentage) {
-  $(".progbar").css("width", percentage.toString() + '%');
+  $("#progbar").css("width", percentage.toString() + '%');
   //alert(percentage.toString() * '%');
   songProgress = percentage;
 }
@@ -205,26 +205,27 @@ $(document).ready(function(){
 <div id="leftmenu"> 
 <a href="http://localhost/" id="leftmenulogo"></a> 
   <ul id="mainmenu"> 
-    <li><a href="http://localhost/" id="boxed">&nbsp;playlist</a></li> 
-    <li><a href="http://localhost/" id="boxed">&nbsp;search</a></li> 
-    <li><form action="/search" method="post"><input accesskey="f" id="id_query" name="query" maxlength="100" type="text" value="quick search"></form></li> 
-    <li><a href="http://localhost/" id="boxed">&nbsp;upload</a></li> 
-    <li><a href="http://localhost/" id="boxed">&nbsp;favourites</a></li> 
-    <li><a href="http://localhost/" id="boxed">&nbsp;artists</a></li> 
-    <li><a href="http://localhost/" id="boxed">&nbsp;user page</a></li> 
-    <li><a href="http://localhost/" id="boxed">&nbsp;settings</a></li> 
-    <li><a href="http://localhost/" id="boxed">&nbsp;forums</a></li> 
-    <li><a href="http://localhost/" id="boxed">&nbsp;irc</a></li> 
-    <li><a href="http://localhost/" id="boxed">&nbsp;listen!</a></li> 
-    <li><a href="#" id="boxed" onclick="flashplaypop();">&nbsp;flash player</a></li> 
-    <li><a href="http://localhost/" id="boxed">&nbsp;logout</a></li> 
+    <li><a href="{% url playlist.views.playlist %}" class="boxed">&nbsp;playlist</a></li> 
+    <li><a href="{% url playlist.views.search %}" class="boxed">&nbsp;search</a></li> 
+    <li><form action="/search" method="post" class="boxed"><input accesskey="f" id="id_query" name="query" maxlength="100" type="text" value="quick search"></form></li> 
+    <li><a href="{% url playlist.views.upload %}" class="boxed">&nbsp;upload</a></li> 
+    <li><a href="{% url playlist.views.search %}?query=favourites%3D{{user.name}}" class="boxed">&nbsp;favourites</a></li>
+    <li><a href="{% url playlist.views.listartists "all","1" %}" class="boxed">&nbsp;artists</a></li> 
+    <li><a href="{% url playlist.views.user user.id %}" class="boxed">&nbsp;user page</a></li> 
+    <li><a href="{% url user_settings %}" class="boxed">&nbsp;settings</a></li> 
+    <li><a href="{% url forum_index %}" class="boxed">&nbsp;forums</a></li> 
+    <!--<li><a href="" class="boxed">&nbsp;irc</a></li> -->
+    <li><a href="http://gbs.fm:8080/listen.pls" class="boxed">&nbsp;listen!</a></li> 
+    <li><a href="#" class="boxed" onclick="flashplaypop();">&nbsp;flash player</a></li> 
+    <li><a href="{% url django.contrib.auth.views.logout %}" class="boxed">&nbsp;logout</a></li> 
     {% if perms.playlist.view_g2admin %}
-    <!--<a href="{#{% url admin_site %}#}"><li>Admin</li></a>--> 
-    <li><a id="menuitem" href="{% url g2admin %}"><img id="butansurface" src="images/butansurface.png" alt="admin" title="Admin" />Admin</a></li> 
+    <li><a href="{% url g2admin %}" class="boxed">&nbsp;g2 admin</a></li> 
+    <!-- TODO: shut django up about the other one
+    <a href="{#{% url admin_site %}#}"><li>Admin</li></a>--> 
     {% endif %}
   </ul> 
   <p class="listenersthing">icons from <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a></p> 
-  <p class="listenersthing" title="g2:{{listeners}} - ghetto:-">{{listeners}}</p> 
+  <p class="listenersthing" title="g2:{{listeners}} - ghetto: who knows?">{{listeners}}</p> 
  
 </div> 
  
@@ -268,7 +269,7 @@ $(document).ready(function(){
           <div id="progtube"> 
             <div style="width:40%;" id="progbar"></div> 
           </div> 
-          <span id="songposition">4:56</span>/<span id="songlength">7:23</span> 
+          <span id="songPosition">4:56</span>/<span id="songLength">7:23</span>
         </div> 
         <span class="disabled"><div id="songandartist"><a href="#">artist</a> - <a href="#">title</a></div> 
         <div id="votebuttonslow"> 

@@ -1,8 +1,8 @@
 /* The following CSS is mad, messy, horrible maze of a thing, sorry */
 
 body, #maincontainer { background-color:#D8E9D6; } /* BODY BG, PLAYLIST CONTAINER BG */
-a#boxed, #id_query { background:#B1D07C url('thintop1.png') repeat-x; color:#F9F00D; } /* BUTTON BG */
-a#boxed:hover { background-color:#E0F290; } /* BUTTON HOVER BG */
+a.boxed, #id_query { background:#B1D07C url('thintop1.png') repeat-x; color:#F9F00D; } /* BUTTON BG */
+a.boxed:hover { background-color:#E0F290; } /* BUTTON HOVER BG */
 #bottomcont { background:#A1D29D url('thintop1.png') repeat-x; } /* BOTTOM BAR BG */
 #leftmenu { background:#A1D29D url('g2log2.png') no-repeat center bottom; } /* MENU BG */
 #noticearea { background:#A1D29D url('thintop1.png') repeat-x; } /* NOTICE BOX BG */
@@ -56,7 +56,14 @@ body {
   width:100px;
   height:100px;
 }
-a#boxed, #id_query {
+
+form.boxed {
+  height:12px;
+  width:80px;
+  display:block;
+}
+
+a.boxed, #id_query {
   border:1px solid black;
   border-radius:3px;
   -moz-border-radius:3px;
