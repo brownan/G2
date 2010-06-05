@@ -7,10 +7,17 @@
   <div class="playlist">
     <form action='{% url playlist.views.search %}' method="GET">
     <p>
-      {{ form.query }} {{ form.query.errors }}
-      Only orphans {{ form.orphan }}
+      {{ form.query }} 
+    </p>
+    <p>
       <input type="submit" value="Search" />
     </p>
+    <p>
+      {{ form.query.errors }}
+    </p>
+    
+    <p>Only orphans {{ form.orphan }}</p>
+
     </form>
   
   {% if artists or songs.object_list or albums%}

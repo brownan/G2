@@ -207,9 +207,9 @@ $(document).ready(function(){
   <ul id="mainmenu"> 
     <li><a href="{% url playlist.views.playlist %}" class="boxed">&nbsp;playlist</a></li> 
     <li><a href="{% url playlist.views.search %}" class="boxed">&nbsp;search</a></li> 
-    <li><form action="/search" method="post" class="boxed"><input accesskey="f" id="id_query" name="query" maxlength="100" type="text" value="quick search"></form></li> 
+    <li><form action="{% url playlist.views.search %}" method="get" class="boxed"><input accesskey="f" id="id_query" name="query" maxlength="100" type="text" value="quick search"></form></li> 
     <li><a href="{% url playlist.views.upload %}" class="boxed">&nbsp;upload</a></li> 
-    <li><a href="{% url playlist.views.search %}?query=favourites%3D{{user.name}}" class="boxed">&nbsp;favourites</a></li>
+    <li><a href="{% url playlist.views.search %}?query=favourites%3D{{user.username}}" class="boxed">&nbsp;favourites</a></li>
     <li><a href="{% url playlist.views.listartists "all","1" %}" class="boxed">&nbsp;artists</a></li> 
     <li><a href="{% url playlist.views.user user.id %}" class="boxed">&nbsp;user page</a></li> 
     <li><a href="{% url user_settings %}" class="boxed">&nbsp;settings</a></li> 
