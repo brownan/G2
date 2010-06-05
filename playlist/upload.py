@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import sys
+sys.path.append("/home/jonnty/")
 import os.path
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
