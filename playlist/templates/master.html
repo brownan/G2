@@ -203,7 +203,7 @@ $(document).ready(function(){
 <div id="bg1"></div> 
 <div id="bg2"></div> 
 <div id="leftmenu"> 
-<a href="http://localhost/" id="leftmenulogo"></a> 
+<a href="{% url playlist.views.playlist %}" id="leftmenulogo"></a> 
   <ul id="mainmenu"> 
     <li><a href="{% url playlist.views.playlist %}" class="boxed">&nbsp;playlist</a></li> 
     <li><a href="{% url playlist.views.search %}" class="boxed">&nbsp;search</a></li> 
@@ -225,7 +225,7 @@ $(document).ready(function(){
     {% endif %}
   </ul> 
   <p class="listenersthing">icons from <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a></p> 
-  <p class="listenersthing" title="g2:{{listeners}} - ghetto: who knows?">{{listeners}}</p> 
+  <p class="listenersthing" title="g2:{{listeners}} - ghetto: who knows?">listeners: {{listeners}}</p> 
  
 </div> 
  
