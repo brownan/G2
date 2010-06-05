@@ -25,10 +25,13 @@
         <td><a href='{% url song entry.object.song.id %}'>{{ entry.object.song.title }}</a></td> 
         <td class="time">{{ entry.object.song.length|stom }}</td> 
         <td><a title='uploaded by: {{ entry.object.song.uploader.username }}' href='{% url playlist.views.user entry.object.adder.id %}'>{{ entry.object.adder.username }}</a></td> 
-        <td class=" 
-        {% if entry.pl %}
+        <!-- {% if entry.pl and not entry.object.playing %}
           notyet 
-        {% endif %}
+        {% endif %} 
+        TODO: add to classes VVV when prevoting prevention is on
+        -->
+        <td class=" 
+        
         votes details"> 
         {% num_range 1 6 as vote_range %}
         {% for vote in vote_range %}

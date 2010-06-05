@@ -41,7 +41,8 @@ var stripe = function(data) {
  
 var pruneHandler = function(){
   oldplaylist = $(".history");
-  for (var i=0; i<(oldplaylist.length - 10); i++) { //TODO 10 should be a user setting so need to fix somehow
+  for (var i=0; i<(oldplaylist.length - 11); i++) { //TODO historylength (10) should be a user setting so need to fix somehow
+    //(but it's +1 for weird reasons I can't quite discern)
     $(oldplaylist[i]).fadeOut('slow', removeCallback);
   }
 }
