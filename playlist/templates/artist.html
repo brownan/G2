@@ -6,14 +6,13 @@
   
 {% block main %}
 	<div class="playlist">
-		<table width="620">
+		<table width="620" class="artist">
 			<tr><th class='album' colspan='3'>{{artist.name}}</th></tr>
 			<tr>
 				<th>Title</th>
 				<th>Length</th>
 				<th>Add</th>
 			</tr>
-			<tr><td class="album" >{{ song.album.name }}</td></tr>
 			{% for song in songs %}
         {% ifchanged song.album %} 
         <tr class="albumTitle">

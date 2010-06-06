@@ -139,6 +139,17 @@ a.boxed, #id_query {
   padding:2px 10px 2px 10px;
   font-size:11px;
 }
+
+div.playlist {
+  margin-left:6px;
+}
+
+a.add {
+  padding: 2px 2px 2px 2px;
+  width: auto;
+  display: inline;
+}
+
 div#maincontainer #noticearea, div#maincontainer #messages {
   margin:5px 0px 0px 0px;
 }
