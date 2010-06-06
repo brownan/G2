@@ -2,7 +2,9 @@
 
 body, #maincontainer { background-color:#D8E9D6; } /* BODY BG, PLAYLIST CONTAINER BG */
 a.boxed, #id_query { background:#B1D07C url('thintop1.png') repeat-x; color:#F9F00D; } /* BUTTON BG */
-a.boxed:hover { background-color:#E0F290; } /* BUTTON HOVER BG */
+a.boxed:hover { 
+  background-color:#E0F290; 
+  text-decoration: none;} /* BUTTON HOVER */
 #bottomcont { background:#A1D29D url('thintop1.png') repeat-x; } /* BOTTOM BAR BG */
 #leftmenu { background:#A1D29D url('g2log2.png') no-repeat center bottom; } /* MENU BG */
 #noticearea { background:#A1D29D url('thintop1.png') repeat-x; } /* NOTICE BOX BG */
@@ -141,7 +143,7 @@ a.boxed, #id_query {
 }
 
 div.playlist {
-  margin-left:6px;
+  margin-left:8px;
 }
 
 a.add {
@@ -149,6 +151,7 @@ a.add {
   width: auto;
   display: inline;
 }
+
 
 div#maincontainer #noticearea, div#maincontainer #messages {
   margin:5px 0px 0px 0px;
