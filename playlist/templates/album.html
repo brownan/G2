@@ -14,7 +14,6 @@
         <th>Length</th>
         <th>Add</th>
       </tr>
-      <tr><td class="album" >{{ song.album.name }}</td></tr>
       {% for song in songs %}
         <tr class="{% if forloop.counter|divisibleby:"2" %}even{% else %}odd{% endif %}">
           <td>{{song.artist.name}}</td>
