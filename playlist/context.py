@@ -19,7 +19,7 @@ def positionContextProcessor(request):
     d['song_position'] = d['song_progress'] = d['song_length'] = 0
   else:
     d['song_position'] = cue.getTime(now_playing)
-    d['song_progress'] = cue.getProgress()
+    d['song_progress'] = cue.getProgress()*100 #percentagise
     d['song_length'] = now_playing.length
   return d
   
