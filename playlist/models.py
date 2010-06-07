@@ -216,6 +216,7 @@ class UserProfile(models.Model):
   class Meta:
     permissions = (
     ("view_user",  "g2 Can view user pages"), 
+    ("remove_entry",  "g2 Can remove playlist entries"),
     )
 
   def __unicode__(self): return self.user.username
