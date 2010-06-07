@@ -179,6 +179,15 @@ def ajax(request):
         pass
       #new song length needed
       events.append(('songLength', PlaylistEntry.objects.nowPlaying().song.length))
+      #new comments needed
+      comments = server_playing.comments.all().order_by(date) #ensure oldest first - new comments are placed at top of update list
+      for comment in comments:
+        details = {
+          'body': comment.text,
+          'time': comment.datetime.strftime("%H:%M"),
+          'id': comment.id
+        }
+        events.append(('comment', details))
       
     #new adds
     try:
@@ -195,7 +204,23 @@ def ajax(request):
         html = render_to_string('playlist_table.html',  {'aug_playlist': aug_playlist, 'accuracy':accuracy},
         context_instance=RequestContext(request))
         events.append(("adds", html))   
-
+    
+    #new comments
+    try:
+      last_comment = int(request.REQUEST['last_comment'])
+    except (ValueError, TypeError, KeyError):
+      pass
+    else:
+      comments = server_playing.comments.all().order_by(date).find(id__gt=last_comment)
+      for commment in comments:
+        details = {
+          'body': comment.text,
+          'time': comment.datetime.strftime("%H:%M"),
+          'id': comment.id
+        }
+        events.append(('comment', details))
+        
+    
     if length_changed:
       length = PlaylistEntry.objects.length()
       events.append(('pllength', render_to_string('pl_length.html', {'length':length})))
