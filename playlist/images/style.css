@@ -378,7 +378,7 @@ div#votebuttonslow a {
   background-image:url('pos.gif');
   display:none; /* IT DOESN'T WORK I CAN'T MAKE IT WORK AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA */
 }
-#songandartist {
+#metadata {
   margin-top:4px;
   font-family:verdana;
   font-size:11px;

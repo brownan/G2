@@ -95,6 +95,7 @@ function setSongLength(length) {
   
 }
  
+//set numeric song position
 function setSongPosition(pos) {
   pos = Math.round(Math.min(pos, songLength));
   if (songPosition != pos) {
@@ -105,16 +106,29 @@ function setSongPosition(pos) {
   ajax_args['position'] = pos;
 }
  
+//set progressbar percentage
 function setSongProgress(percentage) {
   $("#progbar").css("width", percentage.toString() + '%');
   //alert(percentage.toString() * '%');
   songProgress = percentage;
 }
  
- 
+//Increment song position every second
+//TODO: make this more accurate using clock to avoid inaccuracies of delyed calls
 function secondLoop() {
   setSongPosition(songPosition+1);
   setTimeout('secondLoop()', 1000);
+}
+
+/*** Clutterbar song info stuff ***/
+
+//Set metadata to appear in clutterbar
+function setClutterMetadata(metadata) {
+  elem = $("div#metadata");
+  old = elem.html();
+  if (metadata != old) {
+    elem.html(metadata);
+  }
 }
  
 /**
@@ -132,7 +146,7 @@ function setupSearch() {
   });
 }
  
-/*
+/**
 * Hide message box
 **/
 function hideMessages() {
@@ -147,6 +161,10 @@ function songLengthHandler(e, length) {
  
 function songPositionHandler(e, position) {
   setSongPosition(position);
+}
+
+function linkedMetadataHandler(e, metadata) {
+  setClutterMetadata(metadata);
 }
  
   
@@ -183,6 +201,7 @@ $(document).ready(function(){
   ajax_args['position'] = songPosition;
   $('body').bind('songPosition', songPositionHandler);
   $('body').bind('songLength', songLengthHandler);
+  $('body').bind('linkedMetadata', linkedMetadataHandler);
   setupSearch();
   secondLoop();
   ajaxLoop();
@@ -266,11 +285,11 @@ $(document).ready(function(){
       
         <div id="progbarbox"> 
           <div id="progtube"> 
-            <div style="width:40%;" id="progbar"></div> 
+            <div style="width:{{song_progress}}%;" id="progbar"></div> 
           </div> 
-          <span id="songPosition">4:56</span>/<span id="songLength">7:23</span>
+          <span id="songPosition">{{song_position}}</span>/<span id="songLength">{{song_length}}</span>
         </div> 
-        <span class="disabled"><div id="songandartist"><a href="#">artist</a> - <a href="#">title</a></div> 
+        <span><div id="metadata">{% include "linked_metadata.html" %}</div>
         <div id="votebuttonslow"> 
         vote: 
         <a class="selectedvote" href="#">1</a> 

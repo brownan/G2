@@ -1,5 +1,5 @@
 {% extends "master.html" %}
-{% block title %}{{now_playing}} - GBS-FM{% endblock %}
+{% block title %}{{now_playing.metadataString}} - GBS-FM{% endblock %}
 {% load filters %}
  
 {% block head %}
@@ -92,9 +92,10 @@ function nowPlayingHandler(e, entryid) {
   ajax_args['now_playing'] = getNowPlayingID();
 }
  
-function pltitleHandler(e, pltitle) {
+function metadataHandler(e, metadata) {
+  pltitle = metadata + " - GBS-FM";
   if ($("title").html() != pltitle) {
-    $("title").html(pltitle)
+    $("title").html(pltitle);
   }
 }
  
@@ -119,7 +120,7 @@ $(document).ready(function(){
   $('body').bind('now_playing', nowPlayingHandler);
   
   //no-arg event handlers
-  $('body').bind('pltitle', pltitleHandler);
+  $('body').bind('metadata', metadataHandler);
   $('body').bind('pllength', pllengthHandler);
   funLoop();
  

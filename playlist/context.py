@@ -23,6 +23,12 @@ def positionContextProcessor(request):
     d['song_length'] = now_playing.length
   return d
   
+def nowPlayingContextProcessor(request):
+  try:
+    return {'now_playing': PlaylistEntry.objects.nowPlaying().song}
+  except PlaylistEntry.DoesNotExist:
+    return {'now_playing': Song.objects.all()[0]} #fun fallback to avoid errors
+  
   
 def SQLLogContextProcessor(request):
 

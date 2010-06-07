@@ -122,10 +122,6 @@ def jsplaylist(request, lastid=None):
   aug_playlist = Playlist(request.user, historylength).fullList()
   accuracy = 1 #TODO: make accuracy user setting
   can_skip = request.user.has_perm('playlist.skip_song')
-  try:
-    now_playing = PlaylistEntry.objects.nowPlaying().song.metadataString()
-  except PlaylistEntry.DoesNotExist:
-    now_playing = None
   lastremoval = RemovedEntry.objects.aggregate(Max('id'))['id__max']
   try:
     welcome_message = Settings.objects.get(key="welcome_message").value
@@ -135,7 +131,7 @@ def jsplaylist(request, lastid=None):
   length = PlaylistEntry.objects.length()
   
   return render_to_response('jsplaylist.html',  {'aug_playlist': aug_playlist, 'can_skip':can_skip, 
-  'lastremoval':lastremoval, 'now_playing':now_playing, 'welcome_message':welcome_message, 
+  'lastremoval':lastremoval, 'welcome_message':welcome_message, 
   'length':length, 'accuracy':accuracy}, context_instance=RequestContext(request))
 
   
@@ -166,17 +162,19 @@ def ajax(request):
         
     #now playing 
     try:
-      now_playing = int(request.REQUEST['now_playing'])
+      client_playing = int(request.REQUEST['now_playing'])
     except (ValueError, TypeError, KeyError):
-      now_playing = 0
+      client_playing = 0
     #always output as if this isn't given it's definitely needed 
     server_playing = PlaylistEntry.objects.nowPlaying()
-    if server_playing.id != now_playing:
+    if server_playing.id != client_playing:
       events.append(('now_playing', server_playing.id))
       length_changed = True
       #new title needed
       try:
-        events.append(('pltitle', PlaylistEntry.objects.nowPlaying().song.metadataString() + " - GBS-FM"))
+        events.append(('metadata', PlaylistEntry.objects.nowPlaying().song.metadataString()))
+        linkedMetadata = render_to_string('linked_metadata.html', context_instance=RequestContext(request))
+        events.append(('linkedMetadata', linkedMetadata))
       except PlaylistEntry.DoesNotExist:
         pass
       #new song length needed
@@ -203,7 +201,7 @@ def ajax(request):
       events.append(('pllength', render_to_string('pl_length.html', {'length':length})))
 
     #handle cuefile stuff
-    tolerance = 5 #tolerance in seconds between real and recieved time TODO: replace with setting
+    tolerance = 5 #tolerance in seconds between real and recieved time TODO: replace with internal setting
     
     position = request.REQUEST.get('position', None)
     if position:
