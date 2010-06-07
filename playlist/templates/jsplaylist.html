@@ -87,8 +87,8 @@ function nowPlayingHandler(e, entryid) {
   nextplaying = $(document.getElementById(entryid));
   nextplaying.addClass('playing');
   //change action buttons
-  nextplaying.children(".action").children(".remove").hide();
-  nextplaying.children(".action").children(".skip").show();
+  nextplaying.children(".actions").children(".remove").hide();
+  nextplaying.children(".actions").children(".skip").show();
   ajax_args['now_playing'] = getNowPlayingID();
 }
  
