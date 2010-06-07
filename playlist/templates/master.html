@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
-<meta http-equiv="content-type" content="text/html; charset=UTF-8"> 
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" /> 
 <head> 
 <title>{% block title %}g2{% endblock %}</title> 
 <link rel="shortcut icon" href="/images/favicon.ico" /> 
@@ -173,7 +173,7 @@ MESSAGES_DELAY = 5000;
  
 //associative array storing args for ajax calls
 //TODO: replace with array of functions to be called to obtain args
-ajax_args = {}
+
  
  
 //Called when list of events is recieved from server: triggers the correct javascript events with the correct arguments
@@ -190,6 +190,7 @@ function ajaxLoop() {
   setTimeout('ajaxLoop()', DELAY);
 }
  
+var ajax_args = {};
 $(document).ready(function(){
   setSongLength(songLength);
   setSongPosition(songPosition);
