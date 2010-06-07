@@ -31,9 +31,12 @@ def commentProcessor(request):
   comments = []
   last_comment = 0
   for comment in now_playing.comments.all():
+    html_title = "Made on %s" % comment.datetime.strftime("%d %b %Y")
     details = {
       'body': comment.text, 
-      'time': comment.datetime.strftime("%H:%M")
+      'time': comment.datetime.strftime("%H:%M"),
+      'html_title': html_title,
+      'commenter': comment.user.username
     }
     last_comment = max((last_comment, comment.id))
     comments.append(details)

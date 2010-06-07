@@ -184,9 +184,12 @@ def ajax(request):
       events.append(('clearComments', ''))
       comments = server_playing.song.comments.all().order_by("datetime") #ensure oldest first - new comments are placed at top of update list
       for comment in comments:
+        html_title = "Made on %s" % comment.datetime.strftime("%d %b %Y")
         details = {
           'body': force_escape(comment.text),
           'time': comment.datetime.strftime("%H:%M"),
+          'html_title': html_title,
+          'commenter': comment.user.username,
           'id': comment.id
         }
         events.append(('comment', details))#new comments
@@ -198,9 +201,12 @@ def ajax(request):
       else:
         comments = server_playing.song.comments.all().order_by("datetime").filter(id__gt=last_comment)
         for comment in comments:
+          html_title = "Made on %s" % comment.datetime.strftime("%d %b %Y")
           details = {
             'body': force_escape(comment.text),
             'time': comment.datetime.strftime("%H:%M"),
+            'html_title': html_title,
+            'commenter': comment.user.username,
             'id': comment.id
           }
           events.append(('comment', details))

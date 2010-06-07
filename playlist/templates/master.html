@@ -125,9 +125,10 @@ function hideMessages() {
 /**
 * Add comment to comment box
 **/
-function addComment(comment, time) {
+function addComment(comment, time, commenter, title) {
   elem = $("div#commentsbox");
-  elem.html("<p class='comment'>" + "[" + time + "] " + comment + "\n" + "</p>" + elem.html());
+  elem.html("<p class='comment' title='title'>" + "[" + time + "] &lt;" + commenter + "&gt; " + \
+             comment + "\n" + "</p>" + elem.html());
 }
 
 /**
@@ -152,7 +153,7 @@ function linkedMetadataHandler(e, metadata) {
 }
 
 function commentHandler(e, comment) {
-  addComment(comment.body, comment.time);
+  addComment(comment.body, comment.time, comment.commenter, comment.html_title);
   ajax_args['last_comment'] = comment.id;
 }
 
@@ -274,13 +275,17 @@ $(document).ready(function(){
 <div id="bottombg" title="geez what klutz designed this?"></div> 
  
       <div id="leftist"> 
-        <form action="" method="post" id="commentform"><input accesskey="c" id="id_comment" name="query" maxlength="100" type="text" value="Comment entry coming soon" disabled="disabled"></form> 
-          <div id="commentsbox"> 
+        <form action="" method="post" id="commentform">
+          <input accesskey="c" id="id_comment" name="query" maxlength="100" type="text" value="Comment entry coming soon" disabled="disabled">
+        </form> 
+        <div id="commentsbox"> 
           <a id="expandbutt" href="#" title="expand comment box"></a> 
           {% for comment in curr_comments %}
-            <p class="comment">[{{comment.time}}] {{comment.body}}</p>
+            <p class="comment" title="{{comment.html_title}}">
+              [{{comment.time}}] &lt;{{comment.commenter}}&gt; {{comment.body}}
+            </p>
           {% endfor %}
-          </div> 
+        </div> 
       </div> 
       <div id="rightist"> 
       
