@@ -121,6 +121,21 @@ function setupSearch() {
 function hideMessages() {
   $("p#messages").fadeOut("slow");
 }
+
+/**
+* Add comment to comment box
+**/
+function addComment(comment, time) {
+  elem = $("div#commentsbox");
+  elem.html("<p class='comment'>" + "[" + time + "] " + comment + "\n" + "</p>" + elem.html());
+}
+
+/**
+* Clear the comment box
+**/
+function clearComments() {
+  $("div#commentsbox").html("");
+}
  
 /*** event handlers for clutterbar ***/
  
@@ -135,6 +150,17 @@ function songPositionHandler(e, position) {
 function linkedMetadataHandler(e, metadata) {
   setClutterMetadata(metadata);
 }
+
+function commentHandler(e, comment) {
+  addComment(comment.body, comment.time);
+  ajax_args['last_comment'] = comment.id;
+}
+
+function clearCommentsHandler(e, blank) {
+  clearComments();
+  ajax_args['last_comment'] = 0;
+}
+  
  
   
 /*** event loop stuff ***/
@@ -168,9 +194,12 @@ $(document).ready(function(){
   setSongLength(songLength);
   setSongPosition(songPosition);
   ajax_args['position'] = songPosition;
+  ajax_args['last_comment'] = {{last_comment}};
   $('body').bind('songPosition', songPositionHandler);
   $('body').bind('songLength', songLengthHandler);
   $('body').bind('linkedMetadata', linkedMetadataHandler);
+  $('body').bind('comment', commentHandler);
+  $('body').bind('clearComments', clearCommentsHandler);
   setupSearch();
   secondLoop();
   ajaxLoop();
@@ -247,7 +276,9 @@ $(document).ready(function(){
         <form action="" method="post" id="commentform"><input accesskey="c" id="id_comment" name="query" maxlength="100" type="text" value=""></form> 
           <div id="commentsbox"> 
           <a id="expandbutt" href="#" title="expand comment box"></a> 
- 
+          {% for comment in curr_comments %}
+            <p class="comment">[{{comment.time}}] {{comment.body}}</p>
+          {% endfor %}
           </div> 
       </div> 
       <div id="rightist"> 

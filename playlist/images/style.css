@@ -447,6 +447,12 @@ ol.alphabetical li {
   display:inline-block;
 }
 
+p.comment {
+  padding: 0px 0px 0px 0px;
+  margin: 0px 0px 0px 0px;
+  font-size: 10px;
+}
+
 /* ONE ARTISTS PAGE SPECIFICS */
 
 div#maincontainer table {
@@ -527,6 +533,9 @@ td.emoted { }
   background:transparent url('45.gif') no-repeat center center;
   width:47px;
 }
+
+/* FORUMS STUFF */
+
 #djangoForumBody {
     width: 90%;
     margin: 0 auto;

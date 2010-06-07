@@ -23,6 +23,24 @@ def positionContextProcessor(request):
     d['song_length'] = now_playing.length
   return d
   
+def commentProcessor(request):
+  try:
+    now_playing = PlaylistEntry.objects.nowPlaying().song
+  except PlaylistEntry.DoesNotExist:
+    return []
+  comments = []
+  last_comment = 0
+  for comment in now_playing.comments.all():
+    details = {
+      'body': comment.text, 
+      'time': comment.datetime.strftime("%H:%M")
+    }
+    last_comment = max((last_comment, comment.id))
+    comments.append(details)
+  
+  return {'curr_comments': comments, 'last_comment': last_comment}
+  
+  
 def nowPlayingContextProcessor(request):
   try:
     return {'now_playing': PlaylistEntry.objects.nowPlaying().song}

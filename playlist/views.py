@@ -47,6 +47,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import permission_required, login_required
 from django.views.generic.list_detail import object_list
+from django.template.defaultfilters import force_escape
 
 
 from playlist.forms import *
@@ -180,14 +181,30 @@ def ajax(request):
       #new song length needed
       events.append(('songLength', PlaylistEntry.objects.nowPlaying().song.length))
       #new comments needed
-      comments = server_playing.comments.all().order_by(date) #ensure oldest first - new comments are placed at top of update list
+      events.append(('clearComments', ''))
+      comments = server_playing.song.comments.all().order_by("datetime") #ensure oldest first - new comments are placed at top of update list
       for comment in comments:
         details = {
-          'body': comment.text,
+          'body': force_escape(comment.text),
           'time': comment.datetime.strftime("%H:%M"),
           'id': comment.id
         }
-        events.append(('comment', details))
+        events.append(('comment', details))#new comments
+    else:
+      try:
+        last_comment = int(request.REQUEST['last_comment'])
+      except (ValueError, TypeError, KeyError):
+        pass
+      else:
+        comments = server_playing.song.comments.all().order_by("datetime").filter(id__gt=last_comment)
+        for comment in comments:
+          details = {
+            'body': force_escape(comment.text),
+            'time': comment.datetime.strftime("%H:%M"),
+            'id': comment.id
+          }
+          events.append(('comment', details))
+      
       
     #new adds
     try:
@@ -205,20 +222,7 @@ def ajax(request):
         context_instance=RequestContext(request))
         events.append(("adds", html))   
     
-    #new comments
-    try:
-      last_comment = int(request.REQUEST['last_comment'])
-    except (ValueError, TypeError, KeyError):
-      pass
-    else:
-      comments = server_playing.comments.all().order_by(date).find(id__gt=last_comment)
-      for commment in comments:
-        details = {
-          'body': comment.text,
-          'time': comment.datetime.strftime("%H:%M"),
-          'id': comment.id
-        }
-        events.append(('comment', details))
+    
         
     
     if length_changed:
