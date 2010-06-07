@@ -514,7 +514,7 @@ def removeentry(request, entryid):
     entry = PlaylistEntry.objects.select_related().get(id=entryid)
   except PlaylistEntry.DoesNotExist:
     raise Http404
-  if ((entry.adder == request.user) or request.user.has_perm("playlist.remove_entry")) and not entry.playing:
+  if ((entry.adder == request.user) or request.user.has_perm("playlist.delete_entry")) and not entry.playing:
     logging.info("User %s (uid %d) removed songid %d from playlist at %s" % (request.user.username, request.user.id, entry.song.id, now()))
     entry.remove()
     request.user.message_set.create(message="Entry deleted successfully.")

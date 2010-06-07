@@ -25,7 +25,7 @@ class Playlist(object):
     
     for entry in entries:
       d = {}
-      if isinstance(entry, PlaylistEntry) and not entry.playing and (self.user.has_perm('playlist.remove_entry') or self.user == entry.adder):
+      if isinstance(entry, PlaylistEntry) and not entry.playing and (self.user.has_perm('playlist.delete_entry') or self.user == entry.adder):
         d = {'can_remove':True, 'object':entry, 'pl':True}
       elif isinstance(entry, PlaylistEntry):
         d = {'can_remove':False, 'object':entry, 'pl':True}
