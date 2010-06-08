@@ -453,6 +453,10 @@ p.comment {
   font-size: 10px;
 }
 
+div#commentsbox {
+  overflow: auto;
+}
+
 /* ONE ARTISTS PAGE SPECIFICS */
 
 div#maincontainer table {
