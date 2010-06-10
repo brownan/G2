@@ -338,10 +338,10 @@ def api(request, resource=""):
       songid = int(songid)
       song = Song.objects.get(id=songid)
     except KeyError:
-      song = PlaylistEntry.objects.select_related().nowPlaying().song
+      song = PlaylistEntry.objects.nowPlaying().song
     except ValueError:
       if songid == "curr":
-        song = PlaylistEntry.objects.select_related("song").nowPlaying().song
+        song = PlaylistEntry.objects.nowPlaying().song
       elif songid == "prev":
         song = OldPlaylistEntry.objects.select_related("song").extra(where=['playlist_oldplaylistentry.id =\
         (select max(playlist_oldplaylistentry.id) from playlist_oldplaylistentry)'])[0].song
