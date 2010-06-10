@@ -59,11 +59,20 @@ body {
   height:100px;
 }
 
-form.boxed {
+#id_query { 
+  background-color:#FFF; 
+}
+
+#id_query:hover { 
+  width:120px; 
+}
+
+
+/*form.boxed {
   height:12px;
   width:80px;
   display:block;
-}
+}*/
 
 a.boxed, #id_query {
   border:1px solid black;
@@ -259,7 +268,7 @@ td.actions {
 td.notyet a {
   display:none;
 }
-#id_query {
+/*#id_query {
   height:14px;
   padding:0px;
   margin:0px 0px -13px 0px;
@@ -269,7 +278,7 @@ td.notyet a {
 #id_query:hover {
   margin-left:-21px;
   width:103px;
-}
+}*/
 div#progbarbox {
   margin:4px 5px 0px 5px;
   font-size:11px;
@@ -313,7 +322,7 @@ div#votebuttonslow a {
   border:1px inset #666;
   font-size:10px;
   padding:0px;
-  margin:4px 0px 0px 6px;
+  margin:5px 0px 0px 5px;
   border-radius:3px 3px 0px 0px;
   -moz-border-radius:3px 3px 0px 0px;
   -webkit-border-radius:3px 3px 0px 0px;
@@ -325,7 +334,7 @@ div#votebuttonslow a {
   border-radius:0px 0px 3px 3px;
   -moz-border-radius:0px 0px 3px 3px;
   -webkit-border-radius:0px 0px 3px 3px;
-  padding:1px;
+  padding:0px;
   font-family:verdana;
   bottom:2px;
   height:74px;
@@ -341,6 +350,7 @@ div#votebuttonslow a {
   text-decoration:underline;
 }
 #leftist {
+  padding:1px;
   position:fixed;
   left:0px;
   bottom:0px;
