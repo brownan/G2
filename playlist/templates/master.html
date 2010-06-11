@@ -1,11 +1,12 @@
+{% load filters %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
-<meta http-equiv="content-type" content="text/html; charset=UTF-8" /> 
 <head> 
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" /> 
 <title>{% block title %}g2{% endblock %}</title> 
 <link rel="shortcut icon" href="/images/favicon.ico" /> 
-<link href="images/style.css" rel="stylesheet" type="text/css"> 
+<link href="images/style.css" rel="stylesheet" type="text/css" /> 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js" type="text/javascript"></script> 
 <script type="text/javascript" src="images/swfobject.js"></script> 
 <script type="text/javascript" src="images/playload.js"></script> 
@@ -189,7 +190,39 @@ function commentSubmit() {
   return false; //avoid default behaviour
 }
   
+/**
+* Score stuff
+**/
 
+function setAvgScore(score) {
+  if (score == 0) {
+    score = "none";
+  }
+  $('#avgscore').html(score);
+  // update playlist if necessary
+  body = $('.playing .score').html();
+  $('.playing .score').html(score + $.trim(body).substring(3, body.length));
+}
+
+function setUserVote(score) {
+  $("#votebuttonslow > .selectedvote[data-vote!="+score+"]").removeClass("selectedvote");
+  $("#votebuttonslow > *[data-vote="+score+"]").addClass("selectedvote");
+  //update playlist if necessary
+  $(".playing .votes a[data-vote!="+score+"]").removeClass("voted");
+  $(".playing .votes a[data-vote="+score+"]").addClass("voted");
+}
+
+function setupVotes() {
+  $("#votebuttonslow > a").click(function () {
+    args = {};
+    for (var i in ajax_args) {
+      args[i] = ajax_args[i];
+    }
+    args['vote'] = $(this).attr("data-vote");
+    $.getJSON("{% url playlist.views.ajax %}", args, eventDispatcher);
+    
+  });
+}
  
 /*** event handlers for clutterbar ***/
  
@@ -213,6 +246,14 @@ function commentHandler(e, comment) {
 function clearCommentsHandler(e, blank) {
   clearComments();
   ajax_args['last_comment'] = 0;
+}
+
+function avgScoreHandler(e, score) {
+  setAvgScore(score);
+}
+
+function userVoteHandler(e, score) {
+  setUserVote(score);
 }
   
  
@@ -246,7 +287,7 @@ function ajaxLoop() {
  
 //for stored ajax args
 var ajax_args = {};
-
+var now_playing = {{now_playing.id}};
 $(document).ready(function(){
   //song position stuff
   setSongLength(songLength);
@@ -254,6 +295,7 @@ $(document).ready(function(){
   
   //comment box stuff
   setupComment();
+  setupVotes();
   
   //ajax events stuff
   ajax_args['position'] = songPosition;
@@ -263,7 +305,9 @@ $(document).ready(function(){
   $('body').bind('linkedMetadata', linkedMetadataHandler);
   $('body').bind('comment', commentHandler);
   $('body').bind('clearComments', clearCommentsHandler);
-  
+  $('body').bind('avgScore', avgScoreHandler);
+  $('body').bind('userVote', userVoteHandler);
+
   //loops
   setupSearch();
   secondLoop();
@@ -271,7 +315,7 @@ $(document).ready(function(){
   voteLoop();
   setTimeout('hideMessages()', MESSAGES_DELAY);
   
-});
+}); 
 </script> 
  
  
@@ -360,14 +404,13 @@ $(document).ready(function(){
           <span id="songPosition">{{song_position}}</span>/<span id="songLength">{{song_length}}</span>
         </div> 
         <span><div id="metadata">{% include "linked_metadata.html" %}</div>
-        <div class="disabled" id="votebuttonslow"> 
+        <div id="votebuttonslow"> 
         vote: 
-        <a class="selectedvote" href="#">1</a> 
-        <a href="#">2</a> 
-        <a href="#">3</a> 
-        <a href="#">4</a> 
-        <a href="#">5</a> 
-        &nbsp;score:
+         {% num_range 1 6 as vote_range %}
+        {% for vote in vote_range %}
+          <a href="#" class="{% ifequal user_vote vote %}selectedvote{% endifequal %}" data-vote="{{vote}}">{{vote}}</a> 
+        {% endfor %}
+        &nbsp;score: <span id='avgscore'>{{now_playing.avgscore|default:"none"}}</span>
         </div></span> 
       </div> 
  

@@ -2,7 +2,7 @@
 
 from playlist.utils import listenerCount
 from playlist.cue import CueFile
-from playlist.models import PlaylistEntry
+from playlist.models import PlaylistEntry, Rating
 
 from django.db import connection
 from django.conf import settings
@@ -45,10 +45,20 @@ def commentProcessor(request):
   
   
 def nowPlayingContextProcessor(request):
+  now_playing = PlaylistEntry.objects.nowPlaying().song
   try:
-    return {'now_playing': PlaylistEntry.objects.nowPlaying().song}
+    user_vote =  int(now_playing.ratings.get(user=request.user).score)
+  except Rating.DoesNotExist:
+    user_vote = 0
+  try:
+    return {
+      'now_playing': now_playing, 
+      'user_vote': user_vote
+    }
   except PlaylistEntry.DoesNotExist:
     return {'now_playing': Song.objects.all()[0]} #fun fallback to avoid errors
+  
+    
   
   
 def SQLLogContextProcessor(request):

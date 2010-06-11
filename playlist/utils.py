@@ -43,48 +43,6 @@ def start_stream():
 def stop_stream():
   Popen(["killall", "-KILL", "ices"]).wait()
   
-  
-#  
-#  d = {}
-#  song = MP3(MUSIC_PATH+'/'+sha_hash+'.mp3', ID3=EasyID3)
-#  d.update(song)
-#  
-#  for v in d.keys():
-#    d[v] = d[v][0] #1-string list -> string
-#
-#  d['sha_hash'] = sha_hash
-#  d['length'] = round(song.info.length)
-#  d['bitrate'] = song.info.bitrate/1000 #b/s -> kb/s
-#  
-#  if not ("title" in d.keys()):
-#    d['title'] = name
-#  if 'artist' in d.keys():
-#    d['artist'] = self._getObj(d['artist'], Artist)
-#  else:
-#    d['artist'] = self._getObj("unknown", Artist)
-#  if 'album' in d.keys():
-#    d['album'] = self._getObj(d['album'], Album)
-#  else:
-#    d['album'] = self._getObj("unknown", Album)
-#    
-#  for x in ["tracknumber", "version", "date"]:
-#    print x
-#    if x in d.keys():
-#      print x
-#      del d[x]
-#  print d.keys()
-#    
-#  d['uploader'] = self
-#  d['format'] = "mp3"
-
-#  print d
-#  s = Song(**d)
-#
-#
-#  s.save()
-#  self.uploads += 1
-#  self.save()
-#
 def getObj(table, name, oldid=None):
   #get album/artist object if it exists; otherwise create it
   try:

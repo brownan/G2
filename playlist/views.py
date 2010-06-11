@@ -144,11 +144,9 @@ def ajax(request):
     length_changed = False #True if any actions would have changed the playlist length
     
     #new removals
-    try:
-      last_removal = int(request.REQUEST['last_removal'])
-    except (ValueError, TypeError, KeyError):
-      last_removal = None
-    if last_removal is not None:
+    last_removal = int(request.REQUEST.get('last_removal', -1))
+    
+    if last_removal != -1:
       removals = RemovedEntry.objects.filter(id__gt=last_removal)
       removal_events = []
       if removal_events:
@@ -163,10 +161,7 @@ def ajax(request):
       
         
     #get now playing track
-    try:
-      client_playing = int(request.REQUEST['now_playing'])
-    except (ValueError, TypeError, KeyError):
-      client_playing = 0
+    client_playing = int(request.REQUEST.get('now_playing', 0))
     #always output as if this isn't given it's definitely needed 
     server_playing = PlaylistEntry.objects.nowPlaying()
     
@@ -178,6 +173,14 @@ def ajax(request):
     else:
       server_playing.song.comment(request.user, comment)
       #TODO: handle comment being too long gracefully
+      
+    #check for submitted vote
+    try:
+      vote = request.REQUEST['vote']
+    except KeyError:
+      pass
+    else:
+      server_playing.song.rate(vote, request.user)    
     
     if server_playing.id != client_playing:
       events.append(('now_playing', server_playing.id))
@@ -206,7 +209,14 @@ def ajax(request):
         for comment in comments:
           events.append(comment.ajaxEvent())
       
-      
+    #send user vote & song avg vote_count
+    try:
+      user_vote = server_playing.song.ratings.get(user=request.user).score
+    except Rating.DoesNotExist:
+      user_vote = 0
+    events.append(('userVote', int(user_vote)))
+    events.append(('avgScore', "%.1f" % server_playing.song.avgscore))
+    
     #new adds
     try:
       last_add = int(request.REQUEST['last_add'])

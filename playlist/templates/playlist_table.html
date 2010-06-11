@@ -30,9 +30,7 @@
         {% endif %} 
         TODO: add to classes VVV when prevoting prevention is on
         -->
-        <td class=" 
-        
-        votes details"> 
+        <td class="votes details"> 
         {% num_range 1 6 as vote_range %}
         {% for vote in vote_range %}
           <a href="{% url playlist.views.api "vote" %}?songid={{entry.object.song.id}}&vote={{vote}}" class="vote{{vote}} {% ifequal entry.object.user_vote vote %}voted{% endifequal %}" data-songid="{{entry.object.song.id}}" data-vote="{{vote}}">{{vote}}</a> 

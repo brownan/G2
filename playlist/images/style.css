@@ -233,7 +233,7 @@ td.votes a.vote5 {
   -webkit-border-radius:0 3px 3px 0;
   border-width:1px 1px 1px 0;
 }
-td.votes a:hover, td.votes a.voted, .selectedvote, div.voteboxbar a:hover, div#votebuttonslow a:hover {
+td.votes a:hover, td.details a.voted, div#votebuttonslow a.selectedvote, div.voteboxbar a:hover, div#votebuttonslow a:hover {
   color:#FFF;
   background-color:#000;
   text-decoration:none;
@@ -465,6 +465,11 @@ p.comment {
 
 div#commentsbox {
   overflow: auto;
+}
+td.votes a:hover, td.votes a.voted, .selectedvote, div.voteboxbar a:hover, div#votebuttonslow a:hover {
+  color:#FFF;
+  background-color:#000;
+  text-decoration:none;
 }
 
 /* ONE ARTISTS PAGE SPECIFICS */
