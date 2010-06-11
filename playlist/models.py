@@ -18,6 +18,8 @@ from django.db.models.signals import pre_save
 from django.db.models import Avg, Count, Sum
 from django.db.models.query import QuerySet
 from playlist.cue import CueFile
+from django.template.defaultfilters import force_escape
+
 
 
 MUSIC_PATH = settings.MUSIC_DIR
@@ -525,6 +527,20 @@ class Comment(models.Model):
     if not self.id:
         self.datetime = datetime.datetime.today()
     super(Comment, self).save()
+    
+  def ajaxEvent(self):
+    """
+    Return event to be sent to client on ajax request for comments.
+    """
+    html_title = "Made on %s" % self.datetime.strftime("%d %b %Y")
+    details = {
+      'body': force_escape(self.text),
+      'time': self.datetime.strftime("%H:%M"),
+      'html_title': html_title,
+      'commenter': self.user.username,
+      'id': self.id
+    }
+    return ('comment', details) 
     
   class Meta:
     ordering = ['-datetime']

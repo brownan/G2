@@ -316,7 +316,7 @@ div#votebuttonslow a {
   text-align:center;
   font-size:12px;
 }
-#id_comment {
+#commentbox {
   background-color:#FFF;
   height:15px;
   border:1px inset #666;

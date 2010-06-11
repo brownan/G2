@@ -11,6 +11,19 @@
 <script type="text/javascript" src="images/playload.js"></script> 
 <script type="text/javascript"> 
  
+// //alow object cloning
+// //from http://my.opera.com/GreyWyvern/blog/show.dml/1725165 (thanks to Brian Huisman)
+// Object.prototype.clone = function() {
+//   var newObj = (this instanceof Array) ? [] : {};
+//   for (i in this) {
+//     if (i == 'clone') continue;
+//     if (this[i] && typeof this[i] == "object") {
+//       newObj[i] = this[i].clone();
+//     } else newObj[i] = this[i]
+//   } return newObj;
+// };
+// 
+
  
 //convert seconds to minutes:seconds
 function stom(time){
@@ -114,6 +127,27 @@ function setupSearch() {
     }
   });
 }
+
+/**
+* Set up comment box properly
+**/
+function setupComment() {
+  $('#commentform').submit(commentSubmit);
+  commentbox = $('#commentbox');
+  commentbox.removeAttr("disabled") //enable it
+  commentbox.css('color', 'grey');
+  commentbox.attr('value', "Comment on this track...");
+  
+  commentbox.focus(function () {
+    if (commentbox.attr('value') == "Comment on this track...") {
+      //clear it and set text to normal colour when in focus
+      commentbox.attr('value', '');
+      commentbox.css('color', 'black');
+    }
+  });
+  
+}
+
  
 /**
 * Hide message box
@@ -136,6 +170,26 @@ function addComment(comment, time, commenter, title) {
 function clearComments() {
   $("div#commentsbox").html("");
 }
+
+/**
+* Submit a comment entered in the comment box
+**/
+function commentSubmit() {
+  commentbox = $('#commentbox');
+  comment = commentbox.val();
+  args = {};
+  for (var i in ajax_args){
+    args[i] = ajax_args[i];
+  }
+  
+  args['comment'] = comment;
+  $.getJSON("{% url playlist.views.ajax %}", args, eventDispatcher);
+  
+  commentbox.val("");
+  return false; //avoid default behaviour
+}
+  
+
  
 /*** event handlers for clutterbar ***/
  
@@ -190,10 +244,18 @@ function ajaxLoop() {
   setTimeout('ajaxLoop()', DELAY);
 }
  
+//for stored ajax args
 var ajax_args = {};
+
 $(document).ready(function(){
+  //song position stuff
   setSongLength(songLength);
   setSongPosition(songPosition);
+  
+  //comment box stuff
+  setupComment();
+  
+  //ajax events stuff
   ajax_args['position'] = songPosition;
   ajax_args['last_comment'] = {{last_comment}};
   $('body').bind('songPosition', songPositionHandler);
@@ -201,6 +263,8 @@ $(document).ready(function(){
   $('body').bind('linkedMetadata', linkedMetadataHandler);
   $('body').bind('comment', commentHandler);
   $('body').bind('clearComments', clearCommentsHandler);
+  
+  //loops
   setupSearch();
   secondLoop();
   ajaxLoop();
@@ -274,9 +338,9 @@ $(document).ready(function(){
 <div id="bottombg" title="geez what klutz designed this?"></div> 
  
       <div id="leftist"> 
-        <form action="" method="post" id="commentform">
-          <input accesskey="c" id="id_comment" name="query" maxlength="100" type="text" 
-                 value="Comment entry coming soon - use comment entry on song page/socks for now" disabled="disabled">
+        <form action="#" method="post" id="commentform">
+          <input accesskey="c" id="commentbox" name="query" maxlength="100" type="text" 
+                 value="You need to enable javascript to use the live comments system." disabled="disabled">
         </form> 
         <div id="commentsbox"> 
           <a id="expandbutt" href="#" title="expand comment box"></a> 

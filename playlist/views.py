@@ -47,7 +47,6 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import permission_required, login_required
 from django.views.generic.list_detail import object_list
-from django.template.defaultfilters import force_escape
 
 
 from playlist.forms import *
@@ -160,14 +159,26 @@ def ajax(request):
         removal_events = removal_events[:MAX_EVENTS] 
       events.extend(removal_events)
       
+
+      
         
-    #now playing 
+    #get now playing track
     try:
       client_playing = int(request.REQUEST['now_playing'])
     except (ValueError, TypeError, KeyError):
       client_playing = 0
     #always output as if this isn't given it's definitely needed 
     server_playing = PlaylistEntry.objects.nowPlaying()
+    
+    #check for submitted comment
+    try:
+      comment = request.REQUEST['comment']
+    except KeyError:
+      pass
+    else:
+      server_playing.song.comment(request.user, comment)
+      #TODO: handle comment being too long gracefully
+    
     if server_playing.id != client_playing:
       events.append(('now_playing', server_playing.id))
       length_changed = True
@@ -184,15 +195,7 @@ def ajax(request):
       events.append(('clearComments', ''))
       comments = server_playing.song.comments.all().order_by("datetime") #ensure oldest first - new comments are placed at top of update list
       for comment in comments:
-        html_title = "Made on %s" % comment.datetime.strftime("%d %b %Y")
-        details = {
-          'body': force_escape(comment.text),
-          'time': comment.datetime.strftime("%H:%M"),
-          'html_title': html_title,
-          'commenter': comment.user.username,
-          'id': comment.id
-        }
-        events.append(('comment', details))#new comments
+        events.append(comment.ajaxEvent())
     else:
       try:
         last_comment = int(request.REQUEST['last_comment'])
@@ -201,15 +204,7 @@ def ajax(request):
       else:
         comments = server_playing.song.comments.all().order_by("datetime").filter(id__gt=last_comment)
         for comment in comments:
-          html_title = "Made on %s" % comment.datetime.strftime("%d %b %Y")
-          details = {
-            'body': force_escape(comment.text),
-            'time': comment.datetime.strftime("%H:%M"),
-            'html_title': html_title,
-            'commenter': comment.user.username,
-            'id': comment.id
-          }
-          events.append(('comment', details))
+          events.append(comment.ajaxEvent())
       
       
     #new adds
