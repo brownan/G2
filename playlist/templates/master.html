@@ -217,7 +217,12 @@ function setupVotes() {
     for (var i in ajax_args) {
       args[i] = ajax_args[i];
     }
-    args['vote'] = $(this).attr("data-vote");
+    button = $(this);
+    if (button.hasClass("selectedvote")) {
+      args['vote'] = 0;
+    } else {
+      args['vote'] = button.attr("data-vote");
+    }
     $.getJSON("{% url playlist.views.ajax %}", args, eventDispatcher);
     
   });
