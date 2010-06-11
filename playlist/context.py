@@ -53,7 +53,8 @@ def nowPlayingContextProcessor(request):
   try:
     return {
       'now_playing': now_playing, 
-      'user_vote': user_vote
+      'user_vote': user_vote,
+      'accuracy': 1 #for average score
     }
   except PlaylistEntry.DoesNotExist:
     return {'now_playing': Song.objects.all()[0]} #fun fallback to avoid errors
