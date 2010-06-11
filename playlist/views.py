@@ -214,8 +214,15 @@ def ajax(request):
       user_vote = server_playing.song.ratings.get(user=request.user).score
     except Rating.DoesNotExist:
       user_vote = 0
+    
+    if server_playing.song.voteno == 1:
+      score_str = "%.1f (%d vote)" % (server_playing.song.avgscore, server_playing.song.voteno)
+    elif server_playing.song.voteno > 1:
+      score_str = "%.1f (%d votes)" % (server_playing.song.avgscore, server_playing.song.voteno, )
+    else:
+      score_str = "no votes"
     events.append(('userVote', int(user_vote)))
-    events.append(('avgScore', "%.1f" % server_playing.song.avgscore))
+    events.append(('score', score_str))
     
     #new adds
     try:

@@ -194,14 +194,13 @@ function commentSubmit() {
 * Score stuff
 **/
 
-function setAvgScore(score) {
+function setScore(score) {
   if (score == 0) {
     score = "none";
   }
   $('#avgscore').html(score);
   // update playlist if necessary
-  body = $('.playing .score').html();
-  $('.playing .score').html(score + $.trim(body).substring(3, body.length));
+  $('.playing .score').html(score);
 }
 
 function setUserVote(score) {
@@ -248,8 +247,8 @@ function clearCommentsHandler(e, blank) {
   ajax_args['last_comment'] = 0;
 }
 
-function avgScoreHandler(e, score) {
-  setAvgScore(score);
+function scoreHandler(e, score) {
+  setScore(score);
 }
 
 function userVoteHandler(e, score) {
@@ -305,7 +304,7 @@ $(document).ready(function(){
   $('body').bind('linkedMetadata', linkedMetadataHandler);
   $('body').bind('comment', commentHandler);
   $('body').bind('clearComments', clearCommentsHandler);
-  $('body').bind('avgScore', avgScoreHandler);
+  $('body').bind('score', scoreHandler);
   $('body').bind('userVote', userVoteHandler);
 
   //loops
@@ -410,7 +409,13 @@ $(document).ready(function(){
         {% for vote in vote_range %}
           <a href="#" class="{% ifequal user_vote vote %}selectedvote{% endifequal %}" data-vote="{{vote}}">{{vote}}</a> 
         {% endfor %}
-        &nbsp;score: <span id='avgscore'>{{now_playing.avgscore|default:"none"}}</span>
+        &nbsp;score: <span id='avgscore'>          
+        {% if now_playing.avgscore %}
+          {{now_playing.avgscore|floatformat:accuracy}} ({{now_playing.voteno}} vote{{now_playing.voteno|pluralize}})
+        {% else %}
+          no votes
+        {% endif %}
+        </span>
         </div></span> 
       </div> 
  
