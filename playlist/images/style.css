@@ -607,6 +607,10 @@ td.emoted { }
     width: 20%;
 }
 
+#djangoForumThreadPosts a {
+  color:#00F;text-decoration:underline; 
+}
+
 #djangoForumBreadcrumbs {
     padding: 20px;
 }
