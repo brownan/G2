@@ -8,6 +8,7 @@ import re
 
 from django.conf import settings
 MUSIC_PATH = settings.MUSIC_DIR
+GHETTO_URL = "http://ghettoradio.us:8209/"
 listeners =  re.compile(r'(\d+) of \d+ listeners \(\d+ unique\)')
 
 def hashSong(file):
@@ -56,17 +57,26 @@ def getObj(table, name, oldid=None):
     return t
 
 
-def listenerCount():
+def listenerCount(url):
   try:
     opener = urllib2.build_opener()
     opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-    s = opener.open(settings.STREAMINFO_URL).read()
+    s = opener.open(url).read()
   except urllib2.URLError:
     return "?"
   try:
     return listeners.search(s).group(1)
   except (IndexError, AttributeError):
     return "?"
+    
+def ghettoListenerCount():
+  return listenerCount(GHETTO_URL)
+  
+def gbsfmListenerCount():
+  return listenerCount(settings.STREAMINFO_URL)
+    
+    
+    
   
   
   

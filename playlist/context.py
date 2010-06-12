@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from playlist.utils import listenerCount
+from playlist.utils import gbsfmListenerCount, ghettoListenerCount
 from playlist.cue import CueFile
 from playlist.models import PlaylistEntry, Rating
 
@@ -8,7 +8,10 @@ from django.db import connection
 from django.conf import settings
 
 def listenersContextProcessor(request):
-  return {'listeners': listenerCount()}
+  return {
+    'gbsfm_listeners': gbsfmListenerCount(),
+    'ghetto_listeners': ghettoListenerCount()
+  }
   
 def positionContextProcessor(request):
   cue = CueFile(settings.LOGIC_DIR + "/ices.cue")
