@@ -627,7 +627,7 @@ def song(request, songid=0, edit=None):
     vote = Rating.objects.get(user=request.user, song=song).score
   except Rating.DoesNotExist:
     vote = 0
-  if request.user.has_perm('playlist.edit_song'):
+  if request.user.has_perm('playlist.edit_song') or request.user.has_perm('playlist.download_song'):
     path = song.getPath()
   else:
     path = None
