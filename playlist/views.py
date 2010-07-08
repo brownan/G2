@@ -639,7 +639,7 @@ def song(request, songid=0, edit=None):
   if request.method == "POST":
     editform = SongForm(request.POST, instance=song)
     if editform.is_valid():
-      edit = False
+      
       if (request.user.has_perm('playlist.edit_song') or (request.user == song.uploader)):
         #user has correct permissions to edit song 
         editform.save()
@@ -661,6 +661,7 @@ def song(request, songid=0, edit=None):
           FieldEdit(field="album", new_value=edited_song.album.name, song_edit=edit).save()
 
         request.user.message_set.create(message="Your edit has been queued for mod approval.")
+      edit = None
   else:
     editform = SongForm(instance=song)
     
