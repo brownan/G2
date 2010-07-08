@@ -20,11 +20,10 @@
 </tr>
 <tr>
     <td colspan="2">
-      {% if can_edit %}
-        <a href='{% url playlist.views.song song.id,"/edit" %}'>
-          <img src="/images/page_edit.png" title="Edit dong info" alt="edit" />
-        </a>
-      {% endif %}
+      <a href='{% url playlist.views.song song.id,"/edit" %}'>
+        <img src="/images/page_edit.png" title="Edit dong info" alt="edit" />
+      </a>
+
       {% if can_delete %}
         <a href='{% url playlist.views.deletesong song.id %}'>
           <img src="/images/cross.png" title="Delete dong" alt="delete" />

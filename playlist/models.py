@@ -265,6 +265,36 @@ class SongTags(models.Model):
   
   class Meta:
     abstract = True
+    
+class EditNote(SongTags):
+  """Note which mods can add to SongEdits to explain their actions or make poor jokes"""
+  author = models.ForeignKey(User, related_name="edit_notes")
+  edit = models.ForeignKey("SongEdit", related_name="notes")
+  note = models.CharField(max_length=300)
+  
+
+class SongEdit(SongTags):
+  """Represents an edit to a song made by an unprivilidged user which needs mod approval"""
+  artist = models.CharField(max_length=255)
+  album = models.CharField(max_length=255)
+  requester = models.ForeignKey(User, related_name="requested_edits")
+  applied = models.BooleanField(default=False)
+  song = models.ForeignKey("Song", related_name="requested_edits")
+  
+  def apply(self):
+    for field in ["title", "composer", "lyricist", "remixer", "genre", "track"]:
+      setattr(self.song, field, getattr(self, field))
+    song.artist = getObj(Artist, self.artist)
+    song.album = getObj(Album, self.album)
+    song.save()
+    self.applied = True
+    self.save()
+    
+  def add_note(self, author, note):
+    EditNote(author=author, note=note, edit=self).save()
+      
+    
+  
 
 class Song(SongTags):
   """All the other boring technical stuff about a track"""

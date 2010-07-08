@@ -603,13 +603,26 @@ def song(request, songid=0, edit=None):
     song = Song.objects.select_related("uploader", "artist", "album", "location").get(id=songid)
   except Song.DoesNotExist:
     raise Http404 # render_to_response('song.html', {'error': 'Song not found.'})
-  if request.method == "POST" and (request.user.has_perm('playlist.edit_song') or (request.user == song.uploader)):
-    editform = SongForm(request.POST, instance=song)
-    if editform.is_valid():
+    
+  editform = SongForm(request.POST, instance=song)
+  if editform.is_valid():
+    if request.method == "POST" and (request.user.has_perm('playlist.edit_song') or (request.user == song.uploader)):
+      #user has correct permissions to edit song 
       editform.save()
       logging.info("User/mod %s (uid %d) edited songid %d at %s" % (request.user.username, request.user.id, song.id, now()))
+    else:
+      #queue a SongEdit
+      #MUST CHANGE IF TAGS CHANGE (sorry code nazis)
+      edit = SongEdit()
+      for field in ["title", "composer", "lyricist", "remixer", "genre", "track"]:
+        setattr(edit, field, getattr(editform, field))
+      edit.artist = editform.artist.name
+      edit.album = editform.album.name
+      edit.save()
+      request.user.message_set.create(message="Your edit has been queued for approval by a mod.")
   else:
     editform = SongForm(instance=song)
+    
   commentform = CommentForm()
   comments = Comment.objects.select_related().filter(song=song)
   banform = BanForm()
@@ -618,11 +631,7 @@ def song(request, songid=0, edit=None):
     can_delete = True
   else:
     can_delete = False
-  if request.user.has_perm('playlist.edit_song') or (request.user == song.uploader):
-    can_edit = True
-  else:
-    can_edit = False
-    edit = None
+
   try:
     vote = Rating.objects.get(user=request.user, song=song).score
   except Rating.DoesNotExist:
