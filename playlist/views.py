@@ -615,11 +615,15 @@ def song(request, songid=0, edit=None):
       #MUST CHANGE IF TAGS CHANGE (sorry code nazis)
       edit = SongEdit()
       for field in ["title", "composer", "lyricist", "remixer", "genre", "track"]:
-        setattr(edit, field, getattr(editform, field))
-      edit.artist = editform.artist.name
-      edit.album = editform.album.name
+        if getattr(editform, field) != getattr(editform.instance, field):
+          FieldEdit(field=field, new_value=getattr(editform, field), song_edit=edit).save()
+      if editform.instance.artist.name != editform.artist.name:
+        FieldEdit(field=field, new_value=editform.artist.name, song_edit=edit).save()
+      if editform.instance.artist.name != editform.artist.name:
+        FieldEdit(field=field, new_value=editform.artist.name, song_edit=edit).save()
+      edit.requester = request.user
       edit.save()
-      request.user.message_set.create(message="Your edit has been queued for approval by a mod.")
+      request.user.message_set.create(message="Your edit has been queued for mod approval.")
   else:
     editform = SongForm(instance=song)
     

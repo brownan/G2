@@ -251,43 +251,39 @@ class SongManager(models.Manager):
   def get_query_set(self):
     return SongSet(self.model)  #force Song to use extended queryset
   
-class SongTags(models.Model):
-  """Abstract model holding only the tags of a track"""
-  #TODO: sort out artist/composer/lyricist/remixer stuff as per note
-  title = models.CharField(max_length=300)
-  artist = models.ForeignKey(Artist, blank=True, related_name='songs')
-  album = models.ForeignKey(Album, blank=True, related_name='songs')
-  composer = models.CharField(max_length=300, blank=True) #balthcat <3
-  lyricist = models.CharField(max_length=300, blank=True)
-  remixer = models.CharField(max_length=300, blank=True) #balthcat <3
-  genre = models.CharField(max_length=100, blank=True)
-  track = models.PositiveIntegerField(blank=True, null=True)
-  
-  class Meta:
-    abstract = True
     
-class EditNote(SongTags):
-  """Note which mods can add to SongEdits to explain their actions or make poor jokes"""
+class EditNote(models.Model):
+  """Note which mods can add to SongEdits to explain their actions or (more likely) make poor jokes"""
   author = models.ForeignKey(User, related_name="edit_notes")
   edit = models.ForeignKey("SongEdit", related_name="notes")
   note = models.CharField(max_length=300)
   
+class FieldEdit(models.Model):
+  """Represents an edit to a single field"""
+  new_value = models.CharField(max_length=300, blank=False) 
+  field = models.CharField(max_length=50, blank=False)
+  song_edit = models.ForeignKey("SongEdit", related_name="edits")
 
-class SongEdit(SongTags):
+class SongEdit(models.Model):
   """Represents an edit to a song made by an unprivilidged user which needs mod approval"""
-  artist = models.CharField(max_length=255)
-  album = models.CharField(max_length=255)
   requester = models.ForeignKey(User, related_name="requested_edits")
   applied = models.BooleanField(default=False)
+  applied_by = models.ForeignKey(User, related_name="applied_edits", null=True, blank=True)
   song = models.ForeignKey("Song", related_name="requested_edits")
   
-  def apply(self):
-    for field in ["title", "composer", "lyricist", "remixer", "genre", "track"]:
-      setattr(self.song, field, getattr(self, field))
-    song.artist = getObj(Artist, self.artist)
-    song.album = getObj(Album, self.album)
+  def apply(self, applier):
+    """Apply this edit to the song to which it is attached, setting it as applied by applier"""
+    for edit in self.edits.all():
+      if edit.field == "Artist":
+        song.artist = getObj(Artist, self.artist)
+      elif edit.field == "Album":
+        song.album = getObj(Album, self.album)
+      else:
+        setattr(song, field, edit.new_value)
+
     song.save()
     self.applied = True
+    self.applied_by = applier
     self.save()
     
   def add_note(self, author, note):
@@ -296,9 +292,17 @@ class SongEdit(SongTags):
     
   
 
-class Song(SongTags):
-  """All the other boring technical stuff about a track"""
-  
+class Song(models.Model):
+  """Represents a song, containing all tags and other metadata"""
+    #TODO: sort out artist/composer/lyricist/remixer stuff as per note
+  title = models.CharField(max_length=300)
+  artist = models.ForeignKey(Artist, blank=True, related_name='songs')
+  album = models.ForeignKey(Album, blank=True, related_name='songs')
+  composer = models.CharField(max_length=300, blank=True) #balthcat <3
+  lyricist = models.CharField(max_length=300, blank=True)
+  remixer = models.CharField(max_length=300, blank=True) #balthcat <3
+  genre = models.CharField(max_length=100, blank=True)
+  track = models.PositiveIntegerField(blank=True, null=True)
   length = models.IntegerField(editable=False) #in seconds
   bitrate = models.IntegerField(editable=False) #in kbps
   sha_hash = models.CharField(max_length=40, unique=True, editable=False)
