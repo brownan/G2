@@ -251,8 +251,8 @@ class SongManager(models.Manager):
   def get_query_set(self):
     return SongSet(self.model)  #force Song to use extended queryset
   
-
-class Song(models.Model):
+class SongTags(models.Model):
+  """Abstract model holding only the tags of a track"""
   #TODO: sort out artist/composer/lyricist/remixer stuff as per note
   title = models.CharField(max_length=300)
   artist = models.ForeignKey(Artist, blank=True, related_name='songs')
@@ -262,6 +262,12 @@ class Song(models.Model):
   remixer = models.CharField(max_length=300, blank=True) #balthcat <3
   genre = models.CharField(max_length=100, blank=True)
   track = models.PositiveIntegerField(blank=True, null=True)
+  
+  class Meta:
+    abstract = True
+
+class Song(SongTags):
+  """All the other boring technical stuff about a track"""
   
   length = models.IntegerField(editable=False) #in seconds
   bitrate = models.IntegerField(editable=False) #in kbps

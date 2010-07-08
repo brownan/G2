@@ -3,16 +3,19 @@
 from playlist.utils import gbsfmListenerCount, ghettoListenerCount
 from playlist.cue import CueFile
 from playlist.models import PlaylistEntry, Rating
+from django.contrib.auth.decorators import permission_required, login_required
 
 from django.db import connection
 from django.conf import settings
 
+@login_required()
 def listenersContextProcessor(request):
   return {
     'gbsfm_listeners': gbsfmListenerCount(),
     'ghetto_listeners': ghettoListenerCount()
   }
   
+@login_required()
 def positionContextProcessor(request):
   cue = CueFile(settings.LOGIC_DIR + "/ices.cue")
   d = {}
@@ -26,6 +29,7 @@ def positionContextProcessor(request):
     d['song_length'] = now_playing.length
   return d
   
+@login_required()
 def commentProcessor(request):
   try:
     now_playing = PlaylistEntry.objects.nowPlaying().song
@@ -46,7 +50,7 @@ def commentProcessor(request):
   
   return {'curr_comments': comments, 'last_comment': last_comment}
   
-  
+@login_required()
 def nowPlayingContextProcessor(request):
   now_playing = PlaylistEntry.objects.nowPlaying().song
   try:
