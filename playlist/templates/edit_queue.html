@@ -1,0 +1,35 @@
+{% extends "master.html" %}
+
+{% block title %}Song edit queue - GBS-FM{% endblock %}
+
+{% load filters %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block main %}
+<div class="playlist">
+
+{% for edit in edits %}
+  <div style="border-width: 1px; border-style: solid;">
+  <p> 
+    Edit to <a href="{% url playlist.views.artist edit.song.artist.id %}">{{edit.song.artist.name}}</a> - <a href="{% url playlist.views.song edit.song.id %}">{{edit.song.title}}</a> by <a href="{% url playlist.views.user edit.user.id %}">{{edit.user.username}}</a>
+  </p>
+  <p>
+    <a href="{% url playlist.views.edit_queue approve=edit.id %}">(approve)</a> <a href="{% url playlist.views.edit_queue deny=edit.id %}">(deny)</a> 
+    
+    {% for field in edit.fields %}
+      <p>{{field.name}}: {{field.old_value}} -> {{field.new_value}}</p>
+    {% empty %}
+      No edits were actually proposed. Weird.
+    {% endfor %}
+  </div>
+{% empty %}
+  No unapproved edits at the moment! Go outside and play, saddo.
+{% endfor %}
+  
+
+
+</div>
+{% endblock %} 

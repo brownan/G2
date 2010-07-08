@@ -597,33 +597,70 @@ def merge_song(request, mergeeid, mergerid):
 
   return HttpResponseRedirect(reverse('song', args=[mergee.id]))
 
+@permission_required('playlist.view_edits')
+def edit_queue(request, approve=None, deny=None):
+  if approve:
+    edit = SongEdit.objects.select_related().get(id=approve)
+    edit.apply(request.user)
+    return HttpResponseRedirect(reverse('edit_queue'))
+  if deny:
+    edit = SongEdit.objects.select_related().get(id=deny)
+    edit.deny(request.user)
+    return HttpResponseRedirect(reverse('edit_queue'))
+  
+  edits = SongEdit.objects.select_related().filter(applied=False, denied=False).order_by('created_at')
+  edits_list = []
+  for edit in edits:
+    edit_dict = {}
+    edit_dict['id'] = edit.id
+    edit_dict['song'] = edit.song
+    edit_dict['user'] = edit.requester
+    edit_dict['fields'] = []
+    for field_edit in edit.field_edits.all():
+      edit_dict['fields'].append({'name': field_edit.field,
+                        'old_value': getattr(edit.song, field_edit.field), 
+                        'new_value': field_edit.new_value
+                        })
+    edits_list.append(edit_dict)
+  return render_to_response('edit_queue.html', 
+         {'edits': edits_list},
+         context_instance=RequestContext(request)
+         )
+
 @permission_required('playlist.view_song')
 def song(request, songid=0, edit=None):
   try:
     song = Song.objects.select_related("uploader", "artist", "album", "location").get(id=songid)
   except Song.DoesNotExist:
     raise Http404 # render_to_response('song.html', {'error': 'Song not found.'})
-    
-  editform = SongForm(request.POST, instance=song)
-  if editform.is_valid():
-    if request.method == "POST" and (request.user.has_perm('playlist.edit_song') or (request.user == song.uploader)):
-      #user has correct permissions to edit song 
-      editform.save()
-      logging.info("User/mod %s (uid %d) edited songid %d at %s" % (request.user.username, request.user.id, song.id, now()))
-    else:
-      #queue a SongEdit
-      #MUST CHANGE IF TAGS CHANGE (sorry code nazis)
-      edit = SongEdit()
-      for field in ["title", "composer", "lyricist", "remixer", "genre", "track"]:
-        if getattr(editform, field) != getattr(editform.instance, field):
-          FieldEdit(field=field, new_value=getattr(editform, field), song_edit=edit).save()
-      if editform.instance.artist.name != editform.artist.name:
-        FieldEdit(field=field, new_value=editform.artist.name, song_edit=edit).save()
-      if editform.instance.artist.name != editform.artist.name:
-        FieldEdit(field=field, new_value=editform.artist.name, song_edit=edit).save()
-      edit.requester = request.user
-      edit.save()
-      request.user.message_set.create(message="Your edit has been queued for mod approval.")
+  
+
+  
+  if request.method == "POST":
+    editform = SongForm(request.POST, instance=song)
+    if editform.is_valid():
+      edit = False
+      if (request.user.has_perm('playlist.edit_song') or (request.user == song.uploader)):
+        #user has correct permissions to edit song 
+        editform.save()
+        logging.info("User/mod %s (uid %d) edited songid %d at %s" % (request.user.username, request.user.id, song.id, now()))
+      else:
+        #queue a SongEdit
+        old_song = Song.objects.get(id=editform.instance.id) #original version of song
+        edited_song = editform.save(commit=False) #edited version of song
+        
+        edit = SongEdit(requester=request.user, song=old_song)
+        edit.save()
+        #MUST CHANGE IF TAGS CHANGE (sorry code nazis)
+        for field in ["title", "composer", "lyricist", "remixer", "genre", "track"]:
+          if getattr(edited_song, field) != getattr(old_song, field):
+            FieldEdit(field=field, new_value=getattr(edited_song, field), song_edit=edit).save()
+        if old_song.artist.name != edited_song.artist.name:
+          FieldEdit(field="artist", new_value=edited_song.artist.name, song_edit=edit).save()
+        if old_song.album.name != edited_song.album.name:
+          FieldEdit(field="album", new_value=edited_song.album.name, song_edit=edit).save()
+
+        request.user.message_set.create(message="Your edit has been queued for mod approval.")
   else:
     editform = SongForm(instance=song)
     
@@ -652,7 +689,7 @@ def song(request, songid=0, edit=None):
   return render_to_response('song.html', \
   {'song': song, 'editform':editform, 'edit':edit,'commentform':commentform, 
   'currentuser':request.user, 'comments':comments, 'can_ban':can_ban, 'is_orphan':is_orphan, 
-  'banform':banform, 'can_delete':can_delete, 'can_edit':can_edit, 'vote':vote, 'path':path, 
+  'banform':banform, 'can_delete':can_delete, 'vote':vote, 'path':path, 
   'favourite' : favourite}, \
   context_instance=RequestContext(request))
 

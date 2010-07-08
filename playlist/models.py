@@ -17,6 +17,8 @@ from django.conf import settings
 from django.db.models.signals import pre_save
 from django.db.models import Avg, Count, Sum
 from django.db.models.query import QuerySet
+
+from playlist.utils import getObj
 from playlist.cue import CueFile
 from django.template.defaultfilters import force_escape
 
@@ -262,36 +264,51 @@ class FieldEdit(models.Model):
   """Represents an edit to a single field"""
   new_value = models.CharField(max_length=300, blank=False) 
   field = models.CharField(max_length=50, blank=False)
-  song_edit = models.ForeignKey("SongEdit", related_name="edits")
+  song_edit = models.ForeignKey("SongEdit", related_name="field_edits")
 
 class SongEdit(models.Model):
   """Represents an edit to a song made by an unprivilidged user which needs mod approval"""
   requester = models.ForeignKey(User, related_name="requested_edits")
   applied = models.BooleanField(default=False)
-  applied_by = models.ForeignKey(User, related_name="applied_edits", null=True, blank=True)
+  denied = models.BooleanField(default=False)
+  actioned_by = models.ForeignKey(User, related_name="actioned_edits", null=True, blank=True)
+  created_at = models.DateTimeField()
+  actioned_at = models.DateTimeField(null=True, default=None)
   song = models.ForeignKey("Song", related_name="requested_edits")
+  
+  def deny(self, denier):
+    if not self.denied or self.applied:
+      self.denied = True
+      self.actioned_by = denier
+      self.actioned_at = datetime.datetime.today()
+      self.save()
   
   def apply(self, applier):
     """Apply this edit to the song to which it is attached, setting it as applied by applier"""
-    for edit in self.edits.all():
-      if edit.field == "Artist":
-        song.artist = getObj(Artist, self.artist)
-      elif edit.field == "Album":
-        song.album = getObj(Album, self.album)
-      else:
-        setattr(song, field, edit.new_value)
+    if not (self.applied or self.denied):
+      for edit in self.field_edits.all():
+        if edit.field == "artist":
+          self.song.artist = getObj(Artist, edit.new_value)
+        elif edit.field == "album":
+          self.song.album = getObj(Album, edit.new_value)
+        else:
+          setattr(self.song, edit.field, edit.new_value)
 
-    song.save()
-    self.applied = True
-    self.applied_by = applier
-    self.save()
+      self.song.save()
+      self.applied = True
+      self.actioned_by = applier
+      self.actioned_at = datetime.datetime.today()
+      self.save()
     
   def add_note(self, author, note):
     EditNote(author=author, note=note, edit=self).save()
-      
     
-  
-
+  def save(self):
+    #ensure datetime is creation date
+    if not self.id:
+        self.created_at = datetime.datetime.today()
+    super(SongEdit, self).save()
+      
 class Song(models.Model):
   """Represents a song, containing all tags and other metadata"""
     #TODO: sort out artist/composer/lyricist/remixer stuff as per note
