@@ -313,6 +313,62 @@ class SongEdit(models.Model):
     permissions = (
     ("view_edits",  "g2 Can view & approve/deny SongEdits"), 
     )
+    
+class SongReport(model.Model):
+  song = models.ForeignKey("Song", related_name="reports")
+  reporter = models.ForeignKey(User, related_name="song_reports")
+  #reasons
+  corrupt = models.BooleanField(default=False)
+  not_music = models.BooleanField(default=False)
+  other = models.BooleanField(default=False)
+  duplicate = models.IntegerField(null=True)
+  
+  user_note = models.CharField(max_length=300, blank=True)
+  
+  created_at = models.DateTimeField()
+  actioned_at = models.DateTimeField(null=True)
+  actioned_by = models.ForeignKey(User, related_name="actioned_song_reports")
+  
+  approved = models.BooleanField(default=False)
+  denied = models.BooleanField(default=False)
+  
+  def approve(self, actioner):
+    """Approve the report, taking any necessary action"""
+    if denied: return
+    self.actioned_at = datetime.datetime.today()
+    self.actioned_by = actioner
+    self.approved = True
+    self.save()
+    
+    if corrupt:
+      #delete song
+      self.song.delete() 
+      return #song has gone!
+      
+    if duplicate:
+      #asume songid exists: earlier checks should be made
+      dupe = Song.objects.get(id=duplicate)
+      dupe.merge(self.song)
+      return #song has gone!
+      
+    if not_music:
+      self.song.ban("This dong is not music.")
+      
+  def deny(self, actioner):
+    """Deny the report"""
+    if approved: return
+    
+    self.actioned_at = datetime.datetime.today()
+    self.actioned_by = actioner
+    self.denied = True
+    self.save()
+  
+  
+  def save(self):
+    #ensure datetime is creation date
+    if not self.id:
+        self.created_at = datetime.datetime.today()
+    super(SongReport, self).save()
       
 class Song(models.Model):
   """Represents a song, containing all tags and other metadata"""
@@ -464,18 +520,7 @@ class Song(models.Model):
     c = Comment(text=comment, user=user, song=self, time=time)
     c.save()    
     return time #for API
-    
-  def save(self):
-    #ensure add_date is creation date
-    if not self.id:
-        self.add_date = datetime.datetime.today()
-    super(Song, self).save()
-    
-  def delete(self):
-    #prune artist if now empty
-    if self.artist.songs.count() <= 1:
-        self.artist.delete()
-    super(Song, self).delete()
+
     
   def getPlayCount(self):
     return OldPlaylistEntry.objects.filter(song=self).count()
@@ -514,6 +559,18 @@ class Song(models.Model):
       
     song.delete()
     
+      
+  def save(self):
+    #ensure add_date is creation date
+    if not self.id:
+        self.add_date = datetime.datetime.today()
+    super(Song, self).save()
+    
+  def delete(self):
+    #prune artist if now empty
+    if self.artist.songs.count() <= 1:
+        self.artist.delete()
+    super(Song, self).delete()
         
     
     
