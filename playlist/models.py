@@ -314,20 +314,21 @@ class SongEdit(models.Model):
     ("view_edits",  "g2 Can view & approve/deny SongEdits"), 
     )
     
-class SongReport(model.Model):
-  song = models.ForeignKey("Song", related_name="reports")
-  reporter = models.ForeignKey(User, related_name="song_reports")
+class SongReport(models.Model):
+  song = models.ForeignKey("Song", related_name="reports", editable=False)
+  reporter = models.ForeignKey(User, related_name="song_reports", editable=False)
   #reasons
   corrupt = models.BooleanField(default=False)
   not_music = models.BooleanField(default=False)
   other = models.BooleanField(default=False)
-  duplicate = models.IntegerField(null=True)
+  is_duplicate = models.BooleanField(default=False)
+  duplicate = models.ForeignKey("Song", null=True)
   
   user_note = models.CharField(max_length=300, blank=True)
   
   created_at = models.DateTimeField()
   actioned_at = models.DateTimeField(null=True)
-  actioned_by = models.ForeignKey(User, related_name="actioned_song_reports")
+  actioned_by = models.ForeignKey(User, related_name="actioned_song_reports", null=True)
   
   approved = models.BooleanField(default=False)
   denied = models.BooleanField(default=False)
@@ -339,16 +340,16 @@ class SongReport(model.Model):
     self.actioned_by = actioner
     self.approved = True
     self.save()
-    
-    if corrupt:
-      #delete song
-      self.song.delete() 
-      return #song has gone!
       
     if duplicate:
       #asume songid exists: earlier checks should be made
       dupe = Song.objects.get(id=duplicate)
       dupe.merge(self.song)
+      return #song has gone!
+    
+    if corrupt:
+      #delete song
+      self.song.delete() 
       return #song has gone!
       
     if not_music:

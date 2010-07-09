@@ -626,6 +626,31 @@ def edit_queue(request, approve=None, deny=None):
          {'edits': edits_list},
          context_instance=RequestContext(request)
          )
+         
+@login_required()
+def song_report(request, songid):
+  """View for song report page, handling displaying report form and saving report form data."""
+  try:
+    song = Song.objects.select_related().get(id=songid)
+  except Song.DoesNotExit:
+    raise Http404
+  
+  if request.method == "POST":
+    report_form = ReportForm(request.POST)
+    if report_form.is_valid():
+      report = report_form.save(commit=False)
+      report.song = song
+      report.reporter = request.user
+      report.save()
+      request.user.message_set.create(message="Dong successfully reported.")
+      return HttpResponseRedirect(reverse('song', kwargs={'songid': songid}))
+  else:
+    report_form = ReportForm()
+    
+  return render_to_response('song_report.html', 
+        {'form': report_form, 'song': song},
+        context_instance=RequestContext(request)
+        )  
 
 @permission_required('playlist.view_song')
 def song(request, songid=0, edit=None):

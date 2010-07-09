@@ -42,6 +42,9 @@
           {% endif %}
         </a>
       {% endif %}
+      <a href='{% url playlist.views.song_report song.id %}'>
+        <img src="images/exclamation.png" title="Report this dong" alt="report" />
+      </a>
     </td>
 {% if edit %}
 <form action='{% url playlist.views.song song.id %}' method="post">

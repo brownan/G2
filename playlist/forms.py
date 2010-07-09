@@ -11,7 +11,6 @@ class StringObjectField(forms.CharField):
   
   def __init__(self, model, *args, **kwargs):
     self.model = model
-    #kwargs['initial'] = kwargs['initial'].name
     forms.CharField.__init__(self, *args, **kwargs)
     
   def to_python(self, value):
@@ -22,6 +21,26 @@ class StringObjectField(forms.CharField):
     if not isinstance(value, self.model):
       return getObj(self.model, value)
     return value
+    
+class SongIDField(forms.CharField):
+  """Converts a song ID to a song instance, raising a ValidationError if it doesn't exist."""
+  
+  def __init__(self, *args, **kwargs):
+    forms.CharField.__init__(self, *args, **kwargs)
+    
+  def clean(self, value):
+    if value == 0 or value == "":
+      return None
+    try:
+      value = int(value)
+    except ValueError:
+      raise forms.ValidationError, "The ID must be numeric"
+    try:
+      song = Song.objects.get(id=value)
+    except Song.DoesNotExist:
+      raise forms.ValidationError, "The given ID is invalid!"
+    
+    return song
   
 
 class UploadFileForm(forms.Form):
@@ -73,6 +92,13 @@ class BanForm(forms.Form):
   
 class RegisterForm(UserCreationForm):
   passcode = forms.CharField(max_length=50)
+  
+class ReportForm(forms.ModelForm):
+  duplicate = SongIDField()
+  
+  class Meta:
+    model = SongReport
+    fields = ['corrupt', 'is_duplicate', 'duplicate', 'not_music', 'other', 'user_note']
 
   
 class NewRegisterForm(forms.Form):
