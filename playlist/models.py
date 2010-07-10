@@ -370,6 +370,11 @@ class SongReport(models.Model):
     if not self.id:
         self.created_at = datetime.datetime.today()
     super(SongReport, self).save()
+    
+  class Meta:
+    permissions = (
+    ("approve_reports",  "g2 Can view & approve/deny SongEdits"), 
+    )
       
 class Song(models.Model):
   """Represents a song, containing all tags and other metadata"""

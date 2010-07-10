@@ -626,7 +626,22 @@ def edit_queue(request, approve=None, deny=None):
          {'edits': edits_list},
          context_instance=RequestContext(request)
          )
-         
+
+@permission_required('playlist.approve_reports')
+def reports(request, approve=None, deny=None):
+  if approve:
+    report = SongReport.objects.select_related().get(id=approve)
+    report.approve(request.user)
+    return HttpResponseRedirect(reverse('reports'))
+  if deny:
+    report = SongReport.objects.select_related().get(id=deny)
+    report.deny(request.user)
+    return HttpResponseRedirect(reverse('reports'))
+  reports = SongReport.objects.select_related().filter(approved=False, denied=False).order_by('created_at')
+  return render_to_response('reports.html', 
+        {'reports': reports},
+        context_instance=RequestContext(request)
+        )   
 @login_required()
 def song_report(request, songid):
   """View for song report page, handling displaying report form and saving report form data."""
@@ -644,6 +659,9 @@ def song_report(request, songid):
       report.save()
       request.user.message_set.create(message="Dong successfully reported.")
       return HttpResponseRedirect(reverse('song', kwargs={'songid': songid}))
+    else:
+      for field in report_form:
+        print field.errors
   else:
     report_form = ReportForm()
     

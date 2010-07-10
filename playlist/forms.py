@@ -27,18 +27,32 @@ class SongIDField(forms.CharField):
   
   def __init__(self, *args, **kwargs):
     forms.CharField.__init__(self, *args, **kwargs)
-    
-  def clean(self, value):
-    if value == 0 or value == "":
-      return None
+  
+  def to_python(self, value):
+    value = super(forms.CharField, self).to_python(value)
     try:
       value = int(value)
     except ValueError:
-      raise forms.ValidationError, "The ID must be numeric"
+      raise forms.ValidationError, "The duplicate ID must be numeric"
     try:
       song = Song.objects.get(id=value)
     except Song.DoesNotExist:
-      raise forms.ValidationError, "The given ID is invalid!"
+      raise forms.ValidationError, "The given duplicate ID is invalid!"
+    return song
+  
+  def clean(self, value):
+    if value == 0 or value == "":
+      return None
+    if isinstance(value, Song):
+      return value
+    try:
+      value = int(value)
+    except ValueError:
+      raise forms.ValidationError, "The duplicate ID must be numeric"
+    try:
+      song = Song.objects.get(id=value)
+    except Song.DoesNotExist:
+      raise forms.ValidationError, "The given duplicate ID is invalid!"
     
     return song
   
@@ -94,7 +108,7 @@ class RegisterForm(UserCreationForm):
   passcode = forms.CharField(max_length=50)
   
 class ReportForm(forms.ModelForm):
-  duplicate = SongIDField()
+  duplicate = SongIDField(required=False)
   
   class Meta:
     model = SongReport
