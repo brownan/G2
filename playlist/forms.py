@@ -81,6 +81,7 @@ class SongForm(forms.ModelForm):
   album = StringObjectField(Album, max_length=300) #they should be filled in the template 
   class Meta:
     model = Song
+    fields = ["artist", "album", "track", "title", "composer", "remixer", "genre"]
     
   
   #def clean_artist(self):
