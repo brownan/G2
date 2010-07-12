@@ -571,6 +571,7 @@ class Song(models.Model):
         setattr(self, tag, getattr(song, tag))
       
     song.delete()
+    self.save()
     
       
   def save(self):
