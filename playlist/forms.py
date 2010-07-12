@@ -112,7 +112,7 @@ class ReportForm(forms.ModelForm):
   
   class Meta:
     model = SongReport
-    fields = ['corrupt', 'is_duplicate', 'duplicate', 'not_music', 'other', 'user_note']
+    fields = ['corrupt', 'duplicate', 'not_music', 'other', 'user_note']
 
   
 class NewRegisterForm(forms.Form):

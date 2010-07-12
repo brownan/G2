@@ -321,7 +321,6 @@ class SongReport(models.Model):
   corrupt = models.BooleanField(default=False)
   not_music = models.BooleanField(default=False)
   other = models.BooleanField(default=False)
-  is_duplicate = models.BooleanField(default=False)
   duplicate = models.ForeignKey("Song", null=True)
   
   user_note = models.CharField(max_length=300, blank=True)
@@ -329,7 +328,6 @@ class SongReport(models.Model):
   created_at = models.DateTimeField()
   actioned_at = models.DateTimeField(null=True)
   actioned_by = models.ForeignKey(User, related_name="actioned_song_reports", null=True)
-  
   approved = models.BooleanField(default=False)
   denied = models.BooleanField(default=False)
   
@@ -344,9 +342,10 @@ class SongReport(models.Model):
     if self.duplicate:
       #asume songid exists: earlier checks should be made
       dupe = self.duplicate
+      song = self.song
       self.song = None
       self.save() #avoid cascaded deletion
-      dupe.merge(self.song)
+      dupe.merge(song)
       return #song has gone!
     
     if self.corrupt:
