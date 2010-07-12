@@ -1,0 +1,30 @@
+{% extends "master.html" %}
+
+{% block title %}Reporting {{song.artist.name}} - {{song.title}} - GBS-FM{% endblock %}
+
+{% load filters %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block main %}
+<div class="playlist">
+{% for field in form %}
+  {{field.errors}}
+{% endfor %}
+<h1>Reporting {{song.artist.name}} - {{song.title}}</h1>
+<form action="{% url playlist.views.song_report songid=song.id %}" method="post">
+    <p>{{form.corrupt}}  <span style="font-weight: bold;">Corrupt:</span> use if this dong cuts off or has other major problems. If you can, please upload or find a better version and report this as a duplicate instead so we don't lose any juicy statistics.</p>
+    {{form.corrupt.errors}}
+    <p><span style="font-weight: bold;">Duplicate:</span> use if this dong is a duplicate of another dong (different versions of the same dong don't count). Ideally, you should report the lower-quality dong and leave the better one alone. Enter the duplicate dong's id here: {{form.duplicate}} </p>
+    {{form.duplicate.errors}}
+    <p>{{form.not_music}} <span style="font-weight: bold;">Not music:</span> use if this dong is obviously not music - essentially the only thing that qualifies for this is spoken word unless you enjoy big annoying arguments that don't achieve anything.</p>
+    {{form.not_music.errors}}
+    <p>{{form.other}} <span style="font-weight: bold;">Other:</span> use for any other reasonable issue with this dong.</p>
+    <p>Any further comments or explanation? {{form.user_note}}</p>
+    {{form.user_note.errors}}
+    <input type="submit" value="Submit" />
+</form>
+</div>
+{% endblock %} 

@@ -1,0 +1,45 @@
+{% extends "master.html" %}
+
+{% block title %}Report - GBS-FM{% endblock %}
+
+{% load filters %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block main %}
+<div class="playlist">
+{% for report in reports %}
+  <div style="border-width: 1px; border-style: solid;">
+  <a href="{% url playlist.views.artist report.song.artist.id %}">{{report.song.artist.name}}</a> - <a href="{% url playlist.views.song report.song.id %}">{{report.song.title}}</a> by <a href="{% url playlist.views.user report.reporter.id %}">{{report.reporter.username}}</a>
+  
+  <ul>
+  {% if report.duplicate %}
+    <li>Duplicate with <a href="{% url playlist.views.artist report.duplicate.artist.id %}">{{report.duplicate.artist.name}}</a> - <a href="{% url playlist.views.song report.duplicate.id %}">{{report.duplicate.title}}</a></li>
+  {% endif %}
+  {% if report.corrupt %}
+    <li>Marked corrupt</li>
+  {% endif %}
+  {% if report.not_music %}
+    <li>Marked "not music"</li>
+  {% endif %}
+  {% if report.other %}
+    <li>Marked "other"</li>
+  {% endif %}
+  {% if report.user_note %}
+    <li>User note: {{report.user_note}}
+  {% endif %}
+  </ul>
+  
+  <p> Approving this will <em>{% if report.duplicate %}merge{% else %}{% if report.corrupt %}delete{% else %}{% if report.not_music %}ban{% else %}do nothing to{% endif %}{% endif %}{% endif %}</em> this dong.</p>
+  <p><a href="{% url playlist.views.reports approve=report.id %}">(approve)</a> <a href="{% url playlist.views.reports deny=report.id %}">(deny)</a></p>
+  
+  
+  </div>
+{% empty %}
+No reports at the moment. Our dongs are being very obedient. 
+{% endfor %}
+
+</div>
+{% endblock %} 

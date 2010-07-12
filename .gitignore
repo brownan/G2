@@ -20,4 +20,10 @@ playlist/ftpd.lines.log
 playlist/ftpd.log
 playlist/search.py
 sql.log
+dump_*
+mysql
+nohup.out
+out.sql
+playlist/logic/ices.cue
+playlist/migrations/
 
