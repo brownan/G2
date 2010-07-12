@@ -315,7 +315,7 @@ class SongEdit(models.Model):
     )
     
 class SongReport(models.Model):
-  song = models.ForeignKey("Song", related_name="reports", editable=False)
+  song = models.ForeignKey("Song", related_name="reports", editable=False, null=True)
   reporter = models.ForeignKey(User, related_name="song_reports", editable=False)
   #reasons
   corrupt = models.BooleanField(default=False)
@@ -335,29 +335,31 @@ class SongReport(models.Model):
   
   def approve(self, actioner):
     """Approve the report, taking any necessary action"""
-    if denied: return
+    if self.denied: return
     self.actioned_at = datetime.datetime.today()
     self.actioned_by = actioner
     self.approved = True
     self.save()
       
-    if duplicate:
+    if self.duplicate:
       #asume songid exists: earlier checks should be made
-      dupe = Song.objects.get(id=duplicate)
+      dupe = self.duplicate
+      self.song = None
+      self.save() #avoid cascaded deletion
       dupe.merge(self.song)
       return #song has gone!
     
-    if corrupt:
+    if self.corrupt:
       #delete song
       self.song.delete() 
       return #song has gone!
       
-    if not_music:
+    if self.not_music:
       self.song.ban("This dong is not music.")
       
   def deny(self, actioner):
     """Deny the report"""
-    if approved: return
+    if self.approved: return
     
     self.actioned_at = datetime.datetime.today()
     self.actioned_by = actioner

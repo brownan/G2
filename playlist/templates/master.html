@@ -350,6 +350,9 @@ $(document).ready(function(){
     {% if perms.playlist.view_edits %}
     <li><a href="{% url edit_queue %}" class="boxed">&nbsp;edit queue</a></li> 
     {% endif %}
+    {% if perms.playlist.approve_reports %}
+    <li><a href="{% url reports %}" class="boxed">&nbsp;reports</a></li> 
+    {% endif %}
     {% if perms.playlist.view_g2admin %}
     <li><a href="{% url g2admin %}" class="boxed">&nbsp;g2 admin</a></li> 
     <!-- TODO: shut django up about the other one
