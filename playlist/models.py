@@ -30,6 +30,7 @@ class DuplicateError(Exception): pass
 class ScoreOutOfRangeError(Exception): pass
 class AddError(Exception): pass
 class FileTooBigError(Exception): pass
+class SongPlayingError(Exception): pass
 
 
 
@@ -537,7 +538,8 @@ class Song(models.Model):
     Merge song into this one, copying all relevent metadata (like comments and votes) 
     then deleting it.
     """
-    
+    if PlaylistEntry.objects.nowPlaying().song == song:
+      raise SongPlayingError, "song merged is playing at the moment"
     for comment in song.comments.all():
       self.comments.add(comment)
     
@@ -555,6 +557,10 @@ class Song(models.Model):
       self.avgscore = stats['avg_score'] 
       
     for entry in song.oldentries.all():
+      entry.song = self
+      entry.save()
+      
+    for entry in song.entries.all():
       entry.song = self
       entry.save()
       
