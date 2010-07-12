@@ -348,10 +348,10 @@ $(document).ready(function(){
     <li><a href="#" class="boxed" onclick="flashplaypop();">&nbsp;flash player</a></li> 
     <li><a href="{% url django.contrib.auth.views.logout %}" class="boxed">&nbsp;logout</a></li> 
     {% if perms.playlist.view_edits %}
-    <li><a href="{% url edit_queue %}" class="boxed">&nbsp;edit queue</a></li> 
+    <li><a href="{% url edit_queue %}" class="boxed {% if new_edits %}new{% endif %}">&nbsp;edit queue</a></li> 
     {% endif %}
     {% if perms.playlist.approve_reports %}
-    <li><a href="{% url reports %}" class="boxed">&nbsp;reports</a></li> 
+    <li><a href="{% url reports %}" class="boxed {% if new_reports %}new{% endif %}">&nbsp;reports</a></li> 
     {% endif %}
     {% if perms.playlist.view_g2admin %}
     <li><a href="{% url g2admin %}" class="boxed">&nbsp;g2 admin</a></li> 

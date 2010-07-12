@@ -692,19 +692,18 @@ def song(request, songid=0, edit=None):
         old_song = Song.objects.get(id=editform.instance.id) #original version of song
         edited_song = editform.save(commit=False) #edited version of song
         
-        edit = SongEdit(requester=request.user, song=old_song)
-        edit.save()
+        song_edit = SongEdit(requester=request.user, song=old_song)
+        song_edit.save()
         #MUST CHANGE IF TAGS CHANGE (sorry code nazis)
         for field in ["title", "composer", "lyricist", "remixer", "genre", "track"]:
           if getattr(edited_song, field) != getattr(old_song, field):
-            FieldEdit(field=field, new_value=getattr(edited_song, field), song_edit=edit).save()
+            FieldEdit(field=field, new_value=getattr(edited_song, field), song_edit=song_edit).save()
         if old_song.artist.name != edited_song.artist.name:
-          FieldEdit(field="artist", new_value=edited_song.artist.name, song_edit=edit).save()
+          FieldEdit(field="artist", new_value=edited_song.artist.name, song_edit=song_edit).save()
         if old_song.album.name != edited_song.album.name:
-          FieldEdit(field="album", new_value=edited_song.album.name, song_edit=edit).save()
+          FieldEdit(field="album", new_value=edited_song.album.name, song_edit=song_edit).save()
 
         request.user.message_set.create(message="Your edit has been queued for mod approval.")
-      edit = None
   else:
     editform = SongForm(instance=song)
     

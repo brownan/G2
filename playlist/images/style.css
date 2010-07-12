@@ -122,6 +122,12 @@ a.boxed, #id_query {
   margin:105px 0px 0px 0px;
   padding-left:22px;
 }
+
+#mainmenu a.new {
+  font-weight: bold;
+  color: red;
+}
+
 #mainmenu li {
   margin-bottom:3px;
 }
