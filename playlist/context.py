@@ -3,34 +3,35 @@
 from playlist.utils import gbsfmListenerCount, ghettoListenerCount
 from playlist.cue import CueFile
 from playlist.models import PlaylistEntry, Rating, SongReport, SongEdit
-from django.contrib.auth.decorators import permission_required, login_required
 
 from django.db import connection
 from django.conf import settings
 
-@login_required()
 def listenersContextProcessor(request):
+  if not request.user.is_authenticated(): return {}
   return {
     'gbsfm_listeners': gbsfmListenerCount(),
     'ghetto_listeners': ghettoListenerCount()
   }
   
-@permission_required("playlist.approve_reports")
 def newReportsContextProcessor(request):
+  if not request.user.has_perm('playlist.approve_reports'): return {}
+  
   if SongReport.objects.filter(approved=False, denied=False):
     return {'new_reports': True}
   else:
     return {'new_reports': False}
   
-@permission_required("playlist.view_edits")
 def newEditsContextProcessor(request):
+  if not request.user.has_perm("playlist.view_edits"): return {}
+  
   if SongEdit.objects.filter(applied=False, denied=False):
     return {'new_edits': True}
   else:
     return {'new_edits': False}
   
-@login_required()
 def positionContextProcessor(request):
+  if not request.user.is_authenticated(): return {}
   cue = CueFile(settings.LOGIC_DIR + "/ices.cue")
   d = {}
   try:
@@ -43,8 +44,8 @@ def positionContextProcessor(request):
     d['song_length'] = now_playing.length
   return d
   
-@login_required()
 def commentProcessor(request):
+  if not request.user.is_authenticated(): return {}
   try:
     now_playing = PlaylistEntry.objects.nowPlaying().song
   except PlaylistEntry.DoesNotExist:
@@ -64,8 +65,8 @@ def commentProcessor(request):
   
   return {'curr_comments': comments, 'last_comment': last_comment}
   
-@login_required()
 def nowPlayingContextProcessor(request):
+  if not request.user.is_authenticated(): return {}
   now_playing = PlaylistEntry.objects.nowPlaying().song
   try:
     user_vote =  int(now_playing.ratings.get(user=request.user).score)

@@ -2,7 +2,8 @@
 
 """
 Post Markup
-Author: Will McGugan (http://www.willmcgugan.com)
+Original Author: Will McGugan (http://www.willmcgugan.com)
+(modified by jonnty)
 """
 
 __version__ = "1.1.4"
