@@ -16,7 +16,7 @@
   
   <ul>
   {% if report.duplicate %}
-    <li>Duplicate with <a href="{% url playlist.views.artist report.duplicate.artist.id %}">{{report.duplicate.artist.name}}</a> - <a href="{% url playlist.views.song report.duplicate.id %}">{{report.duplicate.title}}</a></li>
+    <li>Duplicate of <a href="{% url playlist.views.artist report.duplicate.artist.id %}">{{report.duplicate.artist.name}}</a> - <a href="{% url playlist.views.song report.duplicate.id %}">{{report.duplicate.title}}</a></li>
   {% endif %}
   {% if report.corrupt %}
     <li>Marked corrupt</li>
