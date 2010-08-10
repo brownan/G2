@@ -51,7 +51,7 @@ from django.views.generic.list_detail import object_list
 
 from playlist.forms import *
 from playlist.models import *
-from playlist.utils import getSong, getObj, listenerCount
+from playlist.utils import getSong, getObj, gbsfmListenerCount, ghettoListenerCount
 from playlist.upload import UploadedFile
 from playlist.search import Search
 from playlist.cue import CueFile
@@ -475,7 +475,7 @@ def api(request, resource=""):
     #return HttpResponse(playlistinfo)
       
   if resource == "listeners":
-    return HttpResponse(listenerCount())
+    return HttpResponse(gbsfmListenerCount() + " " + ghettoListenerCount())
     
   if resource == "users":
     return HttpResponse(Users.objects.all().count())
