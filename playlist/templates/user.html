@@ -17,6 +17,13 @@
       View user's uploads
     </a>
   <p>
+  {% if owner.get_profile.sa_id %}
+  <p>
+    <a id="menuitem" href="http://forums.somethingawful.com/member.php?action=getinfo&userid={{owner.get_profile.sa_id}}">
+      Something Awful profile
+    </a>
+  </p>
+  {% endif %}
   
   </div>
  
