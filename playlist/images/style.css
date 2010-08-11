@@ -6,7 +6,8 @@ a.boxed:hover {
   background-color:#E0F290; 
   text-decoration: none;} /* BUTTON HOVER */
 #bottomcont { background:#A1D29D url('thintop1.png') repeat-x; } /* BOTTOM BAR BG */
-#leftmenu { background:#A1D29D url('g2log2.png') no-repeat center bottom; } /* MENU BG */
+#leftmenu { background:#A1D29D url('g2log3.png') no-repeat center bottom; } /* MENU BG */
+
 #noticearea { background:#A1D29D url('thintop1.png') repeat-x; } /* NOTICE BOX BG */
 #messages { background:rgba(224,242,144,0.5) url('thintop1.png') repeat-x; } /* SONG ADDED MESSAGES ETC BG */
 div#progbar { background-color:#000; } /* PROGRESS BAR FILL COLOUR */
@@ -54,7 +55,7 @@ body {
 }
 #leftmenulogo {
   position:absolute;
-  background-image:url('logo3.png');
+  background-image:url('logo_3.png');
   width:100px;
   height:100px;
 }
