@@ -137,10 +137,11 @@ function setupComment() {
   commentbox = $('#commentbox');
   commentbox.removeAttr("disabled") //enable it
   commentbox.css('color', 'grey');
-  commentbox.attr('value', "Comment on this track...");
+  message = "Comment on this track here. Bad things will happen to people who use this for general chat!";
+  commentbox.attr('value', message);
   
   commentbox.focus(function () {
-    if (commentbox.attr('value') == "Comment on this track...") {
+    if (commentbox.attr('value') == message) {
       //clear it and set text to normal colour when in focus
       commentbox.attr('value', '');
       commentbox.css('color', 'black');
@@ -393,8 +394,8 @@ $(document).ready(function(){
  
       <div id="leftist"> 
         <form action="#" method="post" id="commentform">
-          <input accesskey="c" id="commentbox" name="query" maxlength="400" type="text" 
-                 value="You need to enable javascript to use the live comments system." disabled="disabled">
+          <input accesskey="c" autocomplete="off" id="commentbox" name="query" maxlength="400" type="text" 
+                 value="You need to enable javascript to use the live comments system." disabled="disabled" />
         </form> 
         <div id="commentsbox"> 
           <a id="expandbutt" href="#" title="expand comment box"></a> 
