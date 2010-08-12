@@ -71,18 +71,16 @@ def error_logger(msg):
     f3.flush()
   
 if __name__ == "__main__":
-  try:
-    f1 = open('ftpd.log', 'a')
-    f2 = open('ftpd.lines.log', 'a')
-    f3 = open('ftpd.error.log', 'a')
-    ftpserver.log = standard_logger
-    ftpserver.logline = line_logger
-    ftpserver.logerror = error_logger
-    authorizer = G2Authorizer()
-    ftp_handler = G2FTPHandler
-    ftp_handler.authorizer = authorizer
-    address = ('', 2100)
-    ftpd = ftpserver.FTPServer(address, ftp_handler)
-    ftpd.serve_forever()
-  except Exception, e:
-    f2.write(e.args)
+  f1 = open('ftpd.log', 'a')
+  f2 = open('ftpd.lines.log', 'a')
+  f3 = open('ftpd.error.log', 'a')
+  ftpserver.log = standard_logger
+  ftpserver.logline = line_logger
+  ftpserver.logerror = error_logger
+  authorizer = G2Authorizer()
+  ftp_handler = G2FTPHandler
+  ftp_handler.authorizer = authorizer
+  address = ('', 2100)
+  ftpd = ftpserver.FTPServer(address, ftp_handler)
+  ftpd.serve_forever()
+
