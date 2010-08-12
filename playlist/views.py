@@ -196,7 +196,7 @@ def ajax(request):
       events.append(('songLength', PlaylistEntry.objects.nowPlaying().song.length))
       #new comments needed
       events.append(('clearComments', ''))
-      comments = server_playing.song.comments.all().order_by("datetime") #ensure oldest first - new comments are placed at top of update list
+      comments = server_playing.song.comments.all().order_by("time") #ensure oldest first - new comments are placed at top of update list
       for comment in comments:
         events.append(comment.ajaxEvent())
     else:
@@ -265,8 +265,6 @@ def api(request, resource=""):
   #authentication
   if request.user.is_authenticated():
     user = request.user
-    
-    
   else: #non-persistent authentication for things like bots and clients
     try:
       username = request.REQUEST['username']
@@ -275,7 +273,6 @@ def api(request, resource=""):
         username = User.objects.get(id=request.REQUEST['userid']).username
       except (User.DoesNotExist, KeyError):
         return HttpResponseForbidden()
-        
     try: #try using password
       password = request.REQUEST['password']
       user = authenticate(username=username, password=password)
@@ -290,6 +287,9 @@ def api(request, resource=""):
           return HttpResponseForbidden()
       except (KeyError, User.DoesNotExist):
         return HttpResponseForbidden()
+        
+  if resource == "nop":
+    return HttpResponse("1")
         
   if resource == "nowplaying":
     try:
