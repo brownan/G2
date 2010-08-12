@@ -148,6 +148,13 @@ function setupComment() {
     }
   });
   
+  commentbox.blur(function () {
+    if (commentbox.attr('value') == '') {
+      //clear it and set text to normal colour when in focus
+      commentbox.attr('value', message);
+      commentbox.css('color', 'grey');
+    }
+  });
 }
 
  
