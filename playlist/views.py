@@ -320,7 +320,7 @@ def api(request, resource=""):
     adds = PlaylistEntry.objects.extra(select={"user_vote": "SELECT ROUND(score, 0) FROM playlist_rating WHERE playlist_rating.user_id = \
     %s AND playlist_rating.song_id = playlist_playlistentry.song_id", "avg_score": "SELECT AVG(playlist_rating.score) FROM playlist_rating WHERE playlist_rating.song_id = playlist_playlistentry.song_id", "vote_count": "SELECT COUNT(*) FROM playlist_rating WHERE playlist_rating.song_id = playlist_playlistentry.song_id"},
     select_params=[request.user.id]).select_related("song__artist", "song__album", "song__uploader", "adder").order_by('addtime').filter(id__gt=lastid)
-    data = serialize("json", adds, relations={'song':{'relations':('artist'), 'fields':('title', 'length', 'artist')}, 'adder':{'fields':('username')}})
+    data = serialize("json", adds, relations={'song':{'relations':('artist'), 'fields':('title', 'length', 'artist', 'avgscore')}, 'adder':{'fields':('username')}})
     return HttpResponse(data)
     
   #if resource == "history":
