@@ -408,7 +408,7 @@ $(document).ready(function(){
           <a id="expandbutt" href="#" title="expand comment box"></a> 
           {% for comment in curr_comments %}
             <p class="comment" title="{{comment.html_title}}">
-              [{{comment.time|stom}}] &lt;{{comment.commenter}}&gt; {{comment.body}}
+              [{{comment.time}}] &lt;{{comment.commenter}}&gt; {{comment.body}}
             </p>
           {% endfor %}
         </div> 
