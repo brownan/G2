@@ -354,7 +354,7 @@ $(document).ready(function(){
     <li><a href="http://gbs.fm:8080/listen.pls" class="boxed">&nbsp;listen!</a></li> 
     <li><a href="http://mibbit.com/?channel=%23gbs-fm&server=irc.buttes.org" class="boxed">&nbsp;live irc chat!</a></li> 
     <!--<li><a href="#" class="boxed" onclick="flashplaypop();">&nbsp;flash player</a></li> -->
-    <li><a href="{% url django.contrib.auth.views.logout %}" class="boxed">&nbsp;logout</a></li> 
+    <li><a href="{% url django.contrib.auth.views.logout_then_login %}" class="boxed">&nbsp;logout</a></li> 
     {% if perms.playlist.view_edits %}
     <li><a href="{% url edit_queue %}" class="boxed {% if new_edits %}new{% endif %}">&nbsp;edit queue</a></li> 
     {% endif %}
