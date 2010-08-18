@@ -1001,7 +1001,8 @@ def newregister(request):
         user.groups.add(g)
         user.save()
         up = UserProfile(user=user)
-        up.sa_id = profile.get_id()
+        if LIVE:
+          up.sa_id = profile.get_id()
         up.save()
         return HttpResponseRedirect(reverse(django.contrib.auth.views.login))
     else:
