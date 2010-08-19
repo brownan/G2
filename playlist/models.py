@@ -136,6 +136,8 @@ class UserProfile(models.Model):
   
   def uploadSong(self, upload):
     """Add an UploadedSong to the database if allowed"""
+    if not user.has_perm("can_upload"):
+      return #do nothing while cackling quietly
     try:
       Song.objects.get(sha_hash=upload.info['sha_hash'])
     except Song.DoesNotExist: pass
@@ -150,7 +152,7 @@ class UserProfile(models.Model):
     upload.info['uploader'] = self.user
     s = upload.store()
     
-    if s.length > settings.MAX_SONG_LENGTH: #10 mins
+    if s.length > settings.MAX_SONG_LENGTH: #11 mins
       s.ban("Autobahned because the dong is too long. Ask a mod to unban it if you want to play it.")
     s.save()
     
