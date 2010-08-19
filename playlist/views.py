@@ -167,7 +167,8 @@ def ajax(request):
     
     #check for submitted comment
     try:
-      comment = request.REQUEST['comment']
+      if request.user.has_perm("can_comment"):
+        comment = request.REQUEST['comment']
     except KeyError:
       pass
     else:
@@ -176,7 +177,8 @@ def ajax(request):
       
     #check for submitted vote
     try:
-      vote = request.REQUEST['vote']
+      if request.user.has_perm("can_vote"):
+        vote = request.REQUEST['vote']
     except KeyError:
       pass
     else:
@@ -407,6 +409,8 @@ def api(request, resource=""):
     return HttpResponse(str(song.id) + "\n" + song.metadataString())
   
   if resource == "vote":
+    if not user.has_perm("playlist.can_vote"):
+      return HttpResponseForbidden()
     try:
       vote = float(request.REQUEST['vote'])
     except KeyError:
@@ -417,6 +421,8 @@ def api(request, resource=""):
     return HttpResponse(str(prevscore) + " " +song.metadataString())
   
   if resource == "comment":
+    if not user.has_perm("playlist.can_comment"):
+      return HttpResponseForbidden()
     try:
       comment = request.REQUEST['comment']
     except KeyError:
@@ -435,6 +441,8 @@ def api(request, resource=""):
       return HttpResponse(str(length['seconds']) + '\n' + str(length['song_count']))
   
   if resource == "add":
+    if not user.has_perm("playlist.queue_song"):
+      return HttpResponseForbidden()
     try:
       song = Song.objects.select_related().get(id=request.REQUEST['songid'])
     except (KeyError, Song.DoesNotExist):
