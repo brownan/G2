@@ -4,6 +4,7 @@ import os
 import os.path
 import threading
 import time
+import errno
 
 sys.path.append('/home/jonnty/Python/pydj/pydj/playlist')
 sys.path.append('/home/jonnty/Python/pydj/')
@@ -41,13 +42,15 @@ class G2FTPHandler(ftpserver.FTPHandler):
 
 class G2Authorizer(ftpserver.DummyAuthorizer):
   def validate_authentication(self, username, password):
+    User.objects.update() #avoid THE FTP BUG!
     if not bool(authenticate(username=username, password=password)):
       return False
     try:
-      homedir = os.path.join(BASE_DIR, username)
+      homedir = os.path.join(BASE_DIR, username.lower())
       os.mkdir(homedir)
-    except OSError:
-      pass #already exists..probably
+    except OSError, e:
+      if e.errno != errno.EEXIST: #file already exists
+        raise e
       
     try:
       self.add_user(username, 'password', homedir, perm='lweadf') #list, write, CWD
