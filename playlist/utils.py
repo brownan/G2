@@ -7,7 +7,6 @@ import urllib2
 import re
 
 from django.conf import settings
-MUSIC_PATH = settings.MUSIC_DIR
 GHETTO_URL = "http://ghettoradio.us:8209/"
 listeners =  re.compile(r'(\d+) of \d+ listeners \(\d+ unique\)')
 
@@ -21,14 +20,6 @@ def hashSong(file):
     sha_hash.update(file.read())
   return sha_hash.hexdigest()  
   
-def storeSong(path,  info):
-  new = open(MUSIC_PATH+'/'+info['sha_hash'] + '.' + info['format'],  'w')
-  old = open(path)
-  try:
-    new.write(old.read())
-  finally:
-    old.close()
-    new.close()
     
 def getSong(song):
   return song.getPath()

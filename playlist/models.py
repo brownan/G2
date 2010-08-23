@@ -24,7 +24,6 @@ from django.template.defaultfilters import force_escape
 
 
 
-MUSIC_PATH = settings.MUSIC_DIR
 
 class DuplicateError(Exception): pass
 class ScoreOutOfRangeError(Exception): pass
@@ -108,35 +107,11 @@ class UserProfile(models.Model):
   s_playlistHistory = models.IntegerField(default=10, help_text="Number of previously played dongs shown") 
   
   def __unicode__(self): return self.name
-  
-  def addSong(self,  file):
-    #FIXME: change to uploadSong, ambiguous naming at the moment (fixed)
-    #DEPRECIATED
-    try: 
-      info = self._getSongInfo(file)
-      info['sha_hash'] = utils.hashSong(file)
-      try:
-        Song.objects.get(sha_hash=info['sha_hash'])
-      except Song.DoesNotExist: pass
-      else:
-        raise DuplicateError
-      if file.size > 50000000: #SETTING
-        raise FileTooBigError
-      info['uploader'] = self.user
-      utils.storeSong(file,  info)
-      s = Song(**info)
-      if s.length > 60*10: #10 mins
-        s.ban("Autobahned because the dong is too long. Ask a mod to unban it if you want to play it.")
-      s.save()
-      self.user.get_profile().uploads += 1
-      self.user.save()
-        
-    finally:
-      file.close()
+
   
   def uploadSong(self, upload):
     """Add an UploadedSong to the database if allowed"""
-    if not user.has_perm("can_upload"):
+    if not self.user.has_perm("playlist.upload_song"):
       return #do nothing while cackling quietly
     try:
       Song.objects.get(sha_hash=upload.info['sha_hash'])
