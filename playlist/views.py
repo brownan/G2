@@ -166,23 +166,23 @@ def ajax(request):
     server_playing = PlaylistEntry.objects.nowPlaying()
     
     #check for submitted comment
-    try:
-      if request.user.has_perm("can_comment"):
+    if request.user.has_perm("playlist.can_comment"):
+      try:
         comment = request.REQUEST['comment']
-    except KeyError:
-      pass
-    else:
-      server_playing.song.comment(request.user, comment)
-      #TODO: handle comment being too long gracefully
+      except KeyError:
+        pass
+      else:
+        server_playing.song.comment(request.user, comment)
+        #TODO: handle comment being too long gracefully
       
     #check for submitted vote
-    try:
-      if request.user.has_perm("can_rate"):
+    if request.user.has_perm("playlist.can_rate"):
+      try:
         vote = request.REQUEST['vote']
-    except KeyError:
-      pass
-    else:
-      server_playing.song.rate(vote, request.user)    
+      except KeyError:
+        pass
+      else:
+        server_playing.song.rate(vote, request.user)    
     
     if server_playing.id != client_playing:
       events.append(('now_playing', server_playing.id))
