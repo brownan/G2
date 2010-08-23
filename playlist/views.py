@@ -177,7 +177,7 @@ def ajax(request):
       
     #check for submitted vote
     try:
-      if request.user.has_perm("can_vote"):
+      if request.user.has_perm("can_rate"):
         vote = request.REQUEST['vote']
     except KeyError:
       pass
@@ -409,7 +409,7 @@ def api(request, resource=""):
     return HttpResponse(str(song.id) + "\n" + song.metadataString())
   
   if resource == "vote":
-    if not user.has_perm("playlist.can_vote"):
+    if not user.has_perm("playlist.can_rate"):
       return HttpResponseForbidden()
     try:
       vote = float(request.REQUEST['vote'])
