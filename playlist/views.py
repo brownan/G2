@@ -734,12 +734,11 @@ def song(request, songid=0, edit=None):
     path = None
     
   favourite = song in request.user.get_profile().favourites.all()
-  is_orphan = (song.uploader == User.objects.get(username="Fagin"))
     
     
   return render_to_response('song.html', \
   {'song': song, 'editform':editform, 'edit':edit,'commentform':commentform, 
-  'currentuser':request.user, 'comments':comments, 'can_ban':can_ban, 'is_orphan':is_orphan, 
+  'currentuser':request.user, 'comments':comments, 'can_ban':can_ban, 
   'banform':banform, 'can_delete':can_delete, 'vote':vote, 'path':path, 
   'favourite' : favourite}, \
   context_instance=RequestContext(request))
@@ -1031,17 +1030,6 @@ def search(request):
       artists = Artist.objects.select_related().filter(name__icontains=query).order_by('name')
       songs = Search(query).getResults().check_playable(request.user).order_by('title')
       albums = Album.objects.select_related().filter(name__icontains=query).order_by('name')
-      if form.cleaned_data['orphan']:
-        scuttle = User.objects.get(username="Fagin")
-        orphans = songs.filter(uploader=scuttle).order_by('title')
-        temp = []
-        for artist in artists:
-          for song in artist.songs.all():
-            if song.uploader == scuttle:
-              temp.append(artist)
-              break
-        artists = temp
-        songs = orphans
         
       paginator = Paginator(songs, 100) 
       try: #sanity check
@@ -1063,39 +1051,3 @@ def search(request):
   return render_to_response('search.html', {'form':form}, context_instance=RequestContext(request))
 
 
-#def info(request):
-  #song = PlaylistEntry.objects.get(playing=True)
-  #return HttpResponse()
-
-@login_required()
-def orphans(request, page=0):
-  try:
-    page = int(page)
-  except:
-    page = 1
-  scuttle = User.objects.get(username="Fagin")
-  songs = Song.objects.filter(uploader=scuttle).order_by("title")
-  for song in songs: 
-    p = Paginator(songs, 50)
-  try:
-    songs = p.page(page)
-  except (EmptyPage, InvalidPage):
-    #page no. out of range
-    songs = p.page(p.num_pages)
-  return render_to_response('scuttle.html', {"songs": songs}, context_instance=RequestContext(request))
-
-@login_required()
-def adopt(request, songid):
-  try:
-    song = Song.objects.get(id=songid)
-  except Song.DoesNotExist:
-    raise Http404
-  scuttle = User.objects.get(username="Fagin")
-  if not song in Song.objects.filter(uploader=scuttle):
-    request.user.message_set.create(message="You may not adopt this dong.")
-    return HttpResponseRedirect(reverse("song", args=[songid]))
-  else:
-    song.uploader = request.user
-    song.save()
-    request.user.message_set.create(message="Dong adopted successfully. Take good care of it!")
-    return HttpResponseRedirect(reverse("song", args=[songid]))    
