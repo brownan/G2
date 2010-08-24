@@ -300,6 +300,24 @@ def api(request, resource=""):
     except PlaylistEntry.DoesNotExist:
       return HttpResponse()
     
+  if resource == "merge":
+    if not user.has_perm("playlist.merge_song"):
+      return HttpResponseForbidden()
+    try:
+      old = Song.objects.get(id=request.REQUEST['old'])
+      new = Song.objects.get(id=request.REQUEST['new'])
+    except KeyError:
+      return HttpResponseBadRequest #args insufficient
+    except Song.DoesNotExist:
+      raise Http404 #songs don't exist
+  
+    logging.info("Mod %s (uid %d) merged song with sha_hash %s into %d at %s" %
+      (request.user.username, request.user.id, old.sha_hash, new.id, now()))
+    
+    new.merge(old)
+    return HttpResponse()
+      
+      
   
   if resource == "deletions":
     try:
