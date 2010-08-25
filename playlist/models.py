@@ -17,10 +17,12 @@ from django.conf import settings
 from django.db.models.signals import pre_save
 from django.db.models import Avg, Count, Sum
 from django.db.models.query import QuerySet
+from django.core.urlresolvers import reverse
+
 
 from playlist.utils import getObj
 from playlist.cue import CueFile
-from django.template.defaultfilters import force_escape
+from django.template.defaultfilters import safe, force_escape
 
 
 
@@ -30,6 +32,7 @@ class ScoreOutOfRangeError(Exception): pass
 class AddError(Exception): pass
 class FileTooBigError(Exception): pass
 class SongPlayingError(Exception): pass
+class CommentTooLongError(Exception): pass
 
 
 
@@ -623,20 +626,53 @@ class SongDir(models.Model):
     else:
       return str(self.path) + " (Not Usable)"
       
-      
+class Emoticon(models.Model):
+  text = models.CharField(max_length=100)
+  alt_text = models.CharField(max_length=100)
+  filename = models.CharField(max_length=100)
+  usable = models.BooleanField(default=True)
+  cripple = models.BooleanField(default=False)
+  
+  def __unicode__(self):
+    if usable:
+      return self.text
+    else:
+      return self.text + " (disabled)"
+
 
 class Comment(models.Model):
-  text = models.CharField(max_length=400)
+  text = models.CharField(max_length=4000)
   user = models.ForeignKey(User, editable=False)
   song = models.ForeignKey(Song, editable=False, related_name="comments")
   time = models.IntegerField(default=0)
   datetime = models.DateTimeField()
   
-  def save(self):
+  def save(self, *args, **kwargs):
     #ensure datetime is creation date
     if not self.id:
         self.datetime = datetime.datetime.today()
-    super(Comment, self).save()
+        
+    if len(self.text) > 400:
+      raise CommentTooLongError, "comment must be less than 400 characters"
+    
+    self.text = self._add_emoticons(self.text)
+    super(Comment, self).save(*args, **kwargs)
+    
+  def _add_emoticons(self, text):
+    text = force_escape(text)
+    text = text.split()
+    emoticons = Emoticon.objects.filter(text__in=text)
+    for i, word in enumerate(text):
+      for e in emoticons:
+        if e.text == word:
+          text[i] = "<img src='%s' alt='%s' title='%s' />" % (
+            "emoticons/"+e.filename, 
+            e.alt_text, 
+            e.text
+          )
+          break
+    return " ".join(text)
+    
     
   def ajaxEvent(self):
     """
@@ -644,7 +680,7 @@ class Comment(models.Model):
     """
     html_title = "Made on %s" % self.datetime.strftime("%d %b %Y")
     details = {
-      'body': force_escape(self.text),
+      'body': self.text,
       'time': self.datetime.strftime("%H:%M"),
       'html_title': html_title,
       'commenter': self.user.username,

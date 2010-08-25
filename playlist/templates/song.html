@@ -209,7 +209,7 @@
   </td>
   
   
-  <td>{{ comment.text }}</td>
+  <td>{{ comment.text|safe }}</td>
   <td>{{ comment.datetime|date:"D jS M Y \a\t g:i:s A" }}</td>
   <td>
     {% if perms.playlist.delete_comment or comment.user == request.user %}

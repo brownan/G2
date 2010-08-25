@@ -52,7 +52,7 @@ def commentProcessor(request):
     return []
   comments = []
   last_comment = 0
-  for comment in now_playing.comments.all():
+  for comment in now_playing.comments.all().order_by("-datetime"):
     html_title = "Made on %s" % comment.datetime.strftime("%d %b %Y")
     details = {
       'body': comment.text, 
@@ -67,19 +67,19 @@ def commentProcessor(request):
   
 def nowPlayingContextProcessor(request):
   if not request.user.is_authenticated(): return {}
-  now_playing = PlaylistEntry.objects.nowPlaying().song
   try:
-    user_vote =  int(now_playing.ratings.get(user=request.user).score)
-  except Rating.DoesNotExist:
-    user_vote = 0
-  try:
+    now_playing = PlaylistEntry.objects.nowPlaying().song
+    try:
+      user_vote =  int(now_playing.ratings.get(user=request.user).score)
+    except Rating.DoesNotExist:
+      user_vote = 0
     return {
       'now_playing': now_playing, 
       'user_vote': user_vote,
       'accuracy': 1 #for average score
     }
   except PlaylistEntry.DoesNotExist:
-    return {'now_playing': Song.objects.all()[0]} #fun fallback to avoid errors
+    return {}  #fun fallback to avoid errors
   
     
   

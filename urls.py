@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import os.path
+
 from django.conf.urls.defaults import *
 import pydj.playlist.views
 from django.conf import settings
@@ -28,6 +30,7 @@ url(r'^admin/(.*)', admin.site.root, {}, "admin_site"),
 (r'^playlist(/(?P<lastid>\d+))?$', 'pydj.playlist.views.playlist', {}, "playlist"),
 (r'^splaylist$', 'pydj.playlist.views.splaylist'),
 (r'^images/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.IMAGES_DIR}),
+(r'^emoticons/(?P<path>.*)$', 'django.views.static.serve', {'document_root': os.path.join(settings.IMAGES_DIR, "emoticons")}, "emoticons"),
 (r'^upload/?$', 'pydj.playlist.views.upload'),
 (r'^search/?$', 'pydj.playlist.views.search'),
 (r'^comment/(\d+)$', 'pydj.playlist.views.comment'),
@@ -35,6 +38,7 @@ url(r'^admin/(.*)', admin.site.root, {}, "admin_site"),
 (r'^artist/(?P<artistid>\d+)$', 'pydj.playlist.views.artist', {}, "artist"),
 (r'^user/(?P<userid>\d+)$', 'pydj.playlist.views.user', {}, "user"),
 (r'^.*/images/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.IMAGES_DIR}),
+(r'^.*/emoticons/(?P<path>.*)$', 'django.views.static.serve', {'document_root': os.path.join(settings.IMAGES_DIR, "emoticons")}, "emoticons"),
 (r'^media/(?P<path>.*)$', 'django.views.static.serve', 
 {'document_root': "/usr/lib/python2.5/site-packages/django/contrib/admin/media/"}),
 (r'^.*login/?$', 'django.contrib.auth.views.login', {'template_name': 'login.html'}, 'login'),
@@ -65,7 +69,6 @@ url(r'^admin/(.*)', admin.site.root, {}, "admin_site"),
 (r'^ajax$', 'pydj.playlist.views.ajax'), 
 (r'^favourite/(?P<songid>\d+)$', 'pydj.playlist.views.favourite'), 
 (r'^unfavourite/(?P<songid>\d+)$', 'pydj.playlist.views.unfavourite'), 
-
 (r'^settings/?$', 'pydj.playlist.views.user_settings', {}, 'user_settings'),
 (r'^keygen/?$', 'pydj.playlist.views.keygen', {}, 'keygen'),
 (r'^g2admin$', 'pydj.playlist.views.g2admin', {}, 'g2admin'), 
