@@ -105,6 +105,7 @@ class UserProfile(models.Model):
   sa_id = models.IntegerField(blank=True, null=True, unique=True,
                               help_text="Something Awful account ID") 
   favourites = models.ManyToManyField("Song", related_name="lovers")
+  tokens = models.IntegerField(default=0)
   
   #settings
   s_playlistHistory = models.IntegerField(default=10, help_text="Number of previously played dongs shown") 
@@ -201,6 +202,7 @@ class UserProfile(models.Model):
   class Meta:
     permissions = (
     ("view_user",  "g2 Can view user pages"), 
+    ("give_token",  "g2 Can award tokens to users"), 
     )
 
   def __unicode__(self): return self.user.username
@@ -424,17 +426,23 @@ class Song(models.Model):
       return True
     
   def playlistAdd(self,  user):
-    """Adds song to the playlist. 
+    """Adds song to the playlist. Silently use up a token if necessary.
     Raises AddError if there's a problem, with (reason, shortreason) as its arg."""
     
-    reasons = self.addDisallowed()
+    reasons = self.addDisallowed() #check song can be added
     if reasons:
       reason, shortreason = reasons
       raise AddError, (reason, shortreason)
-    reasons = user.get_profile().addDisallowed()
+    profile = user.get_profile()
+    reasons = profile.addDisallowed() #check user can add
     if reasons:
       reason, shortreason = reasons
-      raise AddError, (reason, shortreason)
+      if shortreason == "user is greedy" and profile.tokens: 
+        #extra add, use up a token
+        profile.tokens -= 1
+        profile.save()
+      else:
+        raise AddError, (reason, shortreason)
     if self.unban_adds:
       self.unban_adds -= 1
       if self.unban_adds == 0:
@@ -634,7 +642,7 @@ class Emoticon(models.Model):
   cripple = models.BooleanField(default=False)
   
   def __unicode__(self):
-    if usable:
+    if self.usable:
       return self.text
     else:
       return self.text + " (disabled)"
@@ -642,7 +650,7 @@ class Emoticon(models.Model):
 
 class Comment(models.Model):
   text = models.CharField(max_length=4000)
-  user = models.ForeignKey(User, editable=False)
+  user = models.ForeignKey(User, editable=False, related_name="comments")
   song = models.ForeignKey(Song, editable=False, related_name="comments")
   time = models.IntegerField(default=0)
   datetime = models.DateTimeField()

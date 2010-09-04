@@ -878,7 +878,18 @@ def user(request, userid):
     owner=  User.objects.get(id=userid)
   except User.DoesNotExist:
     raise Http404
-  return render_to_response("user.html", {'owner':owner}, context_instance=RequestContext(request))
+  return render_to_response("user.html", {'owner':owner, 'token_button':request.user.has_perm("playlist.give_token")}, context_instance=RequestContext(request))
+
+@permission_required("playlist.give_token")
+def give_token(request, userid):
+  try:
+    profile = User.objects.get(id=userid).get_profile()
+  except User.DoesNotExist:
+    raise Http404
+  profile.tokens += 1
+  profile.save()
+  request.user.message_set.create(message="Token given successfully")
+  return HttpResponseRedirect(reverse('user', args=[userid]))
 
 @permission_required('playlist.can_comment')
 def comment(request, songid): 
@@ -946,16 +957,29 @@ def artist(request, artistid=None):
     
 @permission_required('playlist.queue_song')
 def add(request, songid=0): 
+  """Add a song to the playlist, using a token if necessary or handling an error.
+  Always leaves appropriate user message"""
   try:
-    try:
-      song = Song.objects.get(id=songid)
-    except Song.DoesNotExist:
-      raise Http404
+    song = Song.objects.get(id=songid)
+  except Song.DoesNotExist:
+    raise Http404
+  profile = request.user.get_profile()
+  oldtokens = profile.tokens
+  try:
     song.playlistAdd(request.user)
   except AddError, e:
     msg = "Error: %s" % (e.args[0])
     request.user.message_set.create(message=msg)
-    return HttpResponseRedirect(reverse("playlist"))      
+    return HttpResponseRedirect(reverse("playlist"))
+    
+  if oldtokens != profile.tokens:
+      if profile.tokens:
+        msg = "You already had a dong on the playlist, so you've used up a token to add this one. You have %d left" % (profile.tokens)
+      else:
+        msg = "You already had a dong on the playlist, so you've used up a token to add this one. That was your last one!"
+      request.user.message_set.create(message=msg)
+  else:
+    request.user.message_set.create(message="Track added successfully!")   
 
   if song.isOrphan(): 
     song.uploader = request.user
@@ -963,8 +987,6 @@ def add(request, songid=0):
     msg = "This dong was an orphan, so you have automatically adopted it. Take good care of it!"
     request.user.message_set.create(message=msg)
     
-  request.user.message_set.create(message="Track added successfully!")
-
   return HttpResponseRedirect(reverse("playlist"))
   
 def next(request, authid):

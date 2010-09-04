@@ -7,6 +7,9 @@
   <p><span class="bold">Username:</span> {{owner.username}} </p>
   <p><span class="bold">User status:</span> {{owner.groups.all.0.name}}</p>
   <p><span class="bold">Number of uploads:</span> {{owner.uploads.count}}</p>
+  {% if tokens %}
+    <p><span class="bold">Number of tokens:</span> {{owner.get_profile.tokens}}</p>
+  {% endif %}
   <p>
     <a id="menuitem" href="{% url playlist.views.search %}?query=favourites%3D{{owner.username}}">
       View user's favourites
@@ -21,6 +24,13 @@
   <p>
     <a id="menuitem" href="http://forums.somethingawful.com/member.php?action=getinfo&userid={{owner.get_profile.sa_id}}">
       Something Awful profile
+    </a>
+  </p>
+  {% endif %}
+  {% if token_button %}
+  <p>
+    <a id="menuitem" href="{% url give_token userid=owner.id %}">
+      Give token
     </a>
   </p>
   {% endif %}

@@ -36,6 +36,7 @@ tr.added .artistry {
 td { border-color:#DDD; } /* PLAYLIST INNER BORDERS */
 #columns { background-color:#448F3F; color:#FFF; } /* COLUMN TITLES BG */
 #length { background:#D8E9D6; color:#000; } /* PLAYLIST LENGTH FIELD BG */
+.plinfo { background:#D8E9D6; color:#000; font-weight:normal;} /* PLAYLIST INFO FIELD BG */
 #commentsbox, #rightist { background-color:#C4E2C2; } /* COMMENTS BOX BG, RIGHT SIDE BOTTOM BOX BG */
 
 body {

@@ -139,6 +139,11 @@ $(document).ready(function(){
     {% if aug_playlist %}
     <table class="playlist" id="playlisttable"> 
     <tbody id='playlist'> 
+      {% if user.get_profile.tokens %}
+        <tr><th colspan="7" class="plinfo">
+          You have {{user.get_profile.tokens}} token{{user.get_profile.tokens|pluralize}}, so you can add extra dongs to the playlist!
+        </th></tr>
+      {% endif %}
       <tr><th colspan="7" id="length">{% include "pl_length.html" %}</th></tr>
       <tr id='columns'> 
         <th>Artist</th> 
