@@ -7,9 +7,8 @@
   <p><span class="bold">Username:</span> {{owner.username}} </p>
   <p><span class="bold">User status:</span> {{owner.groups.all.0.name}}</p>
   <p><span class="bold">Number of uploads:</span> {{owner.uploads.count}}</p>
-  {% if tokens %}
-    <p><span class="bold">Number of tokens:</span> {{owner.get_profile.tokens}}</p>
-  {% endif %}
+  <p><span class="bold">Number of tokens:</span> {{owner.get_profile.tokens}}</p>
+  
   <p>
     <a id="menuitem" href="{% url playlist.views.search %}?query=favourites%3D{{owner.username}}">
       View user's favourites
