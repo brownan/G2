@@ -140,4 +140,4 @@ class NewRegisterForm(forms.Form):
       
   
 class WelcomeMsgForm(forms.Form):
-  message = forms.CharField(max_length=2000, widget=forms.Textarea)
+  message = forms.CharField(max_length=2000, widget=forms.Textarea, required=False)
