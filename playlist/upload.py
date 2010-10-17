@@ -52,7 +52,15 @@ class UploadedFile:
     storage = SongDir.objects.getUsableDir()
     storage.storeSong(self.file, self.info)
     self.info['location'] = storage
-    s = Song(**self.info)
+    # Filter out any attributes that aren't part of the model
+    fields = set()
+    for f in Song._meta.fields:
+        fields.add(f.name)
+    info = dict(self.info)
+    for key in info.keys():
+        if key not in fields:
+            del info[key]
+    s = Song(**info)
     s.save()
     return s
   
