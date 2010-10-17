@@ -1,1 +1,5 @@
+{% if now_playing %}
 <a href="{% url playlist.views.artist now_playing.artist.id %}">{{now_playing.artist.name}}</a> (<a href="{% url playlist.views.album now_playing.album.id %}">{{now_playing.album.name}}</a>) - <a href="{% url playlist.views.song now_playing.id %}">{{now_playing.title}}</a>
+{% else %}
+Nothing currently playing
+{% endif %}
