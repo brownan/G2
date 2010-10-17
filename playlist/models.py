@@ -7,7 +7,7 @@ from subprocess import Popen
 import datetime
 import shutil
 import os
-from os.path import basename, dirname
+from os.path import basename, dirname, exists
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 from django.contrib.auth.models import User
@@ -421,8 +421,7 @@ class Song(models.Model):
     return False
       
   def isOrphan(self):
-    scuttle = User.objects.get(username="Fagin")
-    if self.uploader == scuttle:
+    if self.uploader == None:
       return True
     
   def playlistAdd(self,  user):
@@ -616,7 +615,8 @@ class SongDir(models.Model):
   
   def storeSong(self, temp_path, info):
     new_path = self.genPath(info['sha_hash'], info['format'])
-    os.makedirs(dirname(new_path))
+    if not exists(dirname(new_path)):
+        os.makedirs(dirname(new_path))
     new_file = open(new_path,  'w')
     temp_file = open(temp_path)
     try:
