@@ -7,7 +7,7 @@ from subprocess import Popen
 import datetime
 import shutil
 import os
-from os.path import basename
+from os.path import basename, dirname
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
 from django.contrib.auth.models import User
@@ -615,8 +615,9 @@ class SongDir(models.Model):
   objects = SongDirManager()
   
   def storeSong(self, temp_path, info):
-    
-    new_file = open(self.genPath(info['sha_hash'], info['format']),  'w')
+    new_path = self.genPath(info['sha_hash'], info['format'])
+    os.makedirs(dirname(new_path))
+    new_file = open(new_path,  'w')
     temp_file = open(temp_path)
     try:
       new_file.write(temp_file.read())
