@@ -104,7 +104,7 @@ class UserProfile(models.Model):
   api_key = models.CharField(max_length=40, editable=False, blank=True)
   sa_id = models.IntegerField(blank=True, null=True, unique=True,
                               help_text="Something Awful account ID") 
-  favourites = models.ManyToManyField("Song", related_name="lovers")
+  favourites = models.ManyToManyField("Song", related_name="lovers", blank=True)
   tokens = models.IntegerField(default=0)
   
   #settings
