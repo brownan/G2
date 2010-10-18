@@ -51,12 +51,12 @@ from django.views.generic.list_detail import object_list
 
 from playlist.forms import *
 from playlist.models import *
-from playlist.utils import getSong, getObj, gbsfmListenerCount, ghettoListenerCount
+from playlist.utils import getSong, getObj, ListenerCount
 from playlist.upload import UploadedFile
 from playlist.search import Search
 from playlist.cue import CueFile
 from playlist.pllib import Playlist
-from sa import SAProfile, IDNotFoundError
+#from sa import SAProfile, IDNotFoundError
 
 
 
@@ -106,8 +106,6 @@ def splaylist(request):
 @permission_required('playlist.view_playlist')
 def playlist(request, lastid=None):
   #normal entry route
-  if "gbsfm.ath.cx" in request.get_host():
-    return HttpResponseRedirect("/images/moved.html")
   return jsplaylist(request, lastid)
   
   
@@ -494,14 +492,8 @@ def api(request, resource=""):
     randomid = randomdongid()
     return HttpResponse(int(randomid[0]))
 
-  if resource == "plinfo":
-    pldongid = request.GET.get('plid', 0)
-    playlistinfo = plinfoq(pldongid)
-    return HttpResponse(str(playlistinfo[0]) + "\n" + playlistinfo[2] + "\n" + playlistinfo[3] + "\n" + playlistinfo[1])
-    #return HttpResponse(playlistinfo)
-      
   if resource == "listeners":
-    return HttpResponse(gbsfmListenerCount() + " " + ghettoListenerCount())
+    return HttpResponse(ListenerCount())
     
   if resource == "users":
     return HttpResponse(Users.objects.all().count())

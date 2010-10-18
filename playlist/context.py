@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from playlist.utils import gbsfmListenerCount, ghettoListenerCount
+from playlist.utils import ListenerCount
 from playlist.cue import CueFile
 from playlist.models import PlaylistEntry, Rating, SongReport, SongEdit
 
@@ -10,8 +10,7 @@ from django.conf import settings
 def listenersContextProcessor(request):
   if not request.user.is_authenticated(): return {}
   return {
-    'gbsfm_listeners': gbsfmListenerCount(),
-    'ghetto_listeners': ghettoListenerCount()
+    'listeners': ListenerCount(),
   }
   
 def newReportsContextProcessor(request):

@@ -7,8 +7,6 @@ import urllib2
 import re
 
 from django.conf import settings
-GHETTO_URL = "http://ghettoradio.us:8209/"
-listeners =  re.compile(r'(\d+) of \d+ listeners \(\d+ unique\)')
 
 def hashSong(file):
   """Returns sha5 hash of uploaded file. Assumes file is safely closed outside"""
@@ -49,6 +47,7 @@ def getObj(table, name, oldid=None):
     return t
 
 
+listeners =  re.compile(r'(\d+) of \d+ listeners \(\d+ unique\)')
 def listenerCount(url):
   try:
     opener = urllib2.build_opener()
@@ -61,10 +60,7 @@ def listenerCount(url):
   except (IndexError, AttributeError):
     return "?"
     
-def ghettoListenerCount():
-  return listenerCount(GHETTO_URL)
-  
-def gbsfmListenerCount():
+def ListenerCount():
   return listenerCount(settings.STREAMINFO_URL)
     
     

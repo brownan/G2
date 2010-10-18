@@ -351,9 +351,7 @@ $(document).ready(function(){
     <li><a href="{% url playlist.views.user user.id %}" class="boxed">&nbsp;user page</a></li> 
     <li><a href="{% url user_settings %}" class="boxed">&nbsp;settings</a></li> 
     <li><a href="{% url forum_index %}" class="boxed">&nbsp;forums</a></li> 
-    <li><a href="http://gbs.fm:8080/listen.pls" class="boxed">&nbsp;listen!</a></li> 
-    <li><a href="http://mibbit.com/?channel=%23gbs-fm&server=irc.buttes.org" class="boxed">&nbsp;live irc chat!</a></li> 
-    <!--<li><a href="#" class="boxed" onclick="flashplaypop();">&nbsp;flash player</a></li> -->
+    <li><a href="http://192.168.1.110:8000/ices.m3u" class="boxed">&nbsp;listen!</a></li> 
     <li><a href="{% url django.contrib.auth.views.logout_then_login %}" class="boxed">&nbsp;logout</a></li> 
     {% if perms.playlist.view_edits %}
     <li><a href="{% url edit_queue %}" class="boxed {% if new_edits %}new{% endif %}">&nbsp;edit queue</a></li> 
@@ -368,7 +366,7 @@ $(document).ready(function(){
     {% endif %}
   </ul> 
   <p class="listenersthing">icons from <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a></p> 
-  <p class="listenersthing" title="g2:{{gbsfm_listeners}} ghetto:{{ghetto_listeners}}">listeners: {{gbsfm_listeners}}</p> 
+  <p class="listenersthing">listeners: {{listeners}}</p> 
  
 </div> 
  

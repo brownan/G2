@@ -857,17 +857,3 @@ def randomdongid():
     row = cursor.fetchone()
 
     return row
-  
-def plinfoq(self):
-    from django.db import connection, transaction
-    cursor = connection.cursor()
-
-    # Data retrieval operation - no commit required
-    cursor.execute("select song.id, song.title, artist.name, album.name from playlist_song song, playlist_artist artist, playlist_album album where song.artist_id = artist.id and song.album_id = album.id and song.id = (SELECT song_id FROM `gbsfm`.`playlist_playlistentry` order by id limit %s,1)", [int(self)])
-    row = cursor.fetchone()
-    return row
-
-
-
-  
-

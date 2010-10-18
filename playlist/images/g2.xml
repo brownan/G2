@@ -4,10 +4,10 @@
 <track> <!-- Shoutcast Stream -->
 <title>G2</title>
 <creator>G2</creator>
-<location>http://gbsfm.ath.cx:8080</location>
+<location>http://192.168.1.110:8000</location>
 <identifier/>
 <meta rel="type">mp3</meta>
-<info>http://gbsfm.ath.cx/</info>
+<info>http://192.168.1.110:8080</info>
 </track>
 </trackList>
 </playlist>
