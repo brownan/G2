@@ -16,7 +16,7 @@ class UnsupportedFormatError(Exception): pass
 class CorruptFileError(Exception): pass
 
 class UploadedFile:
-  supported_types = ['mp3'] #TODO: ogg (and m4a?)
+  supported_types = set(['mp3']) #TODO: ogg (and m4a?)
   def __init__(self, file, realname=None, filetype=None):
     
     self.type = filetype
