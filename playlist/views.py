@@ -988,17 +988,41 @@ def add(request, songid=0):
     request.user.message_set.create(message=msg)
     
   return HttpResponseRedirect(reverse("playlist"))
-  
+
 def next(request, authid):
-  if authid == settings.NEXT_PASSWORD:
-    try:
-      entry = PlaylistEntry.objects.nowPlaying().next()
-      location = getSong(entry.song)
-      metadata = u"%s [blame %s]" % (entry.song.metadataString(request.user), entry.adder.username)
-      return HttpResponse(location +'\n'+ metadata)
-    except PlaylistEntry.DoesNotExist:
-      pass
-  return HttpResponse()
+  """Go to the next song in the playlist, and return a string for ices to parse.
+  If nothing is next in the playlist, play "bees.mp3" or something"""
+  if authid != settings.NEXT_PASSWORD:
+    return HttpResponse()
+
+  try:
+    old = PlaylistEntry.objects.nowPlaying()
+  except PlaylistEntry.DoesNotExist:
+    # Nothing currently playing
+    pass
+  else:
+    # Retire this entry
+    oldentry = OldPlaylistEntry(song=old.song, adder=old.adder, addtime=old.addtime, playtime=old.playtime)
+    oldentry.save()
+    old.delete()
+
+  # Now find a new item to play
+  try:
+    new = PlaylistEntry.objects.all()[0]
+  except IndexError:
+    # No more playlist entires
+    song = Song.objects.get(title="bees.mp3")
+    blame = ""
+  else:
+    new.playing = True
+    new.playtime = datetime.datetime.today()
+    new.save()
+    song = new.song
+    blame = " [blame %s]" % new.adder.username
+
+  location = getSong(song)
+  metadata = u"%s%s" % (song.metadataString(request.user), blame)
+  return HttpResponse(location +'\n'+ metadata)
    
 def newregister(request):
   get_authcode = lambda randcode: md5(settings.SECRET_KEY + randcode).hexdigest()

@@ -448,10 +448,9 @@ class Song(models.Model):
         self.ban() #assume reason already there
       self.save()
     p = PlaylistEntry(song=self, adder=user)
-    if len(PlaylistEntry.objects.filter(playing=True)) == 0:
-      p.playing=True
-      p.playtime = datetime.datetime.today()
     p.save()
+    if len(PlaylistEntry.objects.filter(playing=True)) == 0:
+      Popen(["killall", "-SIGUSR1", "ices"])
   
   def __unicode__(self): return self.artist.name + ' - ' + self.title
   
@@ -724,27 +723,6 @@ class PlaylistEntry(models.Model):
   playing = models.BooleanField(default=False)
   hijack = models.BooleanField(default=False)
   
-  def next(self):
-    try:
-      #set up new entry
-      new = PlaylistEntry.objects.filter(id__gt=self.id)[0]
-    except IndexError:
-      #no more songs :(
-      #oh well, repeat this one and *don't* record it as having played
-      #old = OldPlaylistEntry(song=self.song, adder=self.adder, addtime=self.addtime, playtime=self.playtime)
-      #old.save()
-      #self.playtime=datetime.datetime.today()
-      return self
-      
-    new.playing = True
-    new.playtime = datetime.datetime.today()
-    #record old one
-    old = OldPlaylistEntry(song=self.song, adder=self.adder, addtime=self.addtime, playtime=self.playtime)
-    old.save()
-    self.delete()
-    new.save()
-    return new
-
   def remove(self):
     """removes from playlist and lets ajax playlist handler know"""
     RemovedEntry(oldid=self.id).save()
@@ -756,6 +734,12 @@ class PlaylistEntry(models.Model):
     super(PlaylistEntry, self).save()
     
   def __unicode__(self): return self.song.title
+  def __repr__(self):
+      return "<%s:%s%s>" % (
+              self.id,
+              self.song.title,
+              " playing" if self.playing else "",
+              )
   
   def delSong(self, songid):
     self.entries.objects.get(id=songid).delete()
