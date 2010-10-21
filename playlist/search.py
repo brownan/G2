@@ -15,7 +15,8 @@ class Search:
                     "length": "length",
                     "score": "avgscore",
                     "votes": "voteno",
-                    "favourites": "lovers__user__username"
+                    "favourites": "lovers__user__username",
+		    "bitrate": "bitrate",
                     }
     self.modifiers = {"=": "__iexact",
                       ":": "__icontains",
