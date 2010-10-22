@@ -1,6 +1,6 @@
 {% extends "master.html" %}
 
-{% block title %}{{song.title}} - GBS-FM{% endblock %}
+{% block title %}{{song.title}}{% endblock %}
 
 {% load filters %}
 
@@ -48,6 +48,7 @@
     </td>
 {% if edit %}
 <form action='{% url playlist.views.song song.id %}' method="post">
+        {% csrf_token %}
     {% for field in editform %}
       {% ifequal field.label "Artist" %}
       <tr>
