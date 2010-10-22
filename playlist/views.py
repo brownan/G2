@@ -942,9 +942,7 @@ def artist(request, artistid=None):
     artist = Artist.objects.get(id=artistid)
   except Artist.DoesNotExist:
     raise Http404
-  print artist
   songs = Song.objects.select_related("artist", "album").check_playable(request.user).filter(artist=artist).order_by("album__name", "track")
-  print songs
   return render_to_response("artist.html", {'songs': songs, 'artist': artist}, context_instance=RequestContext(request))
     
 @permission_required('playlist.queue_song')
