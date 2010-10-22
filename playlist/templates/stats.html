@@ -1,0 +1,56 @@
+{% extends "master.html" %}
+
+{% block title %}Stats - GBS-FM{% endblock %}
+  
+{% block main %}
+  <div class="playlist">
+
+  <p><span class="bold">Dongs in database:</span> {{totaldongs}} </p>
+  <p><span class="bold">Additions to the playlist:</span> {{totaladds}} </p>
+  <p><span class="bold">Unplayed dongs:</span> {{unplayeddongs}} </p>
+  <p><span class="bold">Registered users:</span> {{totalusers}} </p>
+
+
+  {% if populardongs %}
+  <p>Most added dongs:</p>
+  <ul>
+    {% for dong in populardongs %}
+      <li>{{dong}} - {{dong.totaladds}}</li>
+    {% endfor %}
+  </ul>
+  <p>
+  {% endif %}
+
+  {% if votedhidongs %}
+  <p>Highest-rated dongs:</p>
+  <ul>
+    {% for dong in votedhidongs %}
+      <li>{{dong}} - {{dong.avgscore}}</li>
+    {% endfor %}
+  </ul>
+  <p>
+  {% endif %}
+
+  {% if votedlodongs %}
+  <p>Lowest-rated dongs:</p>
+  <ul>
+    {% for dong in votedlodongs %}
+      <li>{{dong}} - {{dong.avgscore}}</li>
+    {% endfor %}
+  </ul>
+  <p>
+  {% endif %}
+
+  {% if recentuploads %}
+  <p>Last ten uploads:</p>
+  <ul>
+    {% for upload in recentuploads %}
+      <li><a href="{% url song upload.id %}">{{upload}}</a> by {{upload.uploader.username}} ({{upload.add_date|date:"D jS M Y \a\t g:i:s A"}})</li>
+    {% endfor %}
+  </ul>
+  <p>
+  {% endif %}
+  
+  </div>
+ 
+{% endblock %} 
