@@ -898,19 +898,15 @@ def user(request, userid):
     raise Http404
 
   # newsomnuke: get most recent additions, first from the current playlist, then from the playlist history
-  curadditions = PlaylistEntry.objects.select_related().filter(adder=owner.id).order_by("-addtime");
-  prevadditions = OldPlaylistEntry.objects.select_related().filter(adder=owner.id).order_by("-addtime")
+  curadditions = PlaylistEntry.objects.select_related().filter(adder=owner.id).order_by("-addtime")[:10];
+  prevadditions = OldPlaylistEntry.objects.select_related().filter(adder=owner.id).order_by("-addtime")[:10]
 
-  recentadds = list(chain(curadditions, prevadditions))
-  if len(recentadds) > 10:
-    recentadds = recentadds[:10]
+  recentadds = list(chain(curadditions, prevadditions))[:10]
 
 #  favouriteadds = Song.objects.select_related().annotate(totaladds = Count('oldentries')).order_by('-totaladds')[0:9]
 
   # recent uploads
-  recentuploads = Song.objects.select_related().filter(uploader=owner.id).order_by("-add_date")
-  if len(recentuploads) > 10:
-    recentuploads = recentuploads[:10]
+  recentuploads = Song.objects.select_related().filter(uploader=owner.id).order_by("-add_date")[:10]
 
   # number of times the user's dongs have been added by other people
   curotheradds = PlaylistEntry.objects.select_related().filter(song__uploader__id=owner.id).exclude(adder__id=owner.id).count()
