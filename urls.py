@@ -32,6 +32,10 @@ url(r'^admin/(.*)', admin.site.root, {}, "admin_site"),
 (r'^images/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.IMAGES_DIR}),
 (r'^emoticons/(?P<path>.*)$', 'django.views.static.serve', {'document_root': os.path.join(settings.IMAGES_DIR, "emoticons")}, "emoticons"),
 (r'^upload/?$', 'pydj.playlist.views.upload'),
+<<<<<<< Updated upstream:urls.py
+=======
+(r'^stats/?$', 'pydj.playlist.views.globalstats'),     
+>>>>>>> Stashed changes:urls.py
 (r'^search/?$', 'pydj.playlist.views.search'),
 (r'^comment/(\d+)$', 'pydj.playlist.views.comment'),
 (r'^comment/(?P<commentid>\d+)/delete$', 'pydj.playlist.views.delete_comment', {}, "delete_comment"),
