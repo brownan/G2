@@ -61,6 +61,7 @@ class UploadedFile:
         if key not in fields:
             del info[key]
     s = Song(**info)
+    s.full_clean()
     s.save()
     return s
   
@@ -90,13 +91,13 @@ class UploadedFile:
       
     tags['length'] = round(song.info.length)
     tags['bitrate'] = song.info.bitrate/1000 #b/s -> kb/s
-    if not ("title" in tags.keys()):
+    if "title" not in tags or not tags['title'].strip():
       tags['title'] = self.realname
-    if 'artist' in tags.keys():
+    if 'artist' in tags and tags['artist'].strip():
       tags['artist'] = Artist.objects.get_or_create(name=tags['artist'])[0]
     else:
       tags['artist'] = Artist.objects.get_or_create(name='(unknown)')[0]
-    if 'album' in tags.keys():
+    if 'album' in tags and tags['album'].strip():
       tags['album'] = Album.objects.get_or_create(name=tags['album'])[0]
     else: 
       tags['album'] = Album.objects.get_or_create(name='(empty)')[0]
@@ -105,7 +106,7 @@ class UploadedFile:
       if x in tags.keys():
         del tags[x] #not stored
         
-    if "tracknumber" in tags.keys():
+    if "tracknumber" in tags:
       try:
         tags['track'] = int(tags['tracknumber'])
       except ValueError:
@@ -119,6 +120,14 @@ class UploadedFile:
             
       del tags['tracknumber']
         
+    # Fix garbled or blank track numbers in tags
+    try:
+      tags['track'] = int(tags['track'])
+    except ValueError:
+      tags['track'] = None
+    except KeyError:
+      pass
+
     tags['format'] = "mp3"
     
     self.info.update(tags)
