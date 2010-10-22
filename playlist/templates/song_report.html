@@ -1,6 +1,6 @@
 {% extends "master.html" %}
 
-{% block title %}Reporting {{song.artist.name}} - {{song.title}} - GBS-FM{% endblock %}
+{% block title %}Reporting {{song.artist.name}} - {{song.title}}{% endblock %}
 
 {% load filters %}
 
@@ -15,6 +15,7 @@
 {% endfor %}
 <h1>Reporting {{song.artist.name}} - {{song.title}}</h1>
 <form action="{% url playlist.views.song_report songid=song.id %}" method="post">
+        {% csrf_token %}
     <p>{{form.corrupt}}  <span style="font-weight: bold;">Corrupt:</span> use if this dong cuts off or has other major problems. If you can, please upload or find a better version and report this as a duplicate instead so we don't lose any juicy statistics.</p>
     {{form.corrupt.errors}}
     <p><span style="font-weight: bold;">Duplicate:</span> use if this dong is a duplicate of another dong (different versions of the same dong don't count). Ideally, you should report the lower-quality dong and leave the better one alone. Enter the duplicate dong's id here: {{form.duplicate}} </p>

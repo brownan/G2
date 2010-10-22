@@ -1,12 +1,13 @@
 {% extends "master.html" %}
 
-{% block title %}Admin - GBS-FM{% endblock %}
+{% block title %}Admin{% endblock %}
   
 {% block main %}
   <div class="playlist">
     <p><a href="{% url start_stream %}" class="button">Start Stream</a></p>
     <p><a href="{% url stop_stream %}" class="button">Stop Stream</a></p>    
     <form action='{% url playlist.views.g2admin %}' method="POST">
+        {% csrf_token %}
     <table class="playlist">
     {{msgform.as_table}}
     </table>

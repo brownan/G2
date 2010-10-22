@@ -1,6 +1,6 @@
 {% extends "master.html" %}
 
-{% block title %}Settings - GBS-FM{% endblock %}
+{% block title %}Settings{% endblock %}
 
 {% load filters %}
 
@@ -13,12 +13,14 @@
 <p>This can be used for third party applications and clients that want to act on your behalf, but that you do not want to give your password to. It can be used to do things like make votes and comments under your name, but cannot be used to do more destuctive things, like to delete songs you have uploaded or to change your password.</p>
 <p>If you fear someone has your API key and may use it maliciously, or just want to be extra safe, you can regenenerate your API key by pressing the button below. This will invalidate the old one, so any applications that you've given it to may stop working properly.</p>
 <form action='{% url keygen %}' method="post">
+        {% csrf_token %}
 <p><input type="submit" value="Regenerate Key" /></p>
 </form>
 <hr />
 <p>Change password:</p>
 <table>
 <form action="{% url user_settings %}" method="POST">
+        {% csrf_token %}
 {{password_form.as_table}}
 </table>
 <p><input type="submit" value="Change Password" /></p>

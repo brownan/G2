@@ -1,6 +1,6 @@
 {% extends "master.html" %}
 
-{% block title %}Upload - GBS-FM{% endblock %}
+{% block title %}Upload{% endblock %}
 
 {% block main %} 
 	<div class="playlist">
@@ -8,14 +8,13 @@
     {{ message }}
     {% endif %}
     <p>Upload mp3 files here. Make sure the tags make sense!</p>
-    <p>&lt;DaWolfey&gt; upload away, but for the love of god, search first</p>
     <form enctype="multipart/form-data" action="/upload" method="POST">
         {% csrf_token %}
     <table>
       {{ form.as_p }}
       <input type="submit" value="Submit" />
     </table>
-    <p>(<em style="font-style: normal; font-weight: bold">FTP uploads</em> not available yet</p>
+    <p><em style="font-style: normal; font-weight: bold">FTP uploads</em> Now Available on port 2100! Login with your username and password.</p>
     {% if uploads %}
     <p>Last ten uploads:</p>
     <ul>
