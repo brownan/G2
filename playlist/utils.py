@@ -47,17 +47,20 @@ def getObj(table, name, oldid=None):
     return t
 
 
-listeners =  re.compile(r'(\d+) of \d+ listeners \(\d+ unique\)')
+listeners =  re.compile(r'>(\d+)<')
 def listenerCount(url):
   try:
     opener = urllib2.build_opener()
     opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-    s = opener.open(url).read()
+    s = opener.open(url)
   except urllib2.URLError:
     return "?"
-  try:
-    return listeners.search(s).group(1)
-  except (IndexError, AttributeError):
+  for line in s:
+    if "Current Listeners" in line:
+      listenerline = s.next()
+      return listeners.search(listenerline).group(1)
+      break
+  else:
     return "?"
     
 def ListenerCount():
