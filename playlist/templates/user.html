@@ -6,9 +6,17 @@
   <div class="playlist">
   <p><span class="bold">Username:</span> {{owner.username}} </p>
   <p><span class="bold">User status:</span> {{owner.groups.all.0.name}}</p>
+  <p><span class="bold">Comments written:</span> {{numcomments}}</p>
   <p><span class="bold">Number of uploads:</span> {{owner.uploads.count}}</p>
+  <p><span class="bold">Number of dongs added to the playlist:</span> {{useradds}}</p>
+  {% if owner.id == viewer %}
+    <p><span class="bold">Number of times your uploads have been added by others:</span> {{otheradds}}</p>
+  {% else %}
+    <p><span class="bold">Number of times user's uploads have been added by others:</span> {{otheradds}}</p>
+  {% endif %}
   <p><span class="bold">Number of tokens:</span> {{owner.get_profile.tokens}}</p>
-  
+  <p><span class="bold">Average score for uploaded dongs:</span> {{uploadavg}}</p>  
+
   <p>
     <a id="menuitem" href="{% url playlist.views.search %}?query=favourites%3D{{owner.username}}">
       View user's favourites
@@ -32,6 +40,26 @@
       Give token
     </a>
   </p>
+  {% endif %}
+
+  {% if recentadds %}
+  <p>Last ten additions:</p>
+  <ul>
+    {% for add in recentadds %}
+      <li><a href="{% url song add.song.id %}">{{add.song.metadataString}}</a> ({{add.addtime|date:"D jS M Y \a\t g:i:s A"}})</li>
+    {% endfor %}
+  </ul>
+  <p>
+  {% endif %}
+
+  {% if recentuploads %}
+  <p>Last ten uploads:</p>
+  <ul>
+    {% for upload in recentuploads %}
+      <li><a href="{% url song upload.id %}">{{upload.metadataString}}</a> ({{upload.add_date|date:"D jS M Y \a\t g:i:s A"}})</li>
+    {% endfor %}
+  </ul>
+  <p>
   {% endif %}
   
   </div>

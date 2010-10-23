@@ -26,6 +26,7 @@ import random
 from hashlib import md5
 from urllib2 import URLError
 from subprocess import Popen
+from itertools import chain
 import logging
 import simplejson as json
 
@@ -744,13 +745,30 @@ def song(request, songid=0, edit=None):
     path = None
     
   favourite = song in request.user.get_profile().favourites.all()
-    
-    
+
+  # newsomnuke: get add history
+  curadditions = PlaylistEntry.objects.select_related().filter(song__id=songid).order_by("-addtime");
+  prevadditions = OldPlaylistEntry.objects.select_related().filter(song__id=songid).order_by("-addtime")
+
+  addhistory = list(chain(curadditions, prevadditions))
+
+  # get ratings and sort them into ascending order
+  ratings = Rating.objects.select_related().filter(song__id=songid)
+  ratings = sorted(ratings, key=lambda e: e.score)
+
+  ratingsagg = {}
+  for rating in ratings:
+    trate = rating.score
+    if trate in ratingsagg:
+      ratingsagg[trate] += 1
+    else:
+      ratingsagg[trate] = 1
+       
   return render_to_response('song.html', \
   {'song': song, 'editform':editform, 'edit':edit,'commentform':commentform, 
   'currentuser':request.user, 'comments':comments, 'can_ban':can_ban, 
   'banform':banform, 'can_delete':can_delete, 'vote':vote, 'path':path, 
-  'favourite' : favourite}, \
+  'favourite':favourite, 'addhistory':addhistory, 'ratings':ratingsagg}, \
   context_instance=RequestContext(request))
 
 @permission_required("playlist.download_song")
@@ -870,7 +888,37 @@ def user(request, userid):
     owner=  User.objects.get(id=userid)
   except User.DoesNotExist:
     raise Http404
-  return render_to_response("user.html", {'owner':owner, 'token_button':request.user.has_perm("playlist.give_token")}, context_instance=RequestContext(request))
+
+  # newsomnuke: get most recent additions, first from the current playlist, then from the playlist history
+  curadditions = PlaylistEntry.objects.select_related().filter(adder=owner.id).order_by("-addtime")[:10];
+  prevadditions = OldPlaylistEntry.objects.select_related().filter(adder=owner.id).order_by("-addtime")[:10]
+
+  recentadds = list(chain(curadditions, prevadditions))[:10]
+
+#  favouriteadds = Song.objects.select_related().annotate(totaladds = Count('oldentries')).order_by('-totaladds')[0:9]
+
+  # recent uploads
+  recentuploads = Song.objects.select_related().filter(uploader=owner.id).order_by("-add_date")[:10]
+
+  # number of times the user's dongs have been added by other people
+  curotheradds = PlaylistEntry.objects.select_related().filter(song__uploader__id=owner.id).exclude(adder__id=owner.id).count()
+  otheradds = OldPlaylistEntry.objects.select_related().filter(song__uploader__id=owner.id).exclude(adder__id=owner.id).count() + curotheradds
+
+  # number of dongs the user has added to the playlist
+  curuseradds = PlaylistEntry.objects.select_related().filter(adder__id=owner.id).count()
+  useradds = OldPlaylistEntry.objects.select_related().filter(adder__id=owner.id).count() + curuseradds
+
+  # average score for uploaded dongs
+  uploadavg = Song.objects.select_related().filter(uploader=owner.id).exclude(voteno=0).aggregate(Avg('avgscore')).values()[0]
+
+  # number of comments written
+  numcomments = Comment.objects.select_related().filter(user__id=owner.id).count()
+
+  viewer = request.user.id
+  return render_to_response("user.html", \
+  {'owner':owner, 'viewer':viewer, 'numcomments':numcomments, 'uploadavg':uploadavg, 'recentadds':recentadds, 
+  'recentuploads':recentuploads, 'otheradds':otheradds, 'useradds':useradds, 'token_button':request.user.has_perm("playlist.give_token")}, \
+  context_instance=RequestContext(request))
 
 @permission_required("playlist.give_token")
 def give_token(request, userid):
@@ -928,13 +976,67 @@ def upload(request):
         request.user.message_set.create(message="Uploaded file successfully!")
   else:
     form = UploadFileForm()
-  uploads = Song.objects.select_related().filter(uploader=request.user).order_by("-add_date")
-  if len(uploads) > 10: 
-    recentuploads = uploads[:10]
-  else: 
-    recentuploads = uploads
-  return render_to_response('upload.html', {'form': form, 'uploads':recentuploads}, context_instance=RequestContext(request))
 
+
+  return render_to_response('upload.html', {'form': form}, context_instance=RequestContext(request))
+
+# newsomnuke: added for global stats page
+@login_required()
+def globalstats(request):
+
+  # SITE STATS
+  # get total number of dongs in database
+  totaldongs = Song.objects.count()
+
+  # get total number of playlist adds
+  curtotaladds = PlaylistEntry.objects.count()
+  totaladds = OldPlaylistEntry.objects.count() + curtotaladds
+
+  # get total number of unplayed dongs
+  unplayeddongs = Song.objects.select_related().annotate(cnt=Count('oldentries')).exclude(cnt__gt=0).count()
+
+  # get total number of registered users, maybe also 'active' users (added a dong in the last week)
+  totalusers = UserProfile.objects.count()
+
+  # DONG STATS
+  # Get 10 most recent uploads
+  recentuploads = Song.objects.select_related().order_by("-add_date")[:10]
+
+  # Get 10 most popular dongs by playcount.  Technically we should check the current playlist as well as the playlist
+  # history, but this is extra effort for a pretty minor issue, and the global stats page will likely take long enough
+  # to load as it is.
+
+  # this works, but is horrendously slow
+  populardongs = Song.objects.select_related().annotate(totaladds=Count('oldentries')).order_by('-totaladds')[0:9]
+
+  # do it directly with SQL
+#  from django.db import connection
+#  cursor = connection.cursor()
+#  cursor.execute("SELECT COUNT(playlist_oldplaylistentry.song_id), playlist_song.title FROM playlist_oldplaylistentry, playlist_song WHERE (playlist_oldplaylistentry.song_id = playlist_song.id) GROUP BY playlist_oldplaylistentry.song_id ORDER BY count(playlist_oldplaylistentry.song_id) DESC LIMIT 0,10")
+
+  # Get 10 most and least popular dongs by score, which have at least 10 votes
+  votedhidongs = Song.objects.select_related().filter(voteno__gte=10).order_by("-avgscore")[:10]
+  votedlodongs = Song.objects.select_related().filter(voteno__gte=10).order_by("avgscore")[:10]
+
+  # TODO: get dong popularity by most 5s
+#  dongmost5s = Rating.objects.select_related().annotate(fives=
+
+  # TODO: get least popular dong by most 1s
+
+  # ARTIST STATS
+  # TODO: get most popular artist by playlist adds
+  # TODO: get most popular artist by most 5s
+  # TODO: get least popular artist by most 1s
+
+  # USER STATS
+  # TODO: get 10 users with most uploads
+  # TODO: get 10 users with most adds
+  # TODO: get 10 users with most reports/edits
+  
+  return render_to_response('stats.html', \
+  {'recentuploads':recentuploads, 'populardongs':populardongs, 'votedhidongs':votedhidongs, 'votedlodongs':votedlodongs,
+  'totaldongs':totaldongs, 'totaladds':totaladds, 'unplayeddongs':unplayeddongs, 'totalusers':totalusers}, \
+  context_instance=RequestContext(request))
 
 @permission_required('playlist.view_artist')
 def artist(request, artistid=None):

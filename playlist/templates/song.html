@@ -190,6 +190,25 @@
   <td colspan="4">{{ song.banreason }}</td>
 </tr>
 {% endif %}
+
+{% if ratings %}
+<tr> <th class="song" colspan="4">Vote breakdown</th> </tr>
+{% for score, count in ratings.items %}
+  <tr>
+    <td>{{score}}: {{count}}</td>
+  </tr>
+{% endfor %}
+{% endif %}
+
+{% if addhistory %}
+<tr> <th class="song" colspan="4">Add history</th> </tr>
+{% for add in addhistory %}
+  <tr>
+    <td>{{add.id}} - {{add.addtime|date:"D jS M Y \a\t g:i:s A"}} added by {{add.adder.username}}</td>
+  </tr>
+{% endfor %}
+{% endif %}
+
 <tr> <th class="song" colspan="4">Comments</th> </tr>
 <tr>
   <td>{{ currentuser.username }}</td>
