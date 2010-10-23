@@ -257,6 +257,9 @@ def ajax(request):
       now_playing = PlaylistEntry.objects.nowPlaying().song
       if abs(int(position) - cue.getTime(now_playing)) >= tolerance: 
         events.append(('songPosition', cue.getTime(now_playing)))
+
+    # Add the current listener count
+    events.append(('listeners', ListenerCount()))
     
     return HttpResponse(json.dumps(events))
   

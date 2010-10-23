@@ -290,6 +290,9 @@ function eventDispatcher(data) {
   }
 }
  
+function listenersHandler(e, data) {
+    $('#listenersbox').html("listeners: " + data);
+}
  
 //Main AJAX loop: handles all periodic AJAX calls
 function ajaxLoop() {
@@ -319,6 +322,7 @@ $(document).ready(function(){
   $('body').bind('clearComments', clearCommentsHandler);
   $('body').bind('score', scoreHandler);
   $('body').bind('userVote', userVoteHandler);
+  $('body').bind('listeners', listenersHandler);
 
   //loops
   setupSearch();
@@ -366,7 +370,7 @@ $(document).ready(function(){
     {% endif %}
   </ul> 
   <p class="listenersthing">icons from <a href="http://www.famfamfam.com/lab/icons/silk/">famfamfam</a></p> 
-  <p class="listenersthing">listeners: {{listeners}}</p> 
+  <p class="listenersthing" id="listenersbox">listeners: {{listeners}}</p> 
  
 </div> 
  
