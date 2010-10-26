@@ -9,7 +9,7 @@ a.boxed:hover {
 #leftmenu { background:#A1D29D url('g2log3.png') no-repeat center bottom; } /* MENU BG */
 
 #noticearea { background:#A1D29D url('thintop1.png') repeat-x; } /* NOTICE BOX BG */
-#messages { background:rgba(224,242,144,0.5) url('thintop1.png') repeat-x; } /* SONG ADDED MESSAGES ETC BG */
+.messages { background:rgba(224,242,144,0.5) url('thintop1.png') repeat-x; } /* SONG ADDED MESSAGES ETC BG */
 div#progbar { background-color:#000; } /* PROGRESS BAR FILL COLOUR */
 td.votes a { background-color:#FFF; } /* VOTE BOX BG IN PLAYLIST */
 .odd { background-color:#D8E9D6; } /* ODD PLAYLIST ITEM BG */
@@ -150,7 +150,7 @@ a.boxed, #id_query {
   -moz-border-radius:7px 7px 0px 0px;
   -webkit-border-radius:7px 7px 0px 0px; */
 }
-#noticearea, #messages {
+#noticearea, .messages {
   margin:5px 0px 0px 100px;
   border-width:1px 0px;
   border-style:solid;
@@ -170,7 +170,7 @@ a.add {
 }
 
 
-div#maincontainer #noticearea, div#maincontainer #messages {
+div#maincontainer #noticearea, div#maincontainer .messages {
   margin:5px 0px 0px 0px;
 }
 div#maincontainer table#playlisttable {

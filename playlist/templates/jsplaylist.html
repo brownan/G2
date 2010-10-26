@@ -93,7 +93,7 @@ function nowPlayingHandler(e, entryid) {
 }
  
 function metadataHandler(e, metadata) {
-  pltitle = metadata + " - ITng Radio";
+  pltitle = metadata + " - {{ sitetitle }}";
   if ($("title").html() != pltitle) {
     $("title").html(pltitle);
   }

@@ -92,3 +92,7 @@ def SQLLogContextProcessor(request):
   return {'sqllog':connection.queries,'sqlcount':len(connection.queries),'sqltime':time, 'show_queries':show_queries}
 
 
+def siteContext(request):
+  return {'sitetitle': settings.SITE_TITLE,
+      'listenurl': settings.LISTEN_URL,
+      }
