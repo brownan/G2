@@ -162,7 +162,20 @@ function setupComment() {
 * Hide message box
 **/
 function hideMessages() {
-  $("p#messages").fadeOut("slow");
+    $("#messagebox > p.messages").fadeOut("slow");
+}
+
+/**
+ * Adds a new message box, used on ajax callbacks
+ */
+function addMessage(text) {
+    var mbox = $("#messagebox");
+    var newmsg = $('<p>' + text + '</p>');
+    newmsg.addClass("messages");
+    mbox.append(newmsg);
+    setTimeout(function () {
+        newmsg.fadeOut('slow');
+    }, MESSAGES_DELAY);
 }
 
 /**
@@ -276,7 +289,7 @@ function userVoteHandler(e, score) {
 DELAY = 15000; 
  
 //how long messages should show for
-MESSAGES_DELAY = 5000;
+MESSAGES_DELAY = 10000;
  
 //associative array storing args for ajax calls
 //TODO: replace with array of functions to be called to obtain args
@@ -375,11 +388,13 @@ $(document).ready(function(){
 </div> 
  
  
+<div id="messagebox">
 {% if messages %}
   {% for message in messages %}
-    <p id="messages">{{ message }}</p> 
+    <p class="messages">{{ message }}</p> 
   {% endfor %}
 {% endif %}
+</div>
 <!-- {% if debug %}
       <p id="messages"><em>Total query count:</em> {{ sqllog|length }}<br/>
       <em>Total execution time:</em> {{ sqltime }}</p>
