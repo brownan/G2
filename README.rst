@@ -31,7 +31,9 @@ Install these packages, for they are required for a functioning installation
   necessary, the newer ices only streams ogg)
 * A streaming server such as Shoutcast DNAS or Icecast.
 
-to build icecast, you'll also need to install:
+to build icecast, you'll also need to install (ubuntu packages, other distros
+may vary):
+
 * build-essential
 * python-dev
 * libshout-dev
