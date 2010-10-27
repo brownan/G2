@@ -1060,10 +1060,20 @@ def add(request, songid=0):
     raise Http404
   profile = request.user.get_profile()
   oldtokens = profile.tokens
+
+  # is this an ajax request?
+  try:
+    isajax = (request.META['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest")
+    toret = [1]
+  except KeyError:
+    isajax = False
+
   try:
     song.playlistAdd(request.user)
   except AddError, e:
     msg = "Error: %s" % (e.args[0])
+    if isajax:
+      return HttpResponse(json.dumps((0, msg)))
     request.user.message_set.create(message=msg)
     return HttpResponseRedirect(reverse("playlist"))
     
@@ -1072,17 +1082,26 @@ def add(request, songid=0):
         msg = "You already had a dong on the playlist, so you've used up a token to add this one. You have %d left" % (profile.tokens)
       else:
         msg = "You already had a dong on the playlist, so you've used up a token to add this one. That was your last one!"
-      request.user.message_set.create(message=msg)
-  else:
+      if not isajax:
+        request.user.message_set.create(message=msg)
+      else:
+        toret.append(msg)
+  elif not isajax:
     request.user.message_set.create(message="Track added successfully!")   
 
   if song.isOrphan(): 
     song.uploader = request.user
     song.save()
     msg = "This dong was an orphan, so you have automatically adopted it. Take good care of it!"
-    request.user.message_set.create(message=msg)
+    if isajax:
+      toret.append(msg)
+    else:
+      request.user.message_set.create(message=msg)
     
-  return HttpResponseRedirect(reverse("playlist"))
+  if isajax:
+    return HttpResponse(json.dumps(toret))
+  else:
+    return HttpResponseRedirect(reverse("playlist"))
 
 def next(request, authid):
   """Go to the next song in the playlist, and return a string for ices to parse.

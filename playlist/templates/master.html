@@ -232,6 +232,40 @@ function setUserVote(score) {
   $(".playing .votes a[data-vote="+score+"]").addClass("voted");
 }
 
+function setupAdds() {
+  var addbuttons = $("a.add");
+  addbuttons.click(function (e) {
+    // button was clicked
+    e.preventDefault();
+
+    var button = $(this);
+    var parent = button.parent();
+
+    // Get the add url
+    var addurl = button.attr("href");
+
+    // remove the button and put a spinner in its place
+
+    button.remove();
+    var spinner = $("<img alt='adding...' src='images/spinner.gif' />");
+    parent.append(spinner);
+
+    // fire of a call to add the song
+    $.getJSON(addurl, function (data) {
+        // Json event returned from adding a song
+        spinner.remove();
+        if (data[0] == true) {
+          parent.append("(Added)");
+        } else {
+          parent.append(button);
+        }
+        for (i=1; i<data.length; i++) {
+          addMessage(data[i]);
+        }
+      });
+  });
+}
+
 function setupVotes() {
   $("#votebuttonslow > a").click(function () {
     args = {};
@@ -324,6 +358,7 @@ $(document).ready(function(){
   //comment box stuff
   setupComment();
   setupVotes();
+  setupAdds();
   
   //ajax events stuff
   ajax_args['position'] = songPosition;
