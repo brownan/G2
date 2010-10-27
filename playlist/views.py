@@ -1125,8 +1125,9 @@ def next(request, authid):
     new = PlaylistEntry.objects.all()[0]
   except IndexError:
     # No more playlist entires
-    song = Song.objects.get(title="bees.mp3")
-    blame = ""
+    location = os.path.join(settings.LOGIC_DIR, "bees.mp3")
+    metadata = "bees"
+    return HttpResponse(location +'\n'+ metadata)
   else:
     new.playing = True
     new.playtime = datetime.datetime.today()
