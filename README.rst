@@ -290,3 +290,16 @@ FTP Setup
 * Edit FTP_BASE_DIR in settings.py to a writable directory for temporary storage of uploaded files
 * Now run ftp.py. Try running in the background with nohup
 
+Downloading Files
+=================
+If a user has the "playlist.download_song" permission, they will have a link on
+each song page to download the file. This link depends on the webserver
+supporting the ``X-Sendfile`` header. For Apache, get the ``mod_xsendfile``
+module.
+
+For Ubuntu, you can install the libapache2-mod-xsendfile module. Make sure to
+turn it on in the server configuration with ``XSendFile On``. If you get errors
+about the path being above the root, you can bypass the check with
+``XSendFileAllowAbove On``. (This option was removed in favor of
+``XSendFilePath`` in 1.0, but Ubuntu still ships 0.9. See the documentation on
+XSendFile for more info)
