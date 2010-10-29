@@ -145,6 +145,12 @@ later.
   PLAYLIST_MAX
     Set this to the maximum number of songs each user can have in playlist at a time
 
+  PLAYLIST_SOFT_TIME_LIMIT
+    Set this to the maximum number of minutes a user can occupy on the
+    playlist. This is a soft limit, they can add a song that exceeds this
+    limit, but cannot add more songs after that. In other words, if their time
+    on the playlist exceeds this value, they cannot add more songs.
+
   REPLAY_INTERVAL
     Set this to the time until a song can be added again, in hours
 

@@ -139,11 +139,22 @@ class UserProfile(models.Model):
     self.user.save()
       
   def addDisallowed(self, entries=None):
-    #check user hasn't got too many songs on the playlist
+    """Checks if this user is allowed to add a song to the playlist or not.
+    If they're not, returns (reason, shortreason), otherwise, returns None
+    """
     if not entries:
       entries = PlaylistEntry.objects.all()
-    if len(entries.filter(adder=self.user)) >= int(settings.PLAYLIST_MAX):
+
+    entries = entries.filter(adder=self.user)
+
+    # Check number of songs this user has
+    if entries.count() >= int(settings.PLAYLIST_MAX):
       return ("you already have too many songs on the playlist", "user is greedy")
+
+    # Check the length of songs the user has on the playlist
+    pllength = entries.aggregate(pllength=Sum("song__length"))['pllength']
+    if pllength > settings.PLAYLIST_SOFT_TIME_LIMIT * 60:
+      return ("you have to much time on the playlist already", "user is greedy")
     return None
     
   def _getSongInfo(self,  file):
