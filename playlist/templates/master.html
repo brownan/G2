@@ -349,7 +349,7 @@ function ajaxLoop() {
  
 //for stored ajax args
 var ajax_args = {};
-var now_playing = {{now_playing.id}};
+var now_playing = {{now_playing.id|default:"0"}};
 $(document).ready(function(){
   //song position stuff
   setSongLength(songLength);
@@ -362,7 +362,7 @@ $(document).ready(function(){
   
   //ajax events stuff
   ajax_args['position'] = songPosition;
-  ajax_args['last_comment'] = {{last_comment}};
+  ajax_args['last_comment'] = {{last_comment|default:"0"}};
   $('body').bind('songPosition', songPositionHandler);
   $('body').bind('songLength', songLengthHandler);
   $('body').bind('linkedMetadata', linkedMetadataHandler);
