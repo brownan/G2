@@ -234,6 +234,11 @@ Head to the admin site at ``/admin``
   * Can view user pages
   * Can view song pages
 
+  You probably also want these permissions:
+
+  * Can comment on songs
+  * Can rate songs
+
 Adding Users
 ------------
 Currently, adding users is a manual process. I stripped out the original
