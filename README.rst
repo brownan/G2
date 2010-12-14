@@ -170,6 +170,11 @@ later.
   LISTEN_URL
     Set this to the URL that the Listen link should point to.
 
+  DEAD_AIR_TRACK
+    This is an absolute path on the filesysem to an mp3 that will play when
+    otherwise nothing is playing. ``bees.mp3`` is included in the logic
+    directory as a default; set this option to its path.
+
 Other directives, not documented yet
 ------------------------------------
 They're not strictly necessary for a working install, but may do something

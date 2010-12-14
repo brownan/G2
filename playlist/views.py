@@ -1125,7 +1125,7 @@ def next(request, authid):
     new = PlaylistEntry.objects.all()[0]
   except IndexError:
     # No more playlist entires
-    location = os.path.join(settings.LOGIC_DIR, "bees.mp3")
+    location = settings.DEAD_AIR_TRACK
     metadata = "bees"
     return HttpResponse(location +'\n'+ metadata)
   else:
